@@ -7,6 +7,8 @@ void Set_MiniSQL();//初始化数据库
 void Run_MiniSQL();//执行数据库
 void Exit_MiniSQL();//退出数据库
 
+extern M_Buffer Buffer;
+
 int main()
 {
 	Set_MiniSQL();
@@ -24,7 +26,7 @@ void Exit_MiniSQL()
 }
 void Run_MiniSQL()
 {
-	MSG msg = Default;
+	Command_lin msg = Default;
 	while (msg != Quit)
 	{
 		try

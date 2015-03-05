@@ -1,12 +1,16 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
+/*
+	缓存管理器
+*/
+
 //在C++中引用C语言中的函数和变量，在包含C语言头文件时，需进行下列处理：
 extern "C"
 {
-#include <io.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
+	#include <io.h>
+	#include <fcntl.h>
+	#include <stdlib.h>
+	#include <string.h>
 }
 #define FILE_PAGESIZE 4096	// 块 4KB
 #define MEM_PAGENUM	  1000	// 块的数量
@@ -25,7 +29,7 @@ typedef struct
 //文件内存地址
 class F_FileAdd
 {
-public :
+public:
 	unsigned long FilePageID; //页编号
 	unsigned int PageOffset;  //页内偏移量
 	void InitiaFile();		  //初始化（0.0）
@@ -86,5 +90,35 @@ class M_PageInfo
 	unsigned int GetFileID() const;//获得所分配的内存页目前内容所属的文件编号
 	void SetFileID(unsigned int fileID); //设置新的文件编号（抛弃页时设为0）
 	unsigned long GetFilePageID() const;//获得所分配的内存页目前内容在文件中的页编号
+};
+
+//内存页置换算法 ，采用Clock算法
+class M_Clock
+{
+	friend class M_Buffer;
+	friend class M_File;
+private:
+	unsigned int M_ClockSize;//内存中页的总数
+	unsigned int M_UseingPage;//正在使用的内存页
+	M_Clock();//成员初始化
+	~M_Clock();//析构函数
+	void SetPageMod();//设置当前页为脏页
+
+};
+
+/*
+	Buffer模块管理类
+	一个内存页管理，一个文件管理
+*/
+class M_Buffer
+{
+public :
+	void Start();//Buffer初始化
+	void End();//结束
+	unsigned int FileCount;//打开的文件总数
+	M_File * F_First;//第一个文件
+	M_File * F_Last;//最后一个文件
+	M_File * F_Current;//当前使用文件
+	class M_Clock * MemPageClock;//Clock算法的对象
 };
 #endif

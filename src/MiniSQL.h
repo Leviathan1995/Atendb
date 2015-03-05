@@ -1,4 +1,5 @@
-#ifndef _MINISQL_H
-#define _MINISQL_H
+#ifndef _MINISQL_H_
+#define _MINISQL_H_
 #include "Buffer.h"
+#include "Command.h"
 #endif
