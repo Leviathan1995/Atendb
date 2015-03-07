@@ -17,4 +17,14 @@ enum Operator_type
 	Between,//between
 	ALL//and
 };
+enum Command_State
+{
+	Create,
+	Table,
+	Table_Name,
+	Left_Query,
+	Right_Query,
+	Column_Name,
+	Column_type,
+};
 #endif

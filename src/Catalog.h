@@ -1,14 +1,41 @@
 #ifndef _CATALOG_H
 #define _CATALOG_H
+#include <string>
+using namespace std;
+
 /*
-	模式信息.
-	即每张表的定义，每张表每个字段的定义
+	模式信息，即数据表的信息
 */
-//字段类型
-union	Byte_type
+//字段
+struct Column_Type
 {
-	int Intvalue; 
-	char Charvalue[256];
-	float Floatvalue;
+	int ID;
+	string Column_TypeName;//字段名
+	bool IsPrimary;//是不是主键
+	bool IsNull;//是否可以为空
+	int RequestSize;//用户请求的长度
+	int StoredLength;//实际存储长度
+	union Column_ptr
+	{
+		Column_Type * Next;//下一个字段
+	};
+};
+//数据表
+struct Table_Type
+{
+	string Table_Name;//表名
+	int ColumnNum;//数据表具有的字段数目
+	int RecordSize;//记录的长度
+	int PrimaryNum;//多属性主键的个数
+	union Table_ptr
+	{
+		Column_Type * Key;//指向主键的指针
+	};
+
+};
+class Catalog
+{
+public :
+	
 };
 #endif

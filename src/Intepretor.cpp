@@ -1,25 +1,82 @@
 #include "Intepretor.h"
 #include "Glob_Var.h"
+#include "Catalog.h"
 #include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
+void Intepretor::CommandInput()
+{
+	while (true)
+	{
+		string command;
+		while (cin >> command)
+		{
+			//去掉（），;
+			bool End;//用户是否输入完成
+			auto start = command.begin();
+			for (auto i = command.begin(); i != command.end(); i++)
+			{
+				switch (*i)
+				{
+				case'(':
+				case ')':
+				case ';':
+					if (start != i)
+						Input.push_back(string(start, i));
+					start = i;
+					start++;
+					End = true;
+				case ',':
 
-//得到输入的命令
-MSG Getcommand(SQL_Create **)
-{
-	MSG Commandtype = UNORMAL;//初始化为错误的命令
-	
-}
+				default:
+					break;
+				}
+				if (End == true)
+					break;
+			}
+			if (Is_Quit(Input))
+				exit(0);//退出
+			else
+				ParseCommand();
 
-//处理输入字符的类的构造函数，对输入进行处理，产生一个有以字符串的集合
-Deal_Input::Deal_Input()
-{
-	InitiaInput();//初始化输入字符串
-	OutputLink();//产生字符串集合
+		}
+	}
 }
-//初始化输入字符串
-void Deal_Input::InitiaInput()
+void Intepretor::ParseCommand()
 {
-	this->Head = NULL;
-	this->Now = NULL;
-	this->NowDealNumber = 0;
+	if (Is_CreateTable(Input))
+		CreateTable(Input);
+}
+void Intepretor::CreateTable(vector<string>Input)
+{
+	Command_State state = Create;
+	Table_Type table;
+	Column_Type column;
+	for (auto i = Input.begin(); i != Input.end(); i++)
+	{
+		switch (state)
+		{
+		case Create:
+			state = Table; break;
+		case Table:
+			state = Table_Name; break;
+		case Table_Name:
+			state = Left_Query;
+			table.Table_Name = *i;
+			break;
+		case Left_Query:
+			if (*i != "(")
+				throw Error();
+			state = Column_Name;
+			break;
+		case Column_Name:
+			state = Column_type;
+			
+
+
+		default:
+			break;
+		}
+	}
 }
