@@ -28,8 +28,17 @@ enum Command_State
 	Column_type,
 	Char_LeftBrackets,//char的左括号
 	Char_RightBrackets,//char的右括号
-	Unique,
+	Unique,//超码约束
+	Not_Null_not,//禁止空值中的not
+	Not_Null_null,//禁止空值中的null
 	CharSize,//字段中Char属性的大小
+	EndComma,//每个属性结束的逗号
+	PrimaryKey_primary,//Primary Key中的Primary
+	PrimaryKey_key,//Primary Key中的key
+	PrimaryKey_LeftBrackets,//Primary Key的右括号
+	PrimaryKey_RightBrackets,//Primary Key的右括号
+	PrimaryKey_ColumnName,//约束为Primary的字段
+	EndTable,//结束创表
 };
 enum ColType
 {

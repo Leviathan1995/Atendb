@@ -117,10 +117,63 @@ void Intepretor::CreateTable(vector<string>Input)
 		case Char_RightBrackets:
 			if (*i != ")")
 				throw Error();
+			if (*(++i) == "not")
+				state = Not_Null_not;
+			break;
+		case Not_Null_not:
+			if (*i != "not")
+				throw Error();
+			state = Not_Null_null;
+			break;
+		case Not_Null_null:
+			if (*i != "null")
+				throw Error();
+			column.IsNull = true;
+			if (*(++i) == "unique")
+				state = Unique;
 			break;
 		case Unique:
-			if (*i == "unique")
-				column.IsUnique = true;
+			if (*i != "unique")
+				throw Error();
+			column.IsUnique = true;
+			if (*(++i) == ",")
+				state = EndComma;
+			break;
+		case EndComma:
+			if (*i != ",")
+				throw Error();
+			if (*(++i) == "primary")
+				state = PrimaryKey_primary;
+			break;
+		case PrimaryKey_primary:
+			if (*i != "primary")
+				throw Error();
+			state = PrimaryKey_key;
+			break;
+		case PrimaryKey_key:
+			if (*i != "key")
+				throw Error();
+			state = PrimaryKey_LeftBrackets;
+			break;
+		case PrimaryKey_LeftBrackets:
+			if (*i != "(")
+				throw Error();
+			state = PrimaryKey_ColumnName;
+			break;
+		case PrimaryKey_ColumnName:
+			Column_Type columnprimary = table.GetColumn(*i);
+			columnprimary.IsPrimary = true;
+			if (*(++i) == ")")
+				state = PrimaryKey_RightBrackets;
+			else
+				state = PrimaryKey_ColumnName;
+			break;
+		case PrimaryKey_RightBrackets:
+			if (*i != ")")
+				throw Error();
+			if (*(++i) == ";")
+				state=
+			break;
 		default:
 			break;
 		}

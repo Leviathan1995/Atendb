@@ -8,8 +8,9 @@ using namespace std;
 	模式信息，即数据表的信息
 */
 //字段
-struct Column_Type
+class Column_Type
 {
+public:
 	int ID;
 	string Column_TypeName;//字段名
 	ColType coltype;//字段属性
@@ -24,8 +25,9 @@ struct Column_Type
 	};
 };
 //数据表
-struct Table_Type
+class Table_Type
 {
+public:
 	string Table_Name;//表名
 	int ColumnNum;//数据表具有的字段数目
 	int RecordSize;//记录的长度
@@ -34,6 +36,7 @@ struct Table_Type
 	{
 		Column_Type * Key;//指向主键的指针
 	};
+	Column_Type GetColumn(string name);//通过字段的名字获得字段
 
 };
 class Catalog
