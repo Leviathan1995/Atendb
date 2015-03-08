@@ -21,5 +21,7 @@ public:
 	bool Is_Quit(vector<string> Input);//是Quit命令
 	void CreateTable(vector<string >Input);//CreateTable命令解析
 	vector<string> Input;//用户输入的命令
+	ColType Trasn2type(string type);//将string转换为类型
+	int String2Int(string s);//将string 转换为int
 };
 #endif 

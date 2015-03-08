@@ -1,5 +1,6 @@
 #ifndef _CATALOG_H
 #define _CATALOG_H
+#include "Glob_Var.h"
 #include <string>
 using namespace std;
 
@@ -11,6 +12,7 @@ struct Column_Type
 {
 	int ID;
 	string Column_TypeName;//字段名
+	ColType coltype;//字段属性
 	bool IsPrimary;//是不是主键
 	bool IsNull;//是否可以为空
 	int RequestSize;//用户请求的长度

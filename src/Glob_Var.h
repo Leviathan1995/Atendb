@@ -26,5 +26,15 @@ enum Command_State
 	Right_Query,
 	Column_Name,
 	Column_type,
+	Char_LeftBrackets,//char的左括号
+	Char_RightBrackets,//char的右括号
+	Unique,
+	CharSize,//字段中Char属性的大小
+};
+enum ColType
+{
+	Int,
+	Char,
+	Float,
 };
 #endif
