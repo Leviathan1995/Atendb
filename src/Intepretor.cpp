@@ -118,6 +118,9 @@ void Intepretor::CreateTable(vector<string>Input)
 			if (*i != ")")
 				throw Error();
 			break;
+		case Unique:
+			if (*i == "unique")
+				column.IsUnique = true;
 		default:
 			break;
 		}

@@ -15,6 +15,7 @@ struct Column_Type
 	ColType coltype;//字段属性
 	bool IsPrimary;//是不是主键
 	bool IsNull;//是否可以为空
+	bool IsUnique;//是否为Unique
 	int RequestSize;//用户请求的长度
 	int StoredLength;//实际存储长度
 	union Column_ptr
