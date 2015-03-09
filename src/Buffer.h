@@ -12,8 +12,8 @@ extern "C"
 	#include <stdlib.h>
 	#include <string.h>
 }
-#define FILE_PAGESIZE 4096	// 块 4KB
-#define MEM_PAGENUM	  1000	// 块的数量
+#define Block_Size 4096	// 块 4KB
+#define Bolck_Num	  1000	// 块的数量
 #ifndef MAX_FILESIZE
 #define MAX_FILESIZE   256	// 文件的最大长度
 #endif

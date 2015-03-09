@@ -29,6 +29,7 @@ public:
 class Table_Type
 {
 public:
+	Table_Type();//创建数据表
 	vector<Column_Type> Table_Column;//数据表中的属性
 	string Table_Name;//表名
 	int ColumnNum;//数据表具有的字段数目
