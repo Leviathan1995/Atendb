@@ -77,6 +77,7 @@ void Intepretor::CreateTable(vector<string>Input)
 	Command_State state = Create;
 	Table_Type table;
 	Column_Type column;
+	Column_Type columnprimary;//primary key 约束需要的字段名变量
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (state)
@@ -137,13 +138,11 @@ void Intepretor::CreateTable(vector<string>Input)
 				throw Error();
 			column.IsUnique = true;
 			if (*(++i) == ",")
-				state = EndComma;
+				state = ColumnEndComma;
 			break;
-		case EndComma:
-			if (*i != ",")
-				throw Error();
-			if (*(++i) == "primary")
-				state = PrimaryKey_primary;
+		case ColumnEndComma:
+			state = Column_Name;
+			table.InsertColumn(column);
 			break;
 		case PrimaryKey_primary:
 			if (*i != "primary")
@@ -161,18 +160,29 @@ void Intepretor::CreateTable(vector<string>Input)
 			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_ColumnName:
-			Column_Type columnprimary = table.GetColumn(*i);
+			columnprimary = table.GetColumn(*i);
 			columnprimary.IsPrimary = true;
 			if (*(++i) == ")")
 				state = PrimaryKey_RightBrackets;
-			else
-				state = PrimaryKey_ColumnName;
+			if (*(++i) == ",")
+				state = PrimaryKey_Comma;
+			break;
+		case PrimaryKey_Comma:
+			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_RightBrackets:
 			if (*i != ")")
 				throw Error();
 			if (*(++i) == ";")
-				state=
+				state = EndPrimaryKey;
+			break;
+		case EndPrimaryKey:
+			if (*(++i) == ")")
+				state = Right_Query;
+			else
+				throw Error();
+			break;
+		case Right_Query:
 			break;
 		default:
 			break;

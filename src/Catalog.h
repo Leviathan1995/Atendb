@@ -2,6 +2,7 @@
 #define _CATALOG_H
 #include "Glob_Var.h"
 #include <string>
+#include <vector>
 using namespace std;
 
 /*
@@ -28,6 +29,7 @@ public:
 class Table_Type
 {
 public:
+	vector<Column_Type> Table_Column;//数据表中的属性
 	string Table_Name;//表名
 	int ColumnNum;//数据表具有的字段数目
 	int RecordSize;//记录的长度
@@ -37,6 +39,7 @@ public:
 		Column_Type * Key;//指向主键的指针
 	};
 	Column_Type GetColumn(string name);//通过字段的名字获得字段
+	void InsertColumn(Column_Type column);//数据表插入属性
 
 };
 class Catalog
