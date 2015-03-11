@@ -1,6 +1,7 @@
 #ifndef _RECORD_MANAGER_H
 #define _RECORD_MANAGER_H
 #include "Catalog.h"
+#include "Buffer.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -16,6 +17,6 @@ using namespace std;
 class Record_Manager
 {
 public:
-	bool CreateTable(string tablename, vector<Column_Type>& Table_Column);
+	bool CreateTable(string tablename, vector<Column_Type>& Table_Column);//½¨±í
 };
 #endif

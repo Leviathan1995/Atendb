@@ -19,9 +19,11 @@ public:
 	~Buffer_Manager();
 	Buffer_Manager & Instance();//缓冲管理器实例化
 	int  Write(string & FileName, string & Content, int BolckNum = -1);
+	bool Write2Block(string& fileName,int blockNum,string& content);
 	bool InBuffer(string FileName, int BlockNum);//检测在不在缓冲区中
 	map<string, B_Block*> MemBlock_Map;//记录使用的块
 	list<B_Block *> MemBlock_Used;//已经使用过的块
+	bool Built_NewBlock(string FileName,int BlockNum,string & str);//建立新的块
 	bool File2Block(string& fileName, int blockNum, string& strOut);
 	bool IsFull();
 	bool Replace(string& FileName,int blockNum,string& content);//替换算法
@@ -49,10 +51,10 @@ public:
 	{
 	public:
 		static bool Read(string & FileName, int Block_Num, char *& Dst);
-		bool Write(B_Block *Current);
-		bool Write(string &FileName, string &Content, int & Num);
-		void CreateFile(string FileName);
-		bool File_NotIn();//文件已经被创建
+		static bool Write(B_Block *Current);
+		static bool Write(string &FileName, string &Content, int & Num);
+		static void CreateFile(string FileName);
+		static bool File_NotIn();//文件已经被创建
 
 	};
 };

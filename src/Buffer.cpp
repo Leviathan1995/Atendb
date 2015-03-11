@@ -1,6 +1,7 @@
 #include "Buffer.h"
 #include <fstream>
 #include <sstream>
+#include <assert.h>
 using namespace std;
 /*
 	缓冲区管理器
@@ -12,16 +13,29 @@ int Buffer_Manager::Write(string & FileName,string & Content,int BlockNum)
 	{
 		if (InBuffer(FileName, BlockNum) == false)//如果不在Buffer中，就把文件对应的块写入Buffer
 			File2Block(FileName, BlockNum, Nouse);
-		Write2Blcok(FileName, BlockNum, Content);
+		Write2Block(FileName, BlockNum, Content);
 		return BlockNum;
 	}
 	else
 	{
 		int num;
-		File::Write(FileName, Content, num);
-		File2Bolck(FileName, num, Nouse);
+		B_File::Write(FileName, Content, num);
+		File2Block(FileName, num, Nouse);
 		return num;
 	}
+}
+
+//写入块中
+bool Buffer_Manager::Write2Block(string & FileName, int Blocknum, string & Content)
+{
+	assert(InBuffer(FileName, Blocknum) == true);
+	string key = B_Block::GetKey();
+	if (MemBlock_Map[key]->Content != Content)
+	{
+		MemBlock_Map[key]->Content = Content;
+		MemBlock_Map[key]->Blcok_Ditry = true;
+	}
+	return true;
 }
 /*
 	文件是否在缓冲区中
@@ -74,7 +88,7 @@ bool Buffer_Manager::File2Block(string& fileName, int blockNum, string& Strout)
 		if (IsFull())
 			Replace(fileName, blockNum, Strout);
 		else
-			Built_NewBlock();//否则建一个新的块
+			Built_NewBlock(fileName, blockNum, Strout);//否则建一个新的块
 		delete[] Empty;
 		return true;
 	}
@@ -83,6 +97,11 @@ bool Buffer_Manager::File2Block(string& fileName, int blockNum, string& Strout)
 bool Buffer_Manager::IsFull()
 {
 	return MemBlock_Used.size() == Block_Size;
+}
+//建立新的块
+bool Buffer_Manager::Built_NewBlock(string FileName, int BlockNum, string &strOut)
+{
+
 }
 //文件写入
 bool Buffer_Manager::B_File::Write(B_Block * cur)
