@@ -17,9 +17,11 @@ class Intepretor
 public:
 	void CommandInput();//输入命令
 	void ParseCommand();//解析命令
-	bool Is_CreateTable(vector<string> Input);//是CreateTable命令
+	bool Is_CreateTable(vector<string> Input);//是否为CreateTable命令
+	bool Is_Select(vector<string> Input);//是否为Select命令
 	bool Is_Quit(vector<string> Input);//是Quit命令
-	void CreateTable(vector<string >Input);//CreateTable命令解析
+	void CreateTable_command(vector<string >Input);//CreateTable命令解析
+	void Select_command(vector<string> Input);//Select命令解析
 	vector<string> Input;//用户输入的命令
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int

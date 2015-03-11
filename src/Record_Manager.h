@@ -18,5 +18,8 @@ class Record_Manager
 {
 public:
 	bool CreateTable(string tablename, vector<Column_Type>& Table_Column);//建表
+	void PrintHead();//打印记录的头部
+	void Print();//打印记录
+	void PrintEnd();//打印记录的尾部
 };
 #endif

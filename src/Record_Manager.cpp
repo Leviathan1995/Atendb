@@ -15,3 +15,4 @@ bool Record_Manager::CreateTable(string tablename, vector<Column_Type>&Table_Col
 		Offset += tuple_size;
 	}
 }
+void Record_Manager::PrintHead()

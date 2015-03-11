@@ -69,10 +69,19 @@ void Intepretor::CommandInput()
 void Intepretor::ParseCommand()
 {
 	if (Is_CreateTable(Input))
-		CreateTable(Input);
+		CreateTable_command(Input);
+	if (Is_Select(Input))
+		Select_command(Input);
+}
+bool Intepretor::Is_CreateTable(vector<string> input)
+{
+	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
+		return true;
+	else
+		return false;
 }
 //创建数据表
-void Intepretor::CreateTable(vector<string>Input)
+void Intepretor::CreateTable_command(vector<string>Input)
 {
 	Command_State state = Create;
 	Table_Type table;
@@ -188,4 +197,9 @@ void Intepretor::CreateTable(vector<string>Input)
 			break;
 		}
 	}
+}
+//选择 命令
+void Intepretor::Select_command(vector<string> Input)
+{
+
 }
