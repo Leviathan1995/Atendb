@@ -25,5 +25,15 @@ public:
 	vector<string> Input;//用户输入的命令
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
+	struct WhereList
+	{
+		string Attribute;
+		Operator_type Op;
+		union 
+		{
+			char StrValue[100];
+			int IntValue;
+		};
+	};
 };
 #endif 
