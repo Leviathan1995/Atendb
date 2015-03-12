@@ -41,6 +41,11 @@ enum Command_State
 	PrimaryKey_ColumnName,//约束为Primary的字段
 	EndPrimaryKey,//Primary key约束结束的分号
 	EndTable,//结束创表
+	Select,//选择
+	SelList,//选择的列表
+	From,//select from 中的from
+	FromList,//Select中From的列表
+	Where,//Select中Where
 };
 enum ColType
 {

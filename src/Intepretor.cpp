@@ -201,5 +201,43 @@ void Intepretor::CreateTable_command(vector<string>Input)
 //—°‘Ò √¸¡Ó
 void Intepretor::Select_command(vector<string> Input)
 {
-
+	Command_State State = Select;
+	string Attribute[100]; int j = 0;
+	string FromLists[100]; int k = 0;
+	for (auto i = Input.begin(); i != Input.end(); i++)
+	{
+		switch (State)
+		{
+		case Select:
+			State = SelList;
+			break;
+		case SelList:
+			Attribute[j] = *i;
+			j++;
+			if (*(++i) == "from")
+				State = From;
+			if (*(++i) == ",")
+				State = SelList;
+			if (*(++i) == "from")
+				State = From;
+			break;
+		case From:
+			if (*i != "from")
+				throw Error();
+			State = FromList;
+			break;
+		case FromList:
+			FromLists[k] = *i;
+			k++;
+			if (*(++i) == ",")
+				State = FromList;
+			if (*(++i) == "where")
+				State = Where;
+			break;
+		case Where:
+			
+		default:
+			break;
+		}
+	}
 }
