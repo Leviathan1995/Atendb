@@ -25,15 +25,24 @@ public:
 	vector<string> Input;//用户输入的命令
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
-	struct WhereList
+	const char * String2Char(string s);//将string 转换为 char *
+	struct WhereList//Select 中的where
 	{
 		string Attribute;
-		Operator_type Op;
+		string Where_Operator;
 		union 
 		{
-			char StrValue[100];
+			const char *StrValue;
 			int IntValue;
 		};
 	};
+};
+class Selection
+{
+public:
+	Selection();
+	Selection();
+	vector<record> Mem_Record;
+	Table_Type Mem_Table;
 };
 #endif 

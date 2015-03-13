@@ -46,6 +46,8 @@ enum Command_State
 	From,//select from 中的from
 	FromList,//Select中From的列表
 	Where,//Select中Where
+	And ,//Select中的where中And
+	EndSelect,//Select中的End
 };
 enum ColType
 {

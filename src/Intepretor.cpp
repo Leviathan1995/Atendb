@@ -21,9 +21,16 @@ ColType Intepretor::Trasn2type(string type)
 			如果不属于这三种类型，需要抛出一个错误得救
 	*/
 }
+//将String 转为Int
 int Intepretor::String2Int(string s)
 {
 	int n = atoi(s.c_str());
+	return n;
+}
+//将String 转为 Char *
+const char * Intepretor::String2Char(string  s)
+{
+	const char *n = s.c_str();
 	return n;
 }
 //获得输入的命令
@@ -198,12 +205,13 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		}
 	}
 }
-//选择 命令
+//选择Select命令
 void Intepretor::Select_command(vector<string> Input)
 {
 	Command_State State = Select;
 	string Attribute[100]; int j = 0;
 	string FromLists[100]; int k = 0;
+	WhereList WhereLists[100];
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (State)
@@ -235,7 +243,24 @@ void Intepretor::Select_command(vector<string> Input)
 				State = Where;
 			break;
 		case Where:
-			
+			WhereLists->Attribute = *i;//字段名
+			i++;
+			WhereLists->Where_Operator = *i;//运算符
+			i++;
+			if (*i == "'")
+				WhereLists->StrValue = String2Char(*(++i));
+			else
+				WhereLists->IntValue = String2Int(*(++i));
+			if (*i == "and")
+				State = And;
+			if (*i == ";")
+				State = EndSelect;
+			break;
+		case And:
+			State = Where;
+			break;
+		case EndSelect:
+			break;
 		default:
 			break;
 		}
