@@ -3,6 +3,7 @@
 #include "Glob_Var.h"
 #include <string>
 #include <vector>
+#include <map>
 using namespace std;
 
 /*
@@ -46,6 +47,7 @@ public:
 class Catalog
 {
 public :
-	
+	map<string, Table_Type> Mem_Table;
+	Table_Type & Get_Table(string name);
 };
 #endif

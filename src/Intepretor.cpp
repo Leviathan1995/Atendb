@@ -80,6 +80,7 @@ void Intepretor::ParseCommand()
 	if (Is_Select(Input))
 		Select_command(Input);
 }
+//是否为创建数据表命令
 bool Intepretor::Is_CreateTable(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
@@ -265,4 +266,9 @@ void Intepretor::Select_command(vector<string> Input)
 			break;
 		}
 	}
+}
+//选择命令接口的构造函数
+Selection::Selection()
+{
+
 }

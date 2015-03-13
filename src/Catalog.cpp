@@ -9,3 +9,9 @@ void Table_Type::InsertColumn(Column_Type column)
 	}
 	Table_Column.push_back(column);
 }
+Table_Type & Catalog::Get_Table(string table_name)
+{
+	if (Mem_Table.find(table_name) == Mem_Table.end())
+		throw Error();
+	return Mem_Table[table_name];
+}

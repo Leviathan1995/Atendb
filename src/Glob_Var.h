@@ -9,13 +9,12 @@ enum MSG {
 };
 enum Operator_type
 {
-	B,//>
-	BE,//>=
-	L,//<
-	LE,//<=
-	NE,//!=
-	Between,//between
-	ALL//and
+	LESS_THAN,
+	EQUAL,
+	MORE_THAN,
+	MORE_AND_EQUAL,
+	LESS_AND_EQUAL,
+	NOT_EQUAL
 };
 enum Command_State
 {

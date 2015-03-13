@@ -3,6 +3,7 @@
 #include <string>
 #include "Catalog.h"
 #include "Glob_Var.h"
+#include "Record.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -37,12 +38,12 @@ public:
 		};
 	};
 };
+//Select ÃüÁîµÄ½Ó¿Ú
 class Selection
 {
 public:
 	Selection();
-	Selection();
-	vector<record> Mem_Record;
+	vector<Record> Mem_Record;
 	Table_Type Mem_Table;
 };
 #endif 

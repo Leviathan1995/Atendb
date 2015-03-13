@@ -27,8 +27,11 @@ public:
 	InputLink *Now;//正在处理的输入字串
 	int NowDealNumber;//正在处理的字符串的序号
 
-
 };
-
-MSG GetCommand(SQL_Create **);//得到输入的命令
+class API
+{
+public:
+	Catalog * Mem_Catalog;
+	Selection Select(string table_name, vector<Comparison>);//选择命令
+};
 #endif
