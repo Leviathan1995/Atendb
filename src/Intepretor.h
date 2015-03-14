@@ -38,12 +38,17 @@ public:
 		};
 	};
 };
+
 //Select 命令的接口
 class Selection
 {
 public:
-	Selection();
+	vector<string> SelLists;//即选择的属性
+	vector<string> TableLists;
+	Selection(string *Sel,string *table);
+	void Print_SelectHead();//打印Select的属性头
 	vector<Record> Mem_Record;
+	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
 	Table_Type Mem_Table;
 };
 #endif 

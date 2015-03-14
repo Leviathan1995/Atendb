@@ -58,7 +58,7 @@ public:
 
 	};
 };
-
+//缓冲管理区的实例化
 inline Buffer_Manager & Buffer_Manager::Instance()
 {
 	Buffer_Manager Buffer_Instance;

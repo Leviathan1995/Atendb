@@ -31,7 +31,7 @@ public:
 class API
 {
 public:
-	Catalog * Mem_Catalog;
+	Catalog * Mem_Catalog;//实例化的数据表信息
 	Selection Select(string table_name, vector<Comparison>);//选择命令
 };
 #endif

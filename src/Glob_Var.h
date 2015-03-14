@@ -48,6 +48,7 @@ enum Command_State
 	And ,//Select中的where中And
 	EndSelect,//Select中的End
 };
+//字段属性
 enum ColType
 {
 	Int,

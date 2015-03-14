@@ -210,8 +210,8 @@ void Intepretor::CreateTable_command(vector<string>Input)
 void Intepretor::Select_command(vector<string> Input)
 {
 	Command_State State = Select;
-	string Attribute[100]; int j = 0;
-	string FromLists[100]; int k = 0;
+	string Attribute[100] = {"$"}; int j = 0;//选择的属性
+	string FromLists[100] = {"$"}; int k = 0;//选择的数据表
 	WhereList WhereLists[100];
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
@@ -221,6 +221,11 @@ void Intepretor::Select_command(vector<string> Input)
 			State = SelList;
 			break;
 		case SelList:
+			if (*i == "*")
+			{
+				Attribute[j] = "All";//如果是* 即选择所有的属性
+				break;
+			}
 			Attribute[j] = *i;
 			j++;
 			if (*(++i) == "from")
@@ -261,14 +266,37 @@ void Intepretor::Select_command(vector<string> Input)
 			State = Where;
 			break;
 		case EndSelect:
+			
+
 			break;
 		default:
-			break;
+			break; 
 		}
 	}
 }
-//选择命令接口的构造函数
-Selection::Selection()
+/*
+	选择命令接口的构造函数
+	Select 为遍历查找
+*/
+Selection::Selection(string *Sel, string *table)
 {
-
+	int i = 0;
+	while (Sel[i]!="$")
+	{
+		SelLists.push_back(Sel[i]);
+		i++;
+	}
+	i = 0;
+	while (table[i] != "$")
+	{
+		TableLists.push_back(table[i]);
+		i++;
+	}
+}
+//打印Select的属性头
+void Selection::Print_SelectHead()
+{
+	/*
+		只打印Selection中的vector<string> SelLists;
+	*/
 }

@@ -44,6 +44,7 @@ public:
 	void InsertColumn(Column_Type column);//数据表插入属性
 
 };
+//数据库中的数据表实例类
 class Catalog
 {
 public :
