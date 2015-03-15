@@ -13,6 +13,17 @@ using namespace std;
 	主函数使用。而对不符合格式要求的语句，输出错误信息，供用
 	户参考。
 */
+
+struct WhereList//Select 中的where
+{
+	string Attribute;
+	string Where_Operator;
+	union
+	{
+		const char *StrValue;
+		int IntValue;
+	};
+};
 class Intepretor
 {
 public:
@@ -27,25 +38,18 @@ public:
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
 	const char * String2Char(string s);//将string 转换为 char *
-	struct WhereList//Select 中的where
-	{
-		string Attribute;
-		string Where_Operator;
-		union 
-		{
-			const char *StrValue;
-			int IntValue;
-		};
-	};
+	
 };
 
 //Select 命令的接口
 class Selection
 {
+	friend class Intepretor;
 public:
 	vector<string> SelLists;//即选择的属性
-	vector<string> TableLists;
-	Selection(string *Sel,string *table);
+	vector<string> TableLists;//select 中from的列表
+	vector<WhereList> WhereLists;//slect 中where部分
+	Selection(string *Sel,string *table,WhereList *& wherelist,int wherenum);//获取用户输入的属性和数据表和where部分
 	void Print_SelectHead();//打印Select的属性头
 	vector<Record> Mem_Record;
 	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组

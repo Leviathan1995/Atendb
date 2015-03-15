@@ -212,7 +212,7 @@ void Intepretor::Select_command(vector<string> Input)
 	Command_State State = Select;
 	string Attribute[100] = {"$"}; int j = 0;//选择的属性
 	string FromLists[100] = {"$"}; int k = 0;//选择的数据表
-	WhereList WhereLists[100];
+	WhereList WhereLists[100]; int w = 0;//where
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (State)
@@ -249,14 +249,14 @@ void Intepretor::Select_command(vector<string> Input)
 				State = Where;
 			break;
 		case Where:
-			WhereLists->Attribute = *i;//字段名
+			WhereLists[w].Attribute = *i;
 			i++;
-			WhereLists->Where_Operator = *i;//运算符
+			WhereLists[w].Where_Operator = *i;//运算符
 			i++;
 			if (*i == "'")
-				WhereLists->StrValue = String2Char(*(++i));
+				WhereLists[w].StrValue = String2Char(*(++i));
 			else
-				WhereLists->IntValue = String2Int(*(++i));
+				WhereLists[w].IntValue = String2Int(*(++i));
 			if (*i == "and")
 				State = And;
 			if (*i == ";")
@@ -278,7 +278,7 @@ void Intepretor::Select_command(vector<string> Input)
 	选择命令接口的构造函数
 	Select 为遍历查找
 */
-Selection::Selection(string *Sel, string *table)
+Selection::Selection(string *Sel, string *table,WhereList *& wherelist,int wherenum)
 {
 	int i = 0;
 	while (Sel[i]!="$")
@@ -292,6 +292,8 @@ Selection::Selection(string *Sel, string *table)
 		TableLists.push_back(table[i]);
 		i++;
 	}
+	for (i = 0; i < wherenum; i++)
+		WhereLists.push_back(wherelist[i]);
 }
 //打印Select的属性头
 void Selection::Print_SelectHead()
