@@ -49,14 +49,28 @@ class Selection
 	friend class Intepretor;
 public:
 
-	vector<string> SelLists;//即选择的属性
-	vector<string> TableLists;//select 中from的数据表列表
-	vector<WhereList> WhereLists;//slect 中where部分
-	Selection(string *Sel,string *table,WhereList *& wherelist,int wherenum);//获取用户输入的属性和数据表和where部分
+	static vector<string> SelLists;//即选择的属性
+	static vector<string> TableLists;//select 中from的数据表列表
+	static vector<WhereList> WhereLists;//slect 中where部分
+	static void SelectionInput(string *Sel,string *table,WhereList *& wherelist,int wherenum);//获取用户输入的属性和数据表和where部分
 	void Selection_Parse();//解析用户输入的Select命令
 	void Print_SelectHead();//打印Select的属性头
 	vector<Record> Mem_Record;
 	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
 	Table_Type Mem_Table;
+};
+//Insert_into 中的values的结构体
+struct Insert_IntoStruct
+{
+	ColType Valuetype;
+	string CharValues;
+	int  IntValues;
+};
+class Insert_Into
+{
+	friend class Intepretor;
+public:
+	vector<Insert_IntoStruct> InsertIntoValues;//Insert into values 中的values的集合
+	void Insert_IntoParse();//insert into 命令解析
 };
 #endif 

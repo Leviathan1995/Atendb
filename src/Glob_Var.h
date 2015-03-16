@@ -52,7 +52,10 @@ enum Command_State
 	Into,//Insert into中的 Into
 	InsertTable,//Insert into 的数据表
 	Insert_Value,//Insert into values 的values
-	Insert_Rightbracket,//Insert into values 的左括号
+	Insert_Rightbracket,//Insert into values 的右括号
+	Insert_Leftbracket,//Insert into values 的左括号
+	Insert_Values,//Insert into values 的values值
+	EndInsert,//insert into values的end
 };
 //字段属性
 enum ColType

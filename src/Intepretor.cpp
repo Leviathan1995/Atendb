@@ -278,7 +278,7 @@ void Intepretor::Select_command(vector<string> Input)
 			State = Where;
 			break;
 		case EndSelect:
-			
+			Selection::Selection();
 
 			break;
 		default:
@@ -287,7 +287,7 @@ void Intepretor::Select_command(vector<string> Input)
 	}
 }
 //获取用户的输入
-Selection::Selection(string *Sel, string *table,WhereList *& wherelist,int wherenum)
+void Selection::SelectionInput(string *Sel, string *table,WhereList *& wherelist,int wherenum)
 {
 	int i = 0;
 	while (Sel[i]!="$")
@@ -345,10 +345,11 @@ void Selection::Print_SelectHead()
 /*
 	Insert_into 命令解析
 */
-void Insert_command(vector<string> input)
+void Intepretor::Insert_command(vector<string> input)
 {
-	Command_State state = Insert;
-	string Inserttable;
+	Insert_IntoStruct insertintovalues;
+	Command_State state = Insert;//插入状态
+	string Inserttable;//插入的数据表
 	for (auto i = input.begin(); i != input.end(); i++)
 	{
 		switch (state)
@@ -364,12 +365,36 @@ void Insert_command(vector<string> input)
 			Inserttable = *i;
 			break;
 		case Insert_Value:
-			state = Insert_Rightbracket;
+			state = Insert_Leftbracket;
 			break;
-		case Insert_Rightbracket:
+		case Insert_Leftbracket:
 			if (*i != "(")
 				throw Error();
-			state
+			state = Insert_Values;
+			break;
+		case Insert_Values:
+			if (*i == "'")
+			{
+				i++;
+				insertintovalues.CharValues = *i;
+			}
+			else
+				insertintovalues.IntValues = String2Int(*i);
+			if (*(++i) == ",")
+				state = Insert_Values;
+			if (*(i) == ")")
+				state = Insert_Rightbracket;
+			else
+				throw Error();
+			break;
+		case Insert_Rightbracket:
+			if (*i == ";")
+				state = EndInsert;
+			else
+				throw Error();
+			break;
+		case EndInsert:
+			break;
 
 		}
 	}
