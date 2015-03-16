@@ -79,11 +79,20 @@ void Intepretor::ParseCommand()
 		CreateTable_command(Input);
 	if (Is_Select(Input))
 		Select_command(Input);
+	if (Is_Insert(Input))
+		Insert_command(Input);
 }
 //是否为创建数据表命令
 bool Intepretor::Is_CreateTable(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
+		return true;
+	else
+		return false;
+}
+bool Intepretor::Is_Select(vector<string> input)
+{
+	if (input.size() >= 2 && input[0] == "insert"&&input[1] == "into")
 		return true;
 	else
 		return false;
@@ -206,6 +215,9 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		}
 	}
 }
+/*
+	选择命令接口的构造函数
+*/
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)
 {
@@ -274,10 +286,7 @@ void Intepretor::Select_command(vector<string> Input)
 		}
 	}
 }
-/*
-	选择命令接口的构造函数
-	Select 为遍历查找
-*/
+//获取用户的输入
 Selection::Selection(string *Sel, string *table,WhereList *& wherelist,int wherenum)
 {
 	int i = 0;
@@ -295,10 +304,73 @@ Selection::Selection(string *Sel, string *table,WhereList *& wherelist,int where
 	for (i = 0; i < wherenum; i++)
 		WhereLists.push_back(wherelist[i]);
 }
+//解析Select命令
+void Selection::Selection_Parse()
+{
+	Table_Type SelectTable;
+	while (!TableLists.empty())
+	{
+		SelectTable = Catalog::Get_Table(TableLists.front());
+		while (!SelLists.empty())
+		{
+			Column_Type SelectColumn;
+			SelectColumn = SelLists.front();
+			switch (Operator_type)
+			{
+			case LESS_THAN:
+				break;
+			case EQUAL:
+				break;
+			case MORE_THAN:
+				break;
+			case MORE_AND_EQUAL:
+				break;
+			case LESS_AND_EQUAL:
+				break;
+			case NOT_EQUAL:
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
 //打印Select的属性头
 void Selection::Print_SelectHead()
 {
 	/*
 		只打印Selection中的vector<string> SelLists;
 	*/
+}
+/*
+	Insert_into 命令解析
+*/
+void Insert_command(vector<string> input)
+{
+	Command_State state = Insert;
+	string Inserttable;
+	for (auto i = input.begin(); i != input.end(); i++)
+	{
+		switch (state)
+		{
+		case Insert:
+			state = Into;
+			break;
+		case Into:
+			state = InsertTable;
+			break;
+		case InsertTable:
+			state = Insert_Value;
+			Inserttable = *i;
+			break;
+		case Insert_Value:
+			state = Insert_Rightbracket;
+			break;
+		case Insert_Rightbracket:
+			if (*i != "(")
+				throw Error();
+			state
+
+		}
+	}
 }

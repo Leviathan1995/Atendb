@@ -31,7 +31,7 @@ class Table_Type
 {
 public:
 	Table_Type();//创建数据表
-	vector<Column_Type> Table_Column;//数据表中的属性
+	vector<Column_Type> Table_Column;//数据表中的元组存放的地方
 	string Table_Name;//表名
 	int ColumnNum;//数据表具有的字段数目
 	int RecordSize;//记录的长度
@@ -48,7 +48,8 @@ public:
 class Catalog
 {
 public :
-	map<string, Table_Type> Mem_Table;
-	Table_Type & Get_Table(string name);
+	static map<string, Table_Type> Mem_Table;
+	static Table_Type & Get_Table(string tablename);
+	static Column_Type & Get_Column(string columnname);
 };
 #endif

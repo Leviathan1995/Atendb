@@ -9,12 +9,13 @@ enum MSG {
 };
 enum Operator_type
 {
-	LESS_THAN,
-	EQUAL,
-	MORE_THAN,
-	MORE_AND_EQUAL,
-	LESS_AND_EQUAL,
-	NOT_EQUAL
+	LESS_THAN,//<
+	EQUAL,//=
+	MORE_THAN,//>
+	MORE_AND_EQUAL,//>=
+	LESS_AND_EQUAL,//<=
+	NOT_EQUAL,//!=  另 where子句不能使用！=运算符
+
 };
 enum Command_State
 {
@@ -47,6 +48,11 @@ enum Command_State
 	Where,//Select中Where
 	And ,//Select中的where中And
 	EndSelect,//Select中的End
+	Insert,//Insert into 中的Insert
+	Into,//Insert into中的 Into
+	InsertTable,//Insert into 的数据表
+	Insert_Value,//Insert into values 的values
+	Insert_Rightbracket,//Insert into values 的左括号
 };
 //字段属性
 enum ColType

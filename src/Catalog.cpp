@@ -15,3 +15,14 @@ Table_Type & Catalog::Get_Table(string table_name)
 		throw Error();
 	return Mem_Table[table_name];
 }
+
+static Column_Type & Get_Column(string tablename,string columnname)
+{
+	Table_Type TableInstance;
+	TableInstance=Catalog::Get_Table(columnname);
+	for (auto i = TableInstance.Table_Column.begin(); i != TableInstance.Table_Column.end(); i++)
+	{
+		if (i->Column_TypeName == columnname)
+			return i;
+	}
+}

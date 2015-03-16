@@ -31,9 +31,11 @@ public:
 	void ParseCommand();//解析命令
 	bool Is_CreateTable(vector<string> Input);//是否为CreateTable命令
 	bool Is_Select(vector<string> Input);//是否为Select命令
+	bool Is_Insert(vector<string> Input);//是否为Insert命令
 	bool Is_Quit(vector<string> Input);//是Quit命令
 	void CreateTable_command(vector<string >Input);//CreateTable命令解析
 	void Select_command(vector<string> Input);//Select命令解析
+	void Insert_command(vector<string> Input);//Insert命令解析
 	vector<string> Input;//用户输入的命令
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
@@ -46,10 +48,12 @@ class Selection
 {
 	friend class Intepretor;
 public:
+
 	vector<string> SelLists;//即选择的属性
-	vector<string> TableLists;//select 中from的列表
+	vector<string> TableLists;//select 中from的数据表列表
 	vector<WhereList> WhereLists;//slect 中where部分
 	Selection(string *Sel,string *table,WhereList *& wherelist,int wherenum);//获取用户输入的属性和数据表和where部分
+	void Selection_Parse();//解析用户输入的Select命令
 	void Print_SelectHead();//打印Select的属性头
 	vector<Record> Mem_Record;
 	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
