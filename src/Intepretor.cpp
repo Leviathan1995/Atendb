@@ -395,7 +395,8 @@ void Intepretor::Insert_command(vector<string> input)
 			break;
 		case EndInsert:
 			break;
-
+		default:
+			break;
 		}
 	}
 }
