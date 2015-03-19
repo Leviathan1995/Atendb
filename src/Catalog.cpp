@@ -6,6 +6,21 @@ void Catalog::CatalogCreateTable(string & Tablename, vector<Column_Type> & Attri
 	Tabletc.Table_Name = Tablename;
 	Tabletc.Flag = CATALOG_SPACE_USED;
 	Tabletc.ColumnNum = Attributes.size();
+	short NewTableIndex = -1;//数据表的标签索引号
+	for (size_t i = 0; i < TableCatalog.size(); i++)
+	{
+		if (!(TableCatalog[i].Flag&CATALOG_SPACE_USED))
+		{
+			NewTableIndex = i;
+			TableCatalog[i] = Tabletc;
+			break;
+		}
+		if (NewTableIndex == -1)
+		{
+			TableCatalog.push_back(Tabletc);
+			NewTableIndex = TableCatalog.size() - 1;
+		}
+	}
 }
 void Table_Type::InsertColumn(Column_Type column)
 {
