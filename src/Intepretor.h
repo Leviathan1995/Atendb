@@ -14,16 +14,7 @@ using namespace std;
 	户参考。
 */
 
-struct WhereList//Select 中的where
-{
-	string Attribute;
-	string Where_Operator;
-	union
-	{
-		const char *StrValue;
-		int IntValue;
-	};
-};
+
 class Intepretor
 {
 public:
@@ -42,7 +33,17 @@ public:
 	const char * String2Char(string s);//将string 转换为 char *
 	
 };
-
+//Select 中的where结构体
+struct WhereList
+{
+	string Attribute;
+	string Where_Operator;
+	union
+	{
+		const char *StrValue;
+		int IntValue;
+	};
+};
 //Select 命令的接口
 class Selection
 {
@@ -65,6 +66,7 @@ struct Insert_IntoStruct
 	ColType Valuetype;
 	string CharValues;
 	int  IntValues;
+	float FloatValues;
 };
 class Insert_Into
 {

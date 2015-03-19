@@ -1,5 +1,12 @@
 #include "Catalog.h"
 #include "Error.h"
+void Catalog::CatalogCreateTable(string & Tablename, vector<Column_Type> & Attributes)
+{
+	Table_Type Tabletc;
+	Tabletc.Table_Name = Tablename;
+	Tabletc.Flag = CATALOG_SPACE_USED;
+	Tabletc.ColumnNum = Attributes.size();
+}
 void Table_Type::InsertColumn(Column_Type column)
 {
 	for (auto i = Table_Column.begin(); i != Table_Column.end(); i++)
@@ -23,6 +30,6 @@ static Column_Type & Get_Column(string tablename,string columnname)
 	for (auto i = TableInstance.Table_Column.begin(); i != TableInstance.Table_Column.end(); i++)
 	{
 		if (i->Column_TypeName == columnname)
-			return i;
+			return *i;
 	}
 }

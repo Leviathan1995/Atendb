@@ -41,22 +41,47 @@ void Intepretor::CommandInput()
 		string command;
 		while (cin >> command)
 		{
-			//去掉（），;
+			//取出（）;,
 			bool End;//用户是否输入完成
 			auto start = command.begin();
 			for (auto i = command.begin(); i != command.end(); i++)
 			{
+				string s;
 				switch (*i)
 				{
 				case'(':
 				case ')':
+				case ',':
+				case '\'':
+				case '=':
+					if (start != i)
+						Input.push_back(string(start, i));
+					s.push_back(*i);
+					Input.push_back(s);
+					start = i;
+					start++;
+					break;
+				case '<':
+				case '>':
+					if (start != i)
+						Input.push_back(string(start, i));
+					s.push_back(*i);
+					i++;
+					if (i != command.end() && (*i == '=' || *i == '>'))
+						s.push_back(*i);
+					else
+						i--;
+					Input.push_back(s);
+					start = i;
+					start++;
+					break;
 				case ';':
 					if (start != i)
 						Input.push_back(string(start, i));
 					start = i;
 					start++;
 					End = true;
-				case ',':
+					break;
 
 				default:
 					break;
@@ -90,6 +115,7 @@ bool Intepretor::Is_CreateTable(vector<string> input)
 	else
 		return false;
 }
+//是否为选择命令
 bool Intepretor::Is_Select(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "insert"&&input[1] == "into")
