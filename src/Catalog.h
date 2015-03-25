@@ -10,6 +10,11 @@ using namespace std;
 /*
 	模式信息，即数据表的信息
 */
+/*
+	一般来说 size_t 是一个无符号整数类型，更确切的信息是 size_t 是 sizeof() 返回的类型。
+	至于定义成 unsigned int 还是 unsigned long 还是别的什么都无关紧要了。
+	使用 size_t 可以提高在代码级别的可移植性
+*/
 //字段
 class Column_Type
 {
@@ -23,10 +28,8 @@ public:
 	bool IsUnique;//是否为Unique
 	int RequestSize;//用户请求的长度
 	int StoredLength;//实际存储长度
-	union Column_ptr
-	{
-		Column_Type * Next;//下一个字段
-	};
+	Column_Type * Next;//下一个字段
+	short NextKey;//该表下一条键的信息，若没有则为-1
 };
 //数据表
 class Table_Type
@@ -41,9 +44,9 @@ public:
 	int ColumnNum;//数据表具有的属性数目
 	int RecordSize;//记录的长度
 	int PrimaryNum;//多属性主键的个数
-	unsigned long indexFlags; // 对每一位，0 表示该键无索引，1 表示该键有索引
-	unsigned short firstKey; // key 目录文件中，该表第一条键信息的编号
-	short firstIndex; // index 目录文件中，该表第一条索引信息的编号
+	unsigned long IndexFlags; // 对每一位，0 表示该键无索引，1 表示该键有索引
+	unsigned short FirstKey; // key 目录文件中，该表第一条键信息的编号
+	short FirstIndex; // index 目录文件中，该表第一条索引信息的编号
 	union Table_ptr
 	{
 		Column_Type * Key;//指向主键的指针
@@ -65,11 +68,16 @@ public :
 	static const char CATALOG_IS_NOT_NULL = 0x04;
 	static const char CATALOG_IS_INDEX = 0x02;
 	static const char CATALOG_HAS_NEXT = 0x01;
-	void CatalogCreateTable(string & Tablename,const vector<Column_Type> & Attributes);
-	vector<Table_Type> TableCatalog;
+	//功能需求
+	void CatalogCreateTable(string & Tablename,const vector<Column_Type> & Attributes);//建立数据表
+	vector<Table_Type> TableCatalog;//数据表的存放
+	vector<Column_Type> ColumnCatalog;//属性的存放
 	static map<string, Table_Type> Mem_Table;
 	static Table_Type & Get_Table(string tablename);
 	static Column_Type & Get_Column(string columnname);
-	void SaveTable2File();
+	void CheckTable(string &Tablename ,vector<Column_Type> & Attributes);//数据表的检查
+	//析构函数
+	~Catalog();
+	void SaveTable2File();//将数据写入文件，由析构函数调用
 };
 #endif

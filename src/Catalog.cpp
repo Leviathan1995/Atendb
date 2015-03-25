@@ -9,7 +9,7 @@ using namespace std;
 void Catalog::CatalogCreateTable(string & Tablename,const vector<Column_Type> & Attributes)
 {
 	Table_Type Tabletc;
-	Tabletc.Table_Name = Tablename;
+	Tabletc.Table_Name = Tablename;//数据表名字
 	Tabletc.Flag = CATALOG_SPACE_USED;
 	Tabletc.ColumnNum = Attributes.size();
 	short NewTableIndex = -1;//数据表的标签索引号
@@ -47,9 +47,57 @@ void Catalog::CatalogCreateTable(string & Tablename,const vector<Column_Type> & 
 		{
 		case Int:
 			Kc.coltype = 0;
-		default:
+			Kc.StoredLength = 4;
+			break;
+		case Char:
+			Kc.coltype = 1;
+			Kc.StoredLength = Attributes[i].RequestSize;
+		case Float:
+			Kc.coltype = 2;
+			Kc.StoredLength = 4;
+		default://默认看作是长度为255的字符串
+			Kc.coltype = 1;
+			Kc.StoredLength = 255;
 			break; 
 		}
+		Kc.Next = NULL;//下一个属性先置为空
+		KeyIndex++;
+		while (KeyIndex < (int)ColumnCatalog.size() && (ColumnCatalog[KeyIndex].Flag &CATALOG_SPACE_USED))
+			KeyIndex++;
+		if (KeyIndex >= (int)ColumnCatalog.size())
+			//索引大于属性存放数组的大小 需要开辟空间
+			ColumnCatalog.push_back(Kc);
+		else
+			ColumnCatalog[KeyIndex] = Kc;
+		if (i == 0)
+			//如果当前是第一条属性，修改TableCatalog的FirstKey
+			TableCatalog[NewTableIndex].FirstKey = KeyIndex;
+		else
+			ColumnCatalog[PreviousKeyIndex].NextKey = KeyIndex;
+		PreviousKeyIndex = KeyIndex;
+		//如果这个属性是主键，修改标志和Primarykey
+		if (Kc.Flag &CATALOG_HAS_PRIMARY_KEY)
+		{
+			TableCatalog[NewTableIndex].Flag |= CATALOG_HAS_PRIMARY_KEY;
+			TableCatalog[NewTableIndex].PrimaryKey = i;
+		}
+	}
+}
+void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
+{
+	for (size_t i = 0; i < TableCatalog.size(); i++)
+	{
+		if ((TableCatalog[i].Flag & CATALOG_SPACE_USED) && !strcmp(TableCatalog[i].Table_Name.c_str(), Tablename.c_str()))
+			cout << "Table alredy Exits";
+		break;
+	}
+	//判断属性是否合法
+	if (Attributes.size()<1 || Attributes.size()>32)
+		throw string("Atttibutes Error:Too few or too many ");
+	for (size_t i = 0; i < Attributes.size(); i++)
+	{
+		if (Attributes[i].StoredLength<1 || Attributes[i].StoredLength>255)
+			throw string("Attributes Error: Illegal length of the Attribute")
 	}
 }
 //插入元组
