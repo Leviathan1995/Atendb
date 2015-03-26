@@ -2,6 +2,7 @@
 #define _API_H
 #include "Glob_Var.h"
 #include "Intepretor.h"
+#include "Record_Manager.h"
 #include "Buffer.h"
 #include <string>
 using namespace std;
@@ -18,6 +19,8 @@ public:
 	API();
 	Intepretor MiniSQLIntepretor;//Intepretor对象
 	Catalog * Mem_Catalog;//实例化的数据表信息
+	//命令操作
+	void CreateTable(string & tablename, vector<Column_Type> & Attributes);
 	Selection Select(string table_name, vector<Comparison>);//选择命令
 };
 #endif

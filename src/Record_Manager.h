@@ -17,9 +17,16 @@ using namespace std;
 class Record_Manager
 {
 public:
+	static Record_Manager & Instance();//实例化
 	bool CreateTable(string tablename, vector<Column_Type>& Table_Column);//建表
 	void PrintHead();//打印记录的头部
 	void Print();//打印记录
 	void PrintEnd();//打印记录的尾部
 };
+//实例化
+inline Record_Manager & Record_Manager::Instance()
+{
+	static Record_Manager Record_Instance;
+	return Record_Instance;
+}
 #endif

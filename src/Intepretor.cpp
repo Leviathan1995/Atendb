@@ -127,7 +127,8 @@ bool Intepretor::Is_Select(vector<string> input)
 void Intepretor::CreateTable_command(vector<string>Input)
 {
 	Command_State state = Create;
-	Table_Type table;
+	Table_Type table;//新建立的数据表
+	vector<Column_Type> NewTableColumn;//新的数据表中字段
 	Column_Type column;
 	Column_Type columnprimary;//primary key 约束需要的字段名变量
 	for (auto i = Input.begin(); i != Input.end(); i++)
@@ -167,51 +168,53 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			column.RequestSize = String2Int(*i);
 			state = Char_LeftBrackets;//char的左括号
 			break;
-		case Char_RightBrackets:
+		case Char_RightBrackets://右括号
 			if (*i != ")")
 				throw Error();
 			if (*(++i) == "not")
 				state = Not_Null_not;
 			break;
-		case Not_Null_not:
+		case Not_Null_not://不为空
 			if (*i != "not")
 				throw Error();
 			state = Not_Null_null;
 			break;
-		case Not_Null_null:
+		case Not_Null_null://不为空
 			if (*i != "null")
 				throw Error();
-			column.IsNull = true;
+			column.IsNotNull = true;
 			if (*(++i) == "unique")
 				state = Unique;
 			break;
-		case Unique:
+		case Unique://唯一属性
 			if (*i != "unique")
 				throw Error();
 			column.IsUnique = true;
 			if (*(++i) == ",")
+			{
 				state = ColumnEndComma;
+				NewTableColumn.push_back(column);
+			}	
 			break;
-		case ColumnEndComma:
+		case ColumnEndComma://一个属性结束，至一个新的属性
 			state = Column_Name;
-			table.InsertColumn(column);
 			break;
-		case PrimaryKey_primary:
+		case PrimaryKey_primary://主键
 			if (*i != "primary")
 				throw Error();
 			state = PrimaryKey_key;
 			break;
-		case PrimaryKey_key:
+		case PrimaryKey_key://主键
 			if (*i != "key")
 				throw Error();
 			state = PrimaryKey_LeftBrackets;
 			break;
-		case PrimaryKey_LeftBrackets:
+		case PrimaryKey_LeftBrackets://主键左括号
 			if (*i != "(")
 				throw Error();
 			state = PrimaryKey_ColumnName;
 			break;
-		case PrimaryKey_ColumnName:
+		case PrimaryKey_ColumnName://主键属性名
 			columnprimary = table.GetColumn(*i);
 			columnprimary.IsPrimary = true;
 			if (*(++i) == ")")
@@ -219,22 +222,23 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			if (*(++i) == ",")
 				state = PrimaryKey_Comma;
 			break;
-		case PrimaryKey_Comma:
+		case PrimaryKey_Comma://继续保持主键的属性的状态
 			state = PrimaryKey_ColumnName;
 			break;
-		case PrimaryKey_RightBrackets:
+		case PrimaryKey_RightBrackets://主键右括号
 			if (*i != ")")
 				throw Error();
-			if (*(++i) == ";")
+			if (*(++i) == ")")
 				state = EndPrimaryKey;
 			break;
-		case EndPrimaryKey:
-			if (*(++i) == ")")
+		case EndPrimaryKey://主键结束
+			if (*i == ")")
 				state = Right_Query;
 			else
 				throw Error();
 			break;
-		case Right_Query:
+		case Right_Query://建表结束
+			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行操作
 			break;
 		default:
 			break;

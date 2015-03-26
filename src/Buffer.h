@@ -17,7 +17,7 @@ class Buffer_Manager
 public:
 	Buffer_Manager();
 	~Buffer_Manager();
-	Buffer_Manager & Instance();//缓冲管理器实例化
+	static Buffer_Manager & Instance();//缓冲管理器实例化
 	int  Write(string & FileName, string & Content, int BolckNum = -1);
 	bool Write2Block(string& fileName,int blockNum,string& content);
 	bool InBuffer(string FileName, int BlockNum);//检测在不在缓冲区中
@@ -61,7 +61,7 @@ public:
 //缓冲管理区的实例化
 inline Buffer_Manager & Buffer_Manager::Instance()
 {
-	Buffer_Manager Buffer_Instance;
+	static Buffer_Manager Buffer_Instance;
 	return Buffer_Instance;
 }
 #endif

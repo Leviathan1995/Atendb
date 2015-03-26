@@ -56,9 +56,19 @@ public:
 
 };
 //数据库中的数据表实例类
+/*
+	Catalog对于文件的存取不通过Buffer ，而是独立对Catalog file进行维护
+	在构造函数中读取信息然后放入缓存，析构函数将信息写回文件。
+*/
 class Catalog
 {
 public :
+	//实例化
+	static Catalog & Instance()
+	{
+		static Catalog CatalogManagent;
+		return CatalogManagent;
+	}
 	// 标志位相关
 	static const char CATALOG_SPACE_USED = 0x80;
 	static const char CATALOG_HAS_PRIMARY_KEY = 0x40;

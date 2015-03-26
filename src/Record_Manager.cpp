@@ -1,5 +1,5 @@
 #include "Record_Manager.h"
-
+//½¨±í
 bool Record_Manager::CreateTable(string tablename, vector<Column_Type>&Table_Column)
 {
 	string FileName = tablename + ".table";
@@ -11,8 +11,13 @@ bool Record_Manager::CreateTable(string tablename, vector<Column_Type>&Table_Col
 	int Offset = 0;//Æ«ÒÆÁ¿
 	while ((Offset + tuple_size) < Block_Size)
 	{
-		Empty_Block.replace(Offset + tuple_size - 1, 1, "1");
+		Empty_Block.replace(Offset + tuple_size - 1, 1, "1");//Ìæ»»
 		Offset += tuple_size;
 	}
+	Buffer_Manager::Instance().Write(FileName,Empty_Block);
+	return true;
 }
 void Record_Manager::PrintHead()
+{
+
+}
