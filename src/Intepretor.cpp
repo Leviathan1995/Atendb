@@ -239,6 +239,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Right_Query://建表结束
 			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行操作
+			API::Instance().CreateTable(table.Table_Name,NewTableColumn);//传到API
 			break;
 		default:
 			break;

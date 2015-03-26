@@ -7,9 +7,14 @@
 using namespace std;
 int main()
 {
-	API MiniSQLApi;
-	Catalog CatalogManagent;//模式信息管理的对象
-	MiniSQLApi.MiniSQLIntepretor.CommandInput();//接受用户输入的命令
-	MiniSQLApi.MiniSQLIntepretor.ParseCommand();//进行命令解析
+	Intepretor MiniSQLIntepretor;
+	cout << "----------Welcome to MiniSQL----------";
+	cout << "|                                    |";
+	cout << "|                                    |";
+	cout << "|                                    |";
+	cout << "|			by:Leviathan1995		  |";
+	cout << "--------------------------------------";
+	MiniSQLIntepretor.CommandInput();//接受用户输入的命令
+	MiniSQLIntepretor.ParseCommand();//进行命令解析
 	return 0;
 }

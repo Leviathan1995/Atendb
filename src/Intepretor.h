@@ -4,6 +4,7 @@
 #include "Catalog.h"
 #include "Glob_Var.h"
 #include "Record.h"
+#include "API.h"
 #include <vector>
 #include <string>
 using namespace std;

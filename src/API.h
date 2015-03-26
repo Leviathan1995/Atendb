@@ -4,6 +4,7 @@
 #include "Intepretor.h"
 #include "Record_Manager.h"
 #include "Buffer.h"
+#include "Catalog.h"
 #include <string>
 using namespace std;
 
@@ -17,10 +18,16 @@ class API
 	friend class Intepretor;
 public:
 	API();
+	static API & Instance();	//实例化
 	Intepretor MiniSQLIntepretor;//Intepretor对象
 	Catalog * Mem_Catalog;//实例化的数据表信息
 	//命令操作
-	void CreateTable(string & tablename, vector<Column_Type> & Attributes);
+	void CreateTable(string & tablename, vector<Column_Type>  Attributes);
 	Selection Select(string table_name, vector<Comparison>);//选择命令
 };
+static API & Instance()
+{
+	static API API_Instance;
+	return API_Instance;
+}
 #endif
