@@ -79,7 +79,7 @@ public :
 	static const char CATALOG_IS_INDEX = 0x02;
 	static const char CATALOG_HAS_NEXT = 0x01;
 	//功能需求
-	void CatalogCreateTable(string & Tablename,const vector<Column_Type> & Attributes);//建立数据表
+	void CatalogCreateTable(string & Tablename, vector<Column_Type> & Attributes);//建立数据表
 	vector<Table_Type> TableCatalog;//数据表的存放
 	vector<Column_Type> ColumnCatalog;//属性的存放
 	static map<string, Table_Type> Mem_Table;

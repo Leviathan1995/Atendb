@@ -1,4 +1,5 @@
 #include "Error.h"
+//Error类的构造函数
 Error::Error()
 {
 	Error_Code = NO_Error;

@@ -1,6 +1,6 @@
 #include "Record_Manager.h"
 //建表
-bool Record_Manager::CreateTable(string tablename, vector<Column_Type>&Table_Column)
+bool Record_Manager::CreateTable(string tablename, const vector<Column_Type>&Table_Column)
 {
 	string FileName = tablename + ".table";
 	string Empty_Block(Block_Size, 0);//申请一个新的块

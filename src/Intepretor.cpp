@@ -1,7 +1,4 @@
 #include "Intepretor.h"
-#include "Glob_Var.h"
-#include "Catalog.h"
-#include "Error.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -145,7 +142,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Left_Query:
 			if (*i != "(")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = Column_Name;
 			break;
 		case Column_Name://字段名
@@ -161,7 +158,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Char_LeftBrackets://左括号
 			if (*i != "(")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = CharSize;
 			break;
 		case CharSize://Char类型大小
@@ -170,25 +167,25 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Char_RightBrackets://右括号
 			if (*i != ")")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			if (*(++i) == "not")
 				state = Not_Null_not;
 			break;
 		case Not_Null_not://不为空
 			if (*i != "not")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = Not_Null_null;
 			break;
 		case Not_Null_null://不为空
 			if (*i != "null")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			column.IsNotNull = true;
 			if (*(++i) == "unique")
 				state = Unique;
 			break;
 		case Unique://唯一属性
 			if (*i != "unique")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			column.IsUnique = true;
 			if (*(++i) == ",")
 			{
@@ -201,17 +198,17 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case PrimaryKey_primary://主键
 			if (*i != "primary")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = PrimaryKey_key;
 			break;
 		case PrimaryKey_key://主键
 			if (*i != "key")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = PrimaryKey_LeftBrackets;
 			break;
 		case PrimaryKey_LeftBrackets://主键左括号
 			if (*i != "(")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_ColumnName://主键属性名
@@ -227,7 +224,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case PrimaryKey_RightBrackets://主键右括号
 			if (*i != ")")
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			if (*(++i) == ")")
 				state = EndPrimaryKey;
 			break;
@@ -235,11 +232,11 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			if (*i == ")")
 				state = Right_Query;
 			else
-				throw Error();
+				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			break;
 		case Right_Query://建表结束
+			API::Instance().CreateTable(table.Table_Name, NewTableColumn);//传到API进行操作
 			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行操作
-			API::Instance().CreateTable(table.Table_Name,NewTableColumn);//传到API
 			break;
 		default:
 			break;

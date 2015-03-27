@@ -6,7 +6,7 @@
 #include "Intepretor.h"
 using namespace std;
 //建立数据表
-void Catalog::CatalogCreateTable(string & Tablename,const vector<Column_Type> & Attributes)
+void Catalog::CatalogCreateTable(string & Tablename,vector<Column_Type> & Attributes)
 {
 	Table_Type Tabletc;
 	Tabletc.Table_Name = Tablename;//数据表名字
@@ -83,6 +83,7 @@ void Catalog::CatalogCreateTable(string & Tablename,const vector<Column_Type> & 
 		}
 	}
 }
+//数据表检查
 void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
 {
 	for (size_t i = 0; i < TableCatalog.size(); i++)
