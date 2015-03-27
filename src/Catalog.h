@@ -2,6 +2,7 @@
 #define _CATALOG_H
 #include "Glob_Var.h"
 #include "Intepretor.h"
+#include "Error.h"
 #include <string>
 #include <vector>
 #include <map>

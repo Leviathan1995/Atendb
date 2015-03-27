@@ -1,10 +1,13 @@
 #include "Catalog.h"
-#include "Error.h"
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>//不加stdlib ofstream报错
-#include "Intepretor.h"
 using namespace std;
+//析构函数
+Catalog::~Catalog()
+{
+	SaveTable2File();//将数据表写入文件
+}
 //建立数据表
 void Catalog::CatalogCreateTable(string & Tablename,vector<Column_Type> & Attributes)
 {
@@ -92,13 +95,14 @@ void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
 			cout << "Table alredy Exits";
 		break;
 	}
-	//判断属性是否合法
+	//判断属性的数量是否合法
 	if (Attributes.size()<1 || Attributes.size()>32)
 		throw string("Atttibutes Error:Too few or too many ");
 	for (size_t i = 0; i < Attributes.size(); i++)
 	{
+		//判断记录的长度是否合法
 		if (Attributes[i].StoredLength<1 || Attributes[i].StoredLength>255)
-			throw string("Attributes Error: Illegal length of the Attribute")
+			throw string("Attributes Error: Illegal length of the Attribute");
 	}
 }
 //插入元组

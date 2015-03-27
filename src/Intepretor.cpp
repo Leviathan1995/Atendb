@@ -30,12 +30,16 @@ const char * Intepretor::String2Char(string  s)
 	const char *n = s.c_str();
 	return n;
 }
+/*
+	命令
+*/
 //获得输入的命令
 void Intepretor::CommandInput()
 {
 	while (true)
 	{
 		string command;
+		vector<string> Input;
 		while (cin >> command)
 		{
 			//取出（）;,
@@ -234,9 +238,9 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			else
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			break;
-		case Right_Query://建表结束
+		case Right_Query://建表结束，传递用户输入的参数
+			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行Table Check操作
 			API::Instance().CreateTable(table.Table_Name, NewTableColumn);//传到API进行操作
-			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行操作
 			break;
 		default:
 			break;
