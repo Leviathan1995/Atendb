@@ -68,6 +68,9 @@ public:
 	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
 	Table_Type Mem_Table;
 };
+/*
+	Insert into 命令接口
+*/
 //Insert_into 中的values的结构体
 struct Insert_IntoStruct
 {
