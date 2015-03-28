@@ -32,10 +32,8 @@ struct Column_Type
 	short NextKey;//该表下一条键的信息，若没有则为-1
 };
 //数据表
-class Table_Type
+struct Table_Type
 {
-public:
-	Table_Type();//创建数据表
 	char Flag;//标志位
 	char PrimaryKey;//如果>32表示无主键
 	char NumberKeys;//<=32
@@ -51,9 +49,6 @@ public:
 	{
 		Column_Type * Key;//指向主键的指针
 	};
-	Column_Type GetColumn(string name);//通过字段的名字获得字段
-	void InsertColumn(Column_Type column);//数据表插入属性
-
 };
 //数据库中的数据表实例类
 /*
@@ -86,6 +81,7 @@ public :
 	static Table_Type & Get_Table(string tablename);//得到 数据表
 	static Column_Type & Get_Column(string tablename,string columnname);//得到 数据表中的属性
 	void CheckTable(string &Tablename ,vector<Column_Type> & Attributes);//数据表的检查
+	void InsertColumn(string tableneame,Column_Type column);//数据表插入属性
 	//析构函数
 	~Catalog();
 	void SaveTable2File();//将数据写入文件，由析构函数调用

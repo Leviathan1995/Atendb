@@ -143,6 +143,13 @@ bool Intepretor::Is_Select(vector<string> input)
 	else
 		return false;
 }
+bool Intepretor::Is_Quit(vector<string> input)
+{
+	if (input.size() >= 2 && input[0] == "quit")
+		return true;
+	else
+		return false;
+}
 //创建数据表
 void Intepretor::CreateTable_command(vector<string>Input)
 {
@@ -235,7 +242,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_ColumnName://主键属性名
-			columnprimary = table.GetColumn(*i);
+			columnprimary = Catalog::Get_Column(table.Table_Name,*i);
 			columnprimary.IsPrimary = true;
 			if (*(++i) == ")")
 				state = PrimaryKey_RightBrackets;
