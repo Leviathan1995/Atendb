@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _INTEPRETOR_H_
 #define _INTEPRETOR_H
 #include <string>
@@ -6,6 +7,7 @@
 #include "Record.h"
 #include "Error.h"
 #include "API.h"
+#include "Select.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -38,35 +40,9 @@ public:
 	*/
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
-	const char * String2Char(string s);//将string 转换为 char *
-	
-};
-//Select 中的where结构体
-struct WhereList
-{
-	string Attribute;
-	string Where_Operator;
-	union
-	{
-		const char *StrValue;
-		int IntValue;
-	};
-};
-//Select 命令的接口
-class Selection
-{
-	friend class Intepretor;
-public:
-
-	static vector<string> SelLists;//即选择的属性
-	static vector<string> TableLists;//select 中from的数据表列表
-	static vector<WhereList> WhereLists;//slect 中where部分
-	static void SelectionInput(string *Sel,string *table,WhereList *& wherelist,int wherenum);//获取用户输入的属性和数据表和where部分
-	void Selection_Parse();//解析用户输入的Select命令
-	void Print_SelectHead();//打印Select的属性头
-	vector<Record> Mem_Record;
-	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
-	Table_Type Mem_Table;
+	static const char * String2Char(string s);//将string 转换为 char *
+	//运算符号选择
+	static enum Operator_type  Op_Judge(string Op);
 };
 /*
 	Insert into 命令接口
@@ -81,7 +57,6 @@ struct Insert_IntoStruct
 };
 class Insert_Into
 {
-	friend class Intepretor;
 public:
 	vector<Insert_IntoStruct> InsertIntoValues;//Insert into values 中的values的集合
 	void Insert_IntoParse();//insert into 命令解析

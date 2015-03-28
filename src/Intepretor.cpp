@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <stdlib.h>
-
 using namespace std;
 //将string类型的type转换为ColType
 ColType Intepretor::Trasn2type(string type)
@@ -17,6 +16,7 @@ ColType Intepretor::Trasn2type(string type)
 	/*
 			如果不属于这三种类型，需要抛出一个错误得救
 	*/
+	else throw Error(0, "Interpreter", "Type", "类型错误，不支持用户输入的类型!");
 }
 //将String 转为Int
 int Intepretor::String2Int(string s)
@@ -29,6 +29,25 @@ const char * Intepretor::String2Char(string  s)
 {
 	const char *n = s.c_str();
 	return n;
+}
+//运算符号选择判断
+enum Operator_type  Intepretor::Op_Judge(string Op)
+{
+	if (Op == "<")
+		return EQUAL;
+	if (Op == "<")
+		return LESS_THAN;//<
+	if (Op == "=")
+		return EQUAL;//=
+	if (Op == ">")
+		return MORE_THAN;//>
+	if (Op == ">=")
+		return MORE_AND_EQUAL;//>=
+	if (Op == "<=")
+		return LESS_AND_EQUAL;//<=
+	if (Op == "!=")
+		return NOT_EQUAL;//!=  另 where子句不能使用！=运算符
+	else throw Error(0, "Interpreter", "Operator", "不支持用户输入的运算符!");
 }
 /*
 	命令
@@ -281,7 +300,7 @@ void Intepretor::Select_command(vector<string> Input)
 			break;
 		case From:
 			if (*i != "from")
-				throw Error();
+				throw Error(0, "Interpreter", "Select", "语法错误!");
 			State = FromList;
 			break;
 		case FromList:
@@ -318,62 +337,7 @@ void Intepretor::Select_command(vector<string> Input)
 		}
 	}
 }
-//获取用户的输入
-void Selection::SelectionInput(string *Sel, string *table,WhereList *& wherelist,int wherenum)
-{
-	int i = 0;
-	while (Sel[i]!="$")
-	{
-		SelLists.push_back(Sel[i]);
-		i++;
-	}
-	i = 0;
-	while (table[i] != "$")
-	{
-		TableLists.push_back(table[i]);
-		i++;
-	}
-	for (i = 0; i < wherenum; i++)
-		WhereLists.push_back(wherelist[i]);
-}
-//解析Select命令
-void Selection::Selection_Parse()
-{
-	Table_Type SelectTable;
-	while (!TableLists.empty())
-	{
-		SelectTable = Catalog::Get_Table(TableLists.front());
-		while (!SelLists.empty())
-		{
-			Column_Type SelectColumn;
-			SelectColumn = SelLists.front();
-			switch (Operator_type)
-			{
-			case LESS_THAN:
-				break;
-			case EQUAL:
-				break;
-			case MORE_THAN:
-				break;
-			case MORE_AND_EQUAL:
-				break;
-			case LESS_AND_EQUAL:
-				break;
-			case NOT_EQUAL:
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
-//打印Select的属性头
-void Selection::Print_SelectHead()
-{
-	/*
-		只打印Selection中的vector<string> SelLists;
-	*/
-}
+
 /*
 	Insert_into 命令解析
 */
@@ -401,7 +365,7 @@ void Intepretor::Insert_command(vector<string> input)
 			break;
 		case Insert_Leftbracket:
 			if (*i != "(")
-				throw Error();
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			state = Insert_Values;
 			break;
 		case Insert_Values:
@@ -417,13 +381,13 @@ void Intepretor::Insert_command(vector<string> input)
 			if (*(i) == ")")
 				state = Insert_Rightbracket;
 			else
-				throw Error();
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			break;
 		case Insert_Rightbracket:
 			if (*i == ";")
 				state = EndInsert;
 			else
-				throw Error();
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			break;
 		case EndInsert:
 			break;

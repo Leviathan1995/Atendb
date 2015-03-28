@@ -99,10 +99,7 @@ bool Buffer_Manager::IsFull()
 	return MemBlock_Used.size() == Block_Size;
 }
 //建立新的块
-bool Buffer_Manager::Built_NewBlock(string FileName, int BlockNum, string &strOut)
-{
 
-}
 //文件写入
 bool Buffer_Manager::B_File::Write(B_Block * cur)
 {

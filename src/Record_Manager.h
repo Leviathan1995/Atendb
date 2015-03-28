@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _RECORD_MANAGER_H
 #define _RECORD_MANAGER_H
 #include "Catalog.h"

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _ELEMMENT_H
 #define _ELEMMETN_H
 #include <string>
@@ -31,7 +32,6 @@ class Comparison
 {
 public:
 	Comparison();
-	Comparison(Column_Type Column, Operator_type Op, Element Elem);
 	ColType Mem_Col;
 	Operator_type Oper;
 	Element Elem;

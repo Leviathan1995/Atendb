@@ -1,7 +1,7 @@
+#pragma once
 #ifndef _CATALOG_H
 #define _CATALOG_H
 #include "Glob_Var.h"
-#include "Intepretor.h"
 #include "Error.h"
 #include <string>
 #include <vector>
@@ -17,9 +17,8 @@ using namespace std;
 	使用 size_t 可以提高在代码级别的可移植性
 */
 //字段
-class Column_Type
+struct Column_Type
 {
-public:
 	int ID;
 	char Flag;//标志位
 	string Column_TypeName;//字段名
@@ -84,8 +83,8 @@ public :
 	vector<Table_Type> TableCatalog;//数据表的存放
 	vector<Column_Type> ColumnCatalog;//属性的存放
 	static map<string, Table_Type> Mem_Table;
-	static Table_Type & Get_Table(string tablename);
-	static Column_Type & Get_Column(string columnname);
+	static Table_Type & Get_Table(string tablename);//得到 数据表
+	static Column_Type & Get_Column(string tablename,string columnname);//得到 数据表中的属性
 	void CheckTable(string &Tablename ,vector<Column_Type> & Attributes);//数据表的检查
 	//析构函数
 	~Catalog();

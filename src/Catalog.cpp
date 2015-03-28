@@ -111,7 +111,7 @@ void Table_Type::InsertColumn(Column_Type column)
 	for (auto i = Table_Column.begin(); i != Table_Column.end(); i++)
 	{
 		if (i->Column_TypeName == column.Column_TypeName)
-			throw Error();//抛出错误，即属性已经存在
+			throw Error(0, "Catalog", "Insert Column", "语法错误!");//抛出错误，即属性已经存在
 	}
 	Table_Column.push_back(column);
 }
@@ -119,11 +119,11 @@ void Table_Type::InsertColumn(Column_Type column)
 Table_Type & Catalog::Get_Table(string table_name)
 {
 	if (Mem_Table.find(table_name) == Mem_Table.end())
-		throw Error();
+		throw Error(1001, "Catalog", "Insert Column", "语法错误!");
 	return Mem_Table[table_name];
 }
 //得到属性
-static Column_Type & Get_Column(string tablename,string columnname)
+Column_Type & Catalog::Get_Column(string tablename,string columnname)
 {
 	Table_Type TableInstance;
 	TableInstance=Catalog::Get_Table(columnname);
@@ -144,9 +144,9 @@ void Catalog::SaveTable2File()
 		Fout.write(TableCatalog[i].Table_Name.c_str(), TableCatalog[i].Table_Name.length());
 		Fout.write(&TableCatalog[i].NumberKeys, 1);
 		Fout.write(&TableCatalog[i].PrimaryKey, 1);
-		Fout.write((char *)&TableCatalog[i].indexFlags, sizeof(long));
-		Fout.write((char *)&TableCatalog[i].firstKey, sizeof(short));
-		Fout.write((char *)&TableCatalog[i].firstIndex, sizeof(short));
+		Fout.write((char *)&TableCatalog[i].IndexFlags, sizeof(long));
+		Fout.write((char *)&TableCatalog[i].FirstKey, sizeof(short));
+		Fout.write((char *)&TableCatalog[i].FirstIndex, sizeof(short));
 	}
 	Fout.close();
 }

@@ -30,7 +30,7 @@ public:
 	string Function;//发生错误的函数
 	string Module;//发生错误的模块
 	string Error_string;//错误描述
-	//Error();//默认构造函数
+	Error();//默认构造函数
 	Error(int Error_Code, string Module, string Function, string Error_string);
 };
 #endif

@@ -3,7 +3,7 @@ using namespace std;
 API::API()
 {
 }
-Selection API::Select(string table_name, vector<Comparison>)
+void API::Select(string table_name, vector<Comparison>)
 {
 	Table_Type table_select = Catalog::Instance().Get_Table(table_name);
 }
