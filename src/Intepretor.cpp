@@ -274,7 +274,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 	}
 }
 /*
-	选择命令接口的构造函数
+	Select命令
 */
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)
@@ -346,7 +346,7 @@ void Intepretor::Select_command(vector<string> Input)
 }
 
 /*
-	Insert_into 命令解析
+	Insert_into 命令
 */
 void Intepretor::Insert_command(vector<string> input)
 {
