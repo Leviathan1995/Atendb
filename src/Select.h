@@ -8,8 +8,8 @@
 //Select 中的where结构体
 struct WhereList
 {
-	string Attribute;
-	string Where_Operator;
+	string Attribute;//选择的属性
+	string Where_Operator;//运算符号
 	union
 	{
 		const char *StrValue;
