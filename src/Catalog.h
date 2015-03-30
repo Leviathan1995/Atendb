@@ -4,6 +4,7 @@
 #include "Glob_Var.h"
 #include "Error.h"
 #include "Record.h"
+#include "Intepretor.h"
 #include <string>
 #include <vector>
 #include <map>

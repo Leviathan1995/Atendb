@@ -108,7 +108,31 @@ void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
 //插入的属性进行检查
 void Catalog::CheckColumn(string & tablename, Record R)
 {
-
+	bool TableFind;//插入记录的数据表是否存在
+	short NumberOfkeys = 0, FirstKeyindex = 0;
+	for (size_t i = 0; i < TableCatalog.size(); i++)
+	{
+		if ((TableCatalog[i].Flag&CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].Table_Name), tablename.c_str()))
+		{
+			TableFind = true;
+			NumberOfkeys = TableCatalog[i].NumberKeys;//数据表中的属性的数量
+			FirstKeyindex = TableCatalog[i].FirstIndex;
+			break;
+		}
+	}
+	if (!TableFind)
+		throw Error(1001, "Catalog", "Check_Column", "数据表不存在");
+	if (R.Mem_Element.size() > NumberOfkeys)//插入的元素数量大于数据表中已规定的
+		throw string("Insert into ValueIllegal: Illegal number of columns");
+	short CurrentKeyindex = FirstKeyindex;
+	for (size_t i = 0; i < R.Mem_Element.size(); i++)
+	{
+		switch ()
+		{
+		default:
+			break;
+		}
+	}
 }
 //插入元组
 void Catalog::CatalogInsertColumn(string tablename,Record R)
