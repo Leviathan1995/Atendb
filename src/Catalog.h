@@ -3,6 +3,7 @@
 #define _CATALOG_H
 #include "Glob_Var.h"
 #include "Error.h"
+#include "Record.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -23,6 +24,7 @@ struct Column_Type
 	char Flag;//标志位
 	string Column_TypeName;//字段名
 	char coltype;//字段属性,0 表示 int，1 表示 char(n)，2 表示 float
+	int M_Char_Num;
 	bool IsPrimary;//是不是主键
 	bool IsNotNull;//是否可以为空
 	bool IsUnique;//是否为Unique
@@ -75,13 +77,14 @@ public :
 	static const char CATALOG_HAS_NEXT = 0x01;
 	//功能需求
 	void CatalogCreateTable(string & Tablename, vector<Column_Type> & Attributes);//建立数据表
+	void CheckTable(string &Tablename, vector<Column_Type> & Attributes);//数据表的检查
+	void CheckColumn(string &Tablename, Record R);//检查属性是否正确
+	void CatalogInsertColumn(string tableneame, Record R);//数据表插入属性
 	vector<Table_Type> TableCatalog;//数据表的存放
 	vector<Column_Type> ColumnCatalog;//属性的存放
 	static map<string, Table_Type> Mem_Table;
 	static Table_Type & Get_Table(string tablename);//得到 数据表
 	static Column_Type & Get_Column(string tablename,string columnname);//得到 数据表中的属性
-	void CheckTable(string &Tablename ,vector<Column_Type> & Attributes);//数据表的检查
-	void InsertColumn(string tableneame,Column_Type column);//数据表插入属性
 	//析构函数
 	~Catalog();
 	void SaveTable2File();//将数据写入文件，由析构函数调用

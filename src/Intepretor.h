@@ -1,13 +1,14 @@
 #pragma once
 #ifndef _INTEPRETOR_H_
 #define _INTEPRETOR_H
-#include <string>
+#include "Insert_Into.h"
 #include "Catalog.h"
 #include "Glob_Var.h"
 #include "Record.h"
 #include "Error.h"
 #include "API.h"
 #include "Select.h"
+#include "Elemment.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -31,6 +32,7 @@ public:
 	bool Is_Select(vector<string> Input);				//是否为Select命令
 	bool Is_Insert(vector<string> Input);				//是否为Insert命令
 	bool Is_Quit(vector<string> Input);					//是否为Quit命令
+	bool Is_Insert(vector<string> Input);				//是否为Insert命令
 	void CreateTable_command(vector<string >Input);		//CreateTable命令解析
 	void Select_command(vector<string> Input);			//Select命令解析
 	void Insert_command(vector<string> Input);			//Insert命令解析
@@ -41,6 +43,7 @@ public:
 	ColType Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
 	static const char * String2Char(string s);//将string 转换为 char *
+	float String2Float(string s);//将string 转换为float
 	//运算符号选择
 	static enum Operator_type  Op_Judge(string Op);
 };

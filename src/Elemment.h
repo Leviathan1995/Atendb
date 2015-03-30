@@ -28,6 +28,7 @@ public:
 	Element(float f);
 	Element(int i);
 };
+/*
 class Comparison
 {
 public:
@@ -36,4 +37,5 @@ public:
 	Operator_type Oper;
 	Element Elem;
 };
+*/
 #endif

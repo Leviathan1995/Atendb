@@ -30,6 +30,12 @@ const char * Intepretor::String2Char(string  s)
 	const char *n = s.c_str();
 	return n;
 }
+//将String转为 Float
+float Intepretor::String2Float(string s)
+{
+	float F = atof(s.c_str());
+	return F;
+}
 //运算符号选择判断
 enum Operator_type  Intepretor::Op_Judge(string Op)
 {
@@ -127,7 +133,7 @@ void Intepretor::ParseCommand()
 	if (Is_Insert(Input))
 		Insert_command(Input);
 }
-//是否为创建数据表命令
+//是否为Create创建数据表命令
 bool Intepretor::Is_CreateTable(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
@@ -135,7 +141,7 @@ bool Intepretor::Is_CreateTable(vector<string> input)
 	else
 		return false;
 }
-//是否为选择命令
+//是否为Select命令
 bool Intepretor::Is_Select(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "insert"&&input[1] == "into")
@@ -143,9 +149,18 @@ bool Intepretor::Is_Select(vector<string> input)
 	else
 		return false;
 }
+//是否为Quit命令
 bool Intepretor::Is_Quit(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "quit")
+		return true;
+	else
+		return false;
+}
+//是否为Insert命令
+bool Intepretor::Is_Insert(vector<string> input)
+{
+	if (input.size() >= 2 && input[0] == "insert"&&input[1] == "into")
 		return true;
 	else
 		return false;
@@ -350,56 +365,94 @@ void Intepretor::Select_command(vector<string> Input)
 */
 void Intepretor::Insert_command(vector<string> input)
 {
+	vector<string> Values;
 	Insert_IntoStruct insertintovalues;
 	Command_State state = Insert;//插入状态
-	string Inserttable;//插入的数据表
+	string Inserttable;//需要插入的数据表
 	for (auto i = input.begin(); i != input.end(); i++)
 	{
 		switch (state)
 		{
 		case Insert:
-			state = Into;
+			if (*i == "into")
+				state = Into;
+			else
+				throw Error(0, "Interpreter", "Select", "语法错误!");
 			break;
 		case Into:
 			state = InsertTable;
 			break;
 		case InsertTable:
-			state = Insert_Value;
-			Inserttable = *i;
-			break;
-		case Insert_Value:
-			state = Insert_Leftbracket;
-			break;
-		case Insert_Leftbracket:
-			if (*i != "(")
-				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			state = Insert_Values;
+			Inserttable = *i;//获取数据表的名字
 			break;
 		case Insert_Values:
-			if (*i == "'")
+			state = Insert_Leftbracket;//值列表的左括号
+			break;
+		case Insert_Leftbracket://值列表的左括号
+			if (*i != "(")
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
+			state = Insert_Values_Or_Mark;
+			break;
+		case Insert_Values_Or_Mark://插入的值
+			if (*i == "\'")
+				state = Insert_Value;
+			else
 			{
-				i++;
-				insertintovalues.CharValues = *i;
+				state = Insert_Comma_Or_Bracket;
+				Values.push_back(*i);
 			}
-			else
-				insertintovalues.IntValues = String2Int(*i);
-			if (*(++i) == ",")
-				state = Insert_Values;
-			if (*(i) == ")")
-				state = Insert_Rightbracket;
-			else
-				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			break;
-		case Insert_Rightbracket:
-			if (*i == ";")
-				state = EndInsert;
-			else
-				throw Error(0, "Interpreter", "Insert into", "语法错误!");
+		case Insert_Value:
+			Values.push_back(*i);
+			state = Insert_Right_Mark;
 			break;
-		case EndInsert:
+		case Insert_Right_Mark:
+			if (*i != "\'")
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
+			state = Insert_Comma_Or_Bracket;
+			break;
+		case Insert_Comma_Or_Bracket:
+			if (*i == ",")
+				state = Insert_Values_Or_Mark;
+			else if (*i == ")")
+				state = Insert_EndInsert;
+			break;
+		case Insert_EndInsert:
 			break;
 		default:
 			break;
 		}
 	}
+	if (state = Insert_EndInsert)
+	{
+		Table_Type t = Catalog::Get_Table(Inserttable);
+		vector<Column_Type> Attributes_List = t.Table_Column;
+		if (Attributes_List.size() != Values.size())
+			throw Error(0, "Interpreter", "Insert into", "语法错误!");
+		Record R;
+		auto i = Attributes_List.begin();
+		auto v = Values.begin();
+		for (; i != Attributes_List.end(); i++)
+		{
+			if (i->coltype == 0)//0表示int
+			{
+				Element E(String2Int(*v));
+				R.Mem_Element.push_back(E);
+			}
+			if (i->coltype == 1)//1表示char
+			{
+				Element E(*v, i->M_Char_Num);
+				R.Mem_Element.push_back(E);
+			}
+			if (i->coltype == 2)//2表示float
+			{
+				Element E(String2Float(*v));
+				R.Mem_Element.push_back(E);
+			}
+		}
+		API::Instance().Insert_Into(Inserttable, R);
+	}
+	else
+		throw Error(0, "Intepretor", "Insert into", "语法错误");
 }

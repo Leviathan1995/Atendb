@@ -25,6 +25,7 @@ void Selection::Selection_Parse()
 	string WhereAttributesName;//where中选择属性的名字
 	Column_Type WhereAttributes;// where中选择属性
 	vector<Record> SelectRecord;//Select判断后的记录
+	Record WhereRecord;//select命令where部分经选择后的记录
 	while (!TableLists.empty())//TableLists为用户选择的数据表集合，即From
 	{
 		SelectTable = Catalog::Get_Table(TableLists.front());//获取用户选择的数据表

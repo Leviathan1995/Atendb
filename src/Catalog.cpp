@@ -105,16 +105,15 @@ void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
 			throw string("Attributes Error: Illegal length of the Attribute");
 	}
 }
-//插入元组
-void Catalog::InsertColumn(string tablename,Column_Type column)
+//插入的属性进行检查
+void Catalog::CheckColumn(string & tablename, Record R)
 {
-	Table_Type InsertTableInstance = Get_Table(tablename);
-	for (auto i = InsertTableInstance.Table_Column.begin(); i != InsertTableInstance.Table_Column.end(); i++)
-	{
-		if (i->Column_TypeName == column.Column_TypeName)
-			throw Error(0, "Catalog", "Insert Column", "语法错误!");//抛出错误，即属性已经存在
-	}
-	InsertTableInstance.Table_Column.push_back(column);
+
+}
+//插入元组
+void Catalog::CatalogInsertColumn(string tablename,Record R)
+{
+	
 }
 //得到数据表
 Table_Type & Catalog::Get_Table(string table_name)

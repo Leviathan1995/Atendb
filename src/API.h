@@ -6,7 +6,7 @@
 #include "Record_Manager.h"
 #include "Buffer.h"
 #include "Catalog.h"
-#include"Select.h"
+#include "Select.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -21,9 +21,12 @@ class API
 public:
 	API();
 	static API & Instance();	//ÊµÀı»¯
-	//ÃüÁî²Ù×÷
-	void CreateTable(string & Tablename,vector<Column_Type> & Attributes);
-	void Select(string table_name, vector<Comparison> Select_Attributes);//Ñ¡ÔñÃüÁî
+	/*	
+		ÃüÁî²Ù×÷
+	*/
+	void CreateTable(string & Tablename,vector<Column_Type> & Attributes);//Create
+	void Insert_Into(string &Tablename, Record R);//Insert into
+	//void Select(string table_name, vector<Comparison> Select_Attributes);//Ñ¡ÔñÃüÁî
 };
 inline static API & Instance()
 {

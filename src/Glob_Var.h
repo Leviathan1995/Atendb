@@ -46,16 +46,19 @@ enum Command_State
 	From,//select from 中的from
 	FromList,//Select中From的列表
 	Where,//Select中Where
-	And ,//Select中的where中And
+	And,//Select中的where中And
 	EndSelect,//Select中的End
 	Insert,//Insert into 中的Insert
 	Into,//Insert into中的 Into
 	InsertTable,//Insert into 的数据表
-	Insert_Value,//Insert into values 的values
+	Insert_Values,//Insert into values 的"values"
 	Insert_Rightbracket,//Insert into values 的右括号
 	Insert_Leftbracket,//Insert into values 的左括号
-	Insert_Values,//Insert into values 的values值
-	EndInsert,//insert into values的end
+	Insert_Values_Or_Mark,//Insert into 中判断是值还是符号
+	Insert_Value,//Insert into values 的values值
+	Insert_Comma_Or_Bracket,//Insert into values中是括号还是值
+	Insert_Right_Mark,//
+	Insert_EndInsert,//insert into values的end
 };
 //字段属性
 enum ColType
