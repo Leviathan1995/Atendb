@@ -3,6 +3,7 @@
 #define _BUFFER_H
 #include "Glob_Var.h"
 #include "Intepretor.h"
+#include "Block.h"
 #include <stdlib.h>
 #include <string>
 #include <map>
@@ -17,53 +18,23 @@ using namespace std;
 class Buffer_Manager
 {
 public:
-	class B_Block;
-	class B_File;
 	Buffer_Manager();
 	~Buffer_Manager();
-	bool File_Exist(string &tablename, File_Type filetyppe);//文件是否存在
-	int ReadLast(string & FileName, string &str);//返回块号
-	static Buffer_Manager & Instance();//缓冲管理器实例化
-	int  Write(string & FileName, string & Content, int BolckNum = -1);
-	bool Write2Block(string& fileName,int blockNum,string& content);
-	bool InBuffer(string FileName, int BlockNum);//检测在不在缓冲区中
-	map<string, B_Block*> MemBlock_Map;//记录使用的块
-	list<B_Block *> MemBlock_Used;//已经使用过的块
-	bool Built_NewBlock(string FileName,int BlockNum,string & str);//建立新的块
-	bool File2Block(string& fileName, int blockNum, string& strOut);
-	bool IsFull();
-	bool Replace(string& FileName,int blockNum,string& content);//替换算法
-	class B_Block
-	{
-	public:
-		string Block_Content;//块的目录
-		/*
-		文件系统检查缓冲池中是否有该文件中的块，
-		有则检查这些块是否写过，写过这些块即为 dirty 块
-		*/
-		bool Block_Pin;
-		bool Blcok_Ditry;
-		int Block_Num;
-		string FileName;
-		string Content;
-		B_Block();
-		static string GetKey();
-		bool IsPin();
-		bool IsDirty();
-		bool Write2File();
-		void Update(string & FileName, int Block_Num, string & Content);
-	};
-	class B_File
-	{
-	public:
-		static bool Read(string & FileName, int Block_Num, char *& Dst);
-		static int ReadLast(string & FileName, string &str);
-		static bool Write(B_Block *Current);
-		static bool Write(string &FileName, string &Content, int & Num);
-		static void CreateFile(string FileName);
-		static bool File_NotIn();//文件已经被创建
-
-	};
+	static Buffer_Manager & Instance();									  //缓冲管理器实例化
+	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
+	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在
+	Block ReadLast(string & FileName, File_Type filetype);				  //返回块
+	void  Write(Block block);											  //写入
+	bool Write2Block(string& fileName,int blockNum,string& content);	  //写入块中
+	bool InBuffer(string FileName, int BlockNum);						  //检测在不在缓冲区中
+	map<string, Block*> MemBlock_Map;									  //记录使用的块
+	list<Block *> MemBlock_Used;										  //已经使用过的块
+	int Buffer_Manager::New_Block(string & tablename, File_Type filetype);//建立新的块，在文件中建立新的block，也就是在文件末尾添加一块新的块，返回offset
+	bool Replace(string& FileName,int blockNum,string& content);		  //替换算法
+	static void CreateFile(string &tablename, File_Type filetype);        //创建文件
+	bool Buffer_Manager::IsFull();										  //缓冲区是否已满
+	int ReadLastNumber(string & filename, string &str);	//返回块号
+	bool Buffer_Manager::File2Block(string& fileName, int blockNum, string& Strout);
 };
 //缓冲管理区的实例化
 inline Buffer_Manager & Buffer_Manager::Instance()

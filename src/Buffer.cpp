@@ -6,24 +6,7 @@ using namespace std;
 /*
 	缓冲区管理器
 */
-int Buffer_Manager::Write(string & FileName,string & Content,int BlockNum)
-{
-	string Nouse;
-	if (BlockNum != -1)
-	{
-		if (InBuffer(FileName, BlockNum) == false)//如果不在Buffer中，就把文件对应的块写入Buffer
-			File2Block(FileName, BlockNum, Nouse);
-		Write2Block(FileName, BlockNum, Content);
-		return BlockNum;
-	}
-	else
-	{
-		int num;
-		B_File::Write(FileName, Content, num);
-		File2Block(FileName, num, Nouse);
-		return num;
-	}
-}
+
 //写入块中
 bool Buffer_Manager::Write2Block(string & FileName, int Blocknum, string & Content)
 {
@@ -51,7 +34,7 @@ bool Buffer_Manager::InBuffer(string FileName, int BlockNum)
 */
 bool Buffer_Manager::Replace(string & FileName, int BlockNum, string & Content)
 {
-	B_Block * cur;
+	Block * cur;
 	while ((cur = MemBlock_Used.front())->IsPin())
 	{
 		MemBlock_Used.pop_front();
@@ -60,87 +43,61 @@ bool Buffer_Manager::Replace(string & FileName, int BlockNum, string & Content)
 	if (cur->IsDirty())
 		cur->Write2File();
 	string Oldkey = cur->GetKey();
-	string Newkey = B_Block::GetKey();
+	string Newkey = Block::GetKey();
 	cur->Update(FileName, BlockNum, Content);
 	MemBlock_Map.erase(MemBlock_Map.find(Oldkey));
 	MemBlock_Map.insert(make_pair(Newkey, cur));
 	return true;
-}
-/*
-	把文件写入块中
-*/
-bool Buffer_Manager::File2Block(string& fileName, int blockNum, string& Strout)
-{
-	char * Empty = new char[Block_Size];//读取文件传出的参数
-	if (B_File::Read(fileName, blockNum, Empty) == false)//读失败(blockNum大于文件的块总数时)
-	{
-		delete[] Empty;
-		return false;
-	}
-	else
-	{
-		Strout = string(Empty, Block_Size);
-		/*
-			如果缓冲区已经满了，
-			使用LRU算法进行替换
-		*/
-		if (IsFull())
-			Replace(fileName, blockNum, Strout);
-		else
-			Built_NewBlock(fileName, blockNum, Strout);//否则建一个新的块
-		delete[] Empty;
-		return true;
-	}
 }
 //缓冲区是否已满
 bool Buffer_Manager::IsFull()
 {
 	return MemBlock_Used.size() == Block_Size;
 }
-//建立新的块
-
 //文件写入
-bool Buffer_Manager::B_File::Write(B_Block * cur)
+void Buffer_Manager::Write(Block block)
 {
-	ofstream Output(cur->FileName, ios::in | ios::out | ios::binary);
-	if (File_NotIn())
+	FILE* fp = NULL;
+	if (block.Block_Type== File_Type::RECORD)
+		fp = fopen(Intepretor::String2Char(block.Block_Name + ".bol"), "rb");
+	else if (block.Block_Type == File_Type::INDEX)
+		fp = fopen(Intepretor::String2Char(block.Block_Name + ".ind"), "rb");
+	if (fp == NULL)
 	{
-		B_File::CreateFile(cur->FileName);
-		Output.open(cur->FileName, ios::in | ios::out | ios::binary);
+		throw string("block type error");
 	}
-	/*
-	seekp:设置输出文件流的文件流指针位置
-	*/
-	Output.seekp(Block_Size*cur->Block_Num);//定位写入文件的指针位置
-	Output.write(cur->Block_Content.c_str(), Block_Size);
-	Output.clear();
-	return true;
+	fseek(fp, block.Block_Offset * 4096, SEEK_SET);
+	fwrite(block.Block_Data, sizeof(Byte), 4096, fp);
+	fclose(fp);
 }
-bool Buffer_Manager::B_File::Write(string &FileName, string &Content, int & Num)
+//返回块
+Block Buffer_Manager::ReadLast(string & tablename,File_Type filetype)
 {
-	ofstream Output(FileName, ios::in | ios::out | ios::binary);
-	if (File_NotIn())
+	B_Block block;
+	FILE* fp = NULL;
+	if (filetype== File_Type::RECORD)
+		fp = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
+	else if (filetype == File_Type::INDEX)
+		fp = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
+	if (fp == NULL)
 	{
-		B_File::CreateFile(FileName);
-		Output.open(FileName, ios::in | ios::out | ios::binary);
+		throw string("no such file");
 	}
-	Output.seekp(0, ios_base::end);
-	long End = Output.tellp();//表示内置指针的当前位置
-	Num = (End / Block_Size);
-	string ToWrite(Block_Size, 0);
-	ToWrite = Content;
-	Output.seekp(Num*Block_Size);
-	Output.write(ToWrite.c_str(), Block_Size);
-	Output.close();
-	return true;
+	fseek(fp, 0, SEEK_END);
+	//if (ftell(fp) == 0)
+	//	throw error();
+
+	fseek(fp, -4096, SEEK_END);
+	int offset = ftell(fp) / 4096;
+	fread(block.Block_Data , sizeof(Byte), 4096, fp);
+	fclose(fp);
+	block.Block_Offset = offset;
+	block.Block_Name = tablename;
+	block.Block_Type = filetype;
+	return block;
 }
 //返回块号
-int Buffer_Manager::ReadLast(string & filename,string & str)
-{
-	return B_File::ReadLast(filename,str);
-}
-//返回块号
-int Buffer_Manager::B_File::ReadLast(string & filename, string &str)
+int Buffer_Manager::ReadLastNumber(string & filename, string &str)
 {
 	ifstream In(filename, ios::binary);
 	In.seekg(-4096, ios_base::end);
@@ -154,12 +111,48 @@ int Buffer_Manager::B_File::ReadLast(string & filename, string &str)
 bool Buffer_Manager::File_Exist(string  &tablename, File_Type filetype)
 {
 	FILE *FileP = NULL;
-	if (filetype == File_Type::Record)
+	if (filetype == File_Type::RECORD)
 		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	else if (filetype == File_Type::Index)
+	else if (filetype == File_Type::INDEX)
 		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
 	if (FileP == NULL)
 		return false;
 	else
 		return true;
+}
+//创建文件
+void Buffer_Manager::CreateFile(string & tablename, File_Type filetype)
+{
+	FILE * FileP = NULL;
+	if (filetype == File_Type::RECORD)
+		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "wb");
+	else if (filetype == File_Type::INDEX)
+		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "wb");
+	if (FileP == NULL)
+		throw string("File type error");
+	fclose(FileP);
+}
+//建立新的块
+int Buffer_Manager::New_Block(string & tablename, File_Type filetype)
+{
+	FILE *FileP = NULL;
+	if (filetype == File_Type::RECORD)
+		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
+	else if (filetype == File_Type::INDEX)
+		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
+		if (FileP== NULL)
+		{
+			throw string("build new block failness");
+		}
+		fseek(FileP, 0, SEEK_END);
+		int offset = ftell(FileP) / 4096;
+		Block block;
+		fwrite(block.Block_Data, sizeof(Byte), 4096, FileP);
+		fclose(FileP);
+		return offset;
+}
+//读取
+Block Buffer_Manager::Read(string &tablename, File_Type filetype, int offset)
+{
+	Block block;
 }

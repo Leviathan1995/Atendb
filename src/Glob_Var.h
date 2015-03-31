@@ -1,5 +1,6 @@
 #ifndef _GLOB_VAR_H_
 #define _GLOB_VAR_H_
+typedef unsigned char Byte;
 /*
 	全局变量
 */
@@ -69,7 +70,7 @@ enum ColType
 };
 enum File_Type//文件类型
 {
-	Index,
-	Record
+	INDEX,
+	RECORD,
 };
 #endif
