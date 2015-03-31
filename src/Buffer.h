@@ -1,6 +1,9 @@
 #pragma once
 #ifndef _BUFFER_H
 #define _BUFFER_H
+#include "Glob_Var.h"
+#include "Intepretor.h"
+#include <stdlib.h>
 #include <string>
 #include <map>
 #include <list>
@@ -18,6 +21,8 @@ public:
 	class B_File;
 	Buffer_Manager();
 	~Buffer_Manager();
+	bool File_Exist(string &tablename, File_Type filetyppe);//文件是否存在
+	int ReadLast(string & FileName, string &str);//返回块号
 	static Buffer_Manager & Instance();//缓冲管理器实例化
 	int  Write(string & FileName, string & Content, int BolckNum = -1);
 	bool Write2Block(string& fileName,int blockNum,string& content);
@@ -52,6 +57,7 @@ public:
 	{
 	public:
 		static bool Read(string & FileName, int Block_Num, char *& Dst);
+		static int ReadLast(string & FileName, string &str);
 		static bool Write(B_Block *Current);
 		static bool Write(string &FileName, string &Content, int & Num);
 		static void CreateFile(string FileName);

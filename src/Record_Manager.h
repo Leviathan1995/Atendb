@@ -19,10 +19,12 @@ class Record_Manager
 {
 public:
 	static Record_Manager & Instance();//实例化
-	bool CreateTable(string tablename, const vector<Column_Type>& Table_Column);//建表
+	bool CreateTable(string &tablename, const vector<Column_Type>& Table_Column);//Create建表
+	bool Insert_Into(Table_Type &table, Record R);//Insert into 插入记录
 	void PrintHead();//打印记录的头部
 	void Print();//打印记录
 	void PrintEnd();//打印记录的尾部
+	bool HasExisted(Table_Type &table, string content, int num, int BlockNum);
 };
 //实例化
 inline Record_Manager & Record_Manager::Instance()

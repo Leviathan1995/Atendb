@@ -24,7 +24,6 @@ int Buffer_Manager::Write(string & FileName,string & Content,int BlockNum)
 		return num;
 	}
 }
-
 //写入块中
 bool Buffer_Manager::Write2Block(string & FileName, int Blocknum, string & Content)
 {
@@ -134,4 +133,33 @@ bool Buffer_Manager::B_File::Write(string &FileName, string &Content, int & Num)
 	Output.write(ToWrite.c_str(), Block_Size);
 	Output.close();
 	return true;
+}
+//返回块号
+int Buffer_Manager::ReadLast(string & filename,string & str)
+{
+	return B_File::ReadLast(filename,str);
+}
+//返回块号
+int Buffer_Manager::B_File::ReadLast(string & filename, string &str)
+{
+	ifstream In(filename, ios::binary);
+	In.seekg(-4096, ios_base::end);
+	const long Target = In.tellg();
+	char Dst[Block_Size];
+	In.read(Dst, Block_Size);
+	str = string(Dst, Block_Size);
+	return (Target / Block_Size);
+}
+//查找文件是否存在
+bool Buffer_Manager::File_Exist(string  &tablename, File_Type filetype)
+{
+	FILE *FileP = NULL;
+	if (filetype == File_Type::Record)
+		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
+	else if (filetype == File_Type::Index)
+		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
+	if (FileP == NULL)
+		return false;
+	else
+		return true;
 }

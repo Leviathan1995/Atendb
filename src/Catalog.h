@@ -32,21 +32,21 @@ struct Column_Type
 	int RequestSize;//用户请求的长度
 	int StoredLength;//实际存储长度
 	Column_Type * Next;//下一个字段
-	short NextKey;//该表下一条键的信息，若没有则为-1
+	short NextColumn;//该表下一条键的信息，若没有则为-1
 };
 //数据表
 struct Table_Type
 {
 	char Flag;//标志位
-	char PrimaryKey;//如果>32表示无主键
-	char NumberKeys;//<=32
+	char PrimaryColumn;//如果>32表示无主键
+	char NumberColumns;//属性的数量<=32
 	vector<Column_Type> Table_Column;//数据表中的元组存放的地方
 	string Table_Name;//表名
 	int ColumnNum;//数据表具有的属性数目
 	int RecordSize;//记录的长度
 	int PrimaryNum;//多属性主键的个数
 	unsigned long IndexFlags; // 对每一位，0 表示该键无索引，1 表示该键有索引
-	unsigned short FirstKey; // key 目录文件中，该表第一条键信息的编号
+	unsigned short FirstColumn; // key 目录文件中，该表第一条键信息的编号
 	short FirstIndex; // index 目录文件中，该表第一条索引信息的编号
 	union Table_ptr
 	{
@@ -76,18 +76,25 @@ public :
 	static const char CATALOG_IS_NOT_NULL = 0x04;
 	static const char CATALOG_IS_INDEX = 0x02;
 	static const char CATALOG_HAS_NEXT = 0x01;
+	size_t Table_Size(string &tablename);
 	//功能需求
 	void CatalogCreateTable(string & Tablename, vector<Column_Type> & Attributes);//建立数据表
 	void CheckTable(string &Tablename, vector<Column_Type> & Attributes);//数据表的检查
 	void CheckColumn(string &Tablename, Record R);//检查属性是否正确
 	void CatalogInsertColumn(string tableneame, Record R);//数据表插入属性
+	/*
+		文件存放
+		把磁盘读取的目录文件存入此处的vector变量中，对目录的修改操作直接针对此处变量
+	*/
 	vector<Table_Type> TableCatalog;//数据表的存放
 	vector<Column_Type> ColumnCatalog;//属性的存放
 	static map<string, Table_Type> Mem_Table;
+	//获取操作
 	static Table_Type & Get_Table(string tablename);//得到 数据表
 	static Column_Type & Get_Column(string tablename,string columnname);//得到 数据表中的属性
 	//析构函数
 	~Catalog();
 	void SaveTable2File();//将数据写入文件，由析构函数调用
 };
+
 #endif

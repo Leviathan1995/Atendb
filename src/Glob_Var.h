@@ -67,4 +67,9 @@ enum ColType
 	Char,
 	Float,
 };
+enum File_Type//文件类型
+{
+	Index,
+	Record
+};
 #endif

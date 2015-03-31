@@ -74,15 +74,15 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Column_Type> & Attrib
 			ColumnCatalog[KeyIndex] = Kc;
 		if (i == 0)
 			//如果当前是第一条属性，修改TableCatalog的FirstKey
-			TableCatalog[NewTableIndex].FirstKey = KeyIndex;
+			TableCatalog[NewTableIndex].FirstColumn = KeyIndex;
 		else
-			ColumnCatalog[PreviousKeyIndex].NextKey = KeyIndex;
+			ColumnCatalog[PreviousKeyIndex].NextColumn = KeyIndex;
 		PreviousKeyIndex = KeyIndex;
 		//如果这个属性是主键，修改标志和Primarykey
 		if (Kc.Flag &CATALOG_HAS_PRIMARY_KEY)
 		{
 			TableCatalog[NewTableIndex].Flag |= CATALOG_HAS_PRIMARY_KEY;
-			TableCatalog[NewTableIndex].PrimaryKey = i;
+			TableCatalog[NewTableIndex].PrimaryColumn = i;
 		}
 	}
 }
@@ -115,7 +115,7 @@ void Catalog::CheckColumn(string & tablename, Record R)
 		if ((TableCatalog[i].Flag&CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].Table_Name), tablename.c_str()))
 		{
 			TableFind = true;
-			NumberOfkeys = TableCatalog[i].NumberKeys;//数据表中的属性的数量
+			NumberOfkeys = TableCatalog[i].NumberColumns;//数据表中的属性的数量
 			FirstKeyindex = TableCatalog[i].FirstIndex;
 			break;
 		}
@@ -127,11 +127,20 @@ void Catalog::CheckColumn(string & tablename, Record R)
 	short CurrentKeyindex = FirstKeyindex;
 	for (size_t i = 0; i < R.Mem_Element.size(); i++)
 	{
-		switch ()
+		switch (ColumnCatalog[i].coltype)
 		{
+		case 0:
+			break;
+		case 1:
+			if ((int)R.Mem_Element[i].Mem_CharNum>ColumnCatalog[CurrentKeyindex].RequestSize)
+				throw string("ValueIllegal: The value to insert is longer than the length of the key.");
+			break;
+		case 2:
+			break;
 		default:
 			break;
 		}
+		CurrentKeyindex = ColumnCatalog[CurrentKeyindex].NextColumn;
 	}
 }
 //插入元组
@@ -157,6 +166,17 @@ Column_Type & Catalog::Get_Column(string tablename,string columnname)
 			return *i;
 	}
 }
+//获取字段的长度
+size_t Catalog::Table_Size(string &tablename)
+{
+	size_t length = 0;
+	Table_Type t = Get_Table(tablename);
+	for (auto Len = t.Table_Column.begin(); Len != t.Table_Column.end(); Len++)
+	{
+		length += Len->StoredLength;
+	}
+	return length;
+}
 //把数据写入文件
 void Catalog::SaveTable2File()
 {
@@ -166,10 +186,10 @@ void Catalog::SaveTable2File()
 	{
 		Fout.write(&TableCatalog[i].Flag, 1);
 		Fout.write(TableCatalog[i].Table_Name.c_str(), TableCatalog[i].Table_Name.length());
-		Fout.write(&TableCatalog[i].NumberKeys, 1);
-		Fout.write(&TableCatalog[i].PrimaryKey, 1);
+		Fout.write(&TableCatalog[i].NumberColumns, 1);
+		Fout.write(&TableCatalog[i].PrimaryColumn, 1);
 		Fout.write((char *)&TableCatalog[i].IndexFlags, sizeof(long));
-		Fout.write((char *)&TableCatalog[i].FirstKey, sizeof(short));
+		Fout.write((char *)&TableCatalog[i].FirstColumn, sizeof(short));
 		Fout.write((char *)&TableCatalog[i].FirstIndex, sizeof(short));
 	}
 	Fout.close();

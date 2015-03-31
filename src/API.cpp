@@ -25,4 +25,21 @@ void API::CreateTable(string & tablename,vector<Column_Type> &Attributes)
 void API::Insert_Into(string &tablename, Record R)
 {
 	Catalog::Instance().CatalogInsertColumn(tablename, R);
+	Table_Type table = Catalog::Instance().Get_Table(tablename);
+	/*
+	Unique的检查
+	for (auto i = table.Table_Column.begin(); i != table.Table_Column.end(); i++)
+	{
+		if (i->IsUnique)
+		{
+			int ColumnIndex=table
+		}
+	}
+	*/
+	int Offset = Record_Manager::Instance().Insert_Into(table, R);
+	if (Offset=-1)
+		throw string("Insert failed: violation of the constraint 'unique'.");
+	/*
+		构建索引
+	*/
 }
