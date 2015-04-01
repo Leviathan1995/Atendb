@@ -7,7 +7,7 @@ using namespace std;
 	缓冲区管理器
 */
 
-//写入块中
+//直接写入块中
 bool Buffer_Manager::Write2Block(string & FileName, int Blocknum, string & Content)
 {
 	assert(InBuffer(FileName, Blocknum) == true);
@@ -55,20 +55,23 @@ bool Buffer_Manager::IsFull()
 	return MemBlock_Used.size() == Block_Size;
 }
 //文件写入
-void Buffer_Manager::Write(Block block)
+int Buffer_Manager::Write(string& filename,string& content,int blocknum = -1)
 {
-	FILE* fp = NULL;
-	if (block.Block_Type== File_Type::RECORD)
-		fp = fopen(Intepretor::String2Char(block.Block_Name + ".bol"), "rb");
-	else if (block.Block_Type == File_Type::INDEX)
-		fp = fopen(Intepretor::String2Char(block.Block_Name + ".ind"), "rb");
-	if (fp == NULL)
+	string Nouse;
+	if (blocknum != -1)//指定块号的写入
 	{
-		throw string("block type error");
+		if (InBuffer(filename, blocknum) == false)
+			File2Block(filename, blocknum, Nouse);	// 不在buffer中，将文件中对应的块读入buffer (传入的noUse是为与read接口兼容)
+		Write2Block(filename, blocknum, content);	// 直接将content写入buffer中的指定的blocknum块
+		return blocknum;
 	}
-	fseek(fp, block.Block_Offset * 4096, SEEK_SET);
-	fwrite(block.Block_Data, sizeof(Byte), 4096, fp);
-	fclose(fp);
+	else
+	{
+		int num;
+		File::Write(filename,content,num);//先写入文件中
+		File2Block();//再把文件写入缓冲区的块中
+		return num;
+	}
 }
 //返回块
 Block Buffer_Manager::ReadLast(string & tablename,File_Type filetype)
@@ -154,5 +157,29 @@ int Buffer_Manager::New_Block(string & tablename, File_Type filetype)
 //读取
 Block Buffer_Manager::Read(string &tablename, File_Type filetype, int offset)
 {
-	Block block;
+	if (InBuffer(tablename, offset))
+		return ReadBlock();//在buffer中，从buffer中
+	else
+		return File2Block();//不在buffer中，从文件中读
+
+
 }
+//把文件写入块中
+bool Buffer_Manager::File2Block(string& fileName, const int blockNum, string& strOut)
+{
+	char *Dst = new char[Block_Size];//申请一个块大小的内存
+	if (File::Read(fileName, blockNum, Dst) == false)
+	{
+		delete[] Dst;
+		return false;
+	}
+	else
+	{
+		strOut = string(Dst, Block_Size);
+		if (IsFull())//如果缓冲区已经满了
+			Replace(fileName, blockNum, strOut);//利用替换算法 替换进来 
+		else
+			New_Block(fileName, blockNum, strOut);
+	}
+}
+bool Buffer::newBlock(const std::string& fileName, const int blockNum, const std::string& content);

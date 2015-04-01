@@ -4,6 +4,7 @@
 #include "Glob_Var.h"
 #include "Intepretor.h"
 #include "Block.h"
+#include "File.h"
 #include <stdlib.h>
 #include <string>
 #include <map>
@@ -24,17 +25,16 @@ public:
 	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
 	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在
 	Block ReadLast(string & FileName, File_Type filetype);				  //返回块
-	void  Write(Block block);											  //写入
 	bool Write2Block(string& fileName,int blockNum,string& content);	  //写入块中
 	bool InBuffer(string FileName, int BlockNum);						  //检测在不在缓冲区中
 	map<string, Block*> MemBlock_Map;									  //记录使用的块
 	list<Block *> MemBlock_Used;										  //已经使用过的块
-	int Buffer_Manager::New_Block(string & tablename, File_Type filetype);//建立新的块，在文件中建立新的block，也就是在文件末尾添加一块新的块，返回offset
 	bool Replace(string& FileName,int blockNum,string& content);		  //替换算法
 	static void CreateFile(string &tablename, File_Type filetype);        //创建文件
-	bool Buffer_Manager::IsFull();										  //缓冲区是否已满
-	int ReadLastNumber(string & filename, string &str);	//返回块号
-	bool Buffer_Manager::File2Block(string& fileName, int blockNum, string& Strout);
+	bool IsFull();														  //缓冲区是否已满
+	int ReadLastNumber(string & filename, string &str);					  //返回块号
+	bool File2Block(string& fileName, int blockNum, string& Strout);	  //把文件写入块中
+	bool newBlock(string& fileName,int blockNum,string& content);		  //申请新块
 };
 //缓冲管理区的实例化
 inline Buffer_Manager & Buffer_Manager::Instance()

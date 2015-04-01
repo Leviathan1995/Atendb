@@ -27,7 +27,7 @@ public:
 	void PrintEnd();//打印记录的尾部
 	bool HasExisted(Table_Type &table, string content, int num, int BlockNum);
 	void WriteRecord2Block(Byte *Positon, Record R);////将一条记录按顺序拷贝到p的位置
-	Record copy_block_to_record(Byte* Position, Table_Type table);
+	Record Copy_block_to_record(Byte* Position, Table_Type table);
 };
 //实例化
 inline Record_Manager & Record_Manager::Instance()

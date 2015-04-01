@@ -44,8 +44,10 @@ bool Record_Manager::Insert_Into(Table_Type &table, Record R)
 	block = Buffer_Manager::Instance().Read(table.Table_Name, File_Type::RECORD, Offset);
 	Byte * P_Record = block.Block_Data;
 	P_Record[0] = 1;
-	
+	Copy_block_to_record(P_Record, table);
+	File.Write(block);
 }
+//把记录写入块中
 void Record_Manager::WriteRecord2Block(Byte * Position,Record R)
 {
 	for (vector<Element>::iterator I = R.Mem_Element.begin(); i != R.Mem_Element.end(); i++)
@@ -69,7 +71,8 @@ void Record_Manager::WriteRecord2Block(Byte * Position,Record R)
 		}
 	}
 }
-Record copy_block_to_record(Byte* Position, Table_Type table)
+//返回块中的记录
+Record Copy_block_to_record(Byte* Position, Table_Type table)
 {
 	vector<Column_Type> Attributes = table.Table_Column;
 	Record R;
