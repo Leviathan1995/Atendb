@@ -22,17 +22,16 @@ void Selection::SelectionInput(string *Sel, string *table, WhereList *& wherelis
 void Selection::Selection_Parse()
 {
 	Table_Type SelectTable;
-	string WhereAttributesName;//where中选择属性的名字
-	Column_Type WhereAttributes;// where中选择属性
-	vector<Record> SelectRecord;//Select判断后的记录
-	Record WhereRecord;//select命令where部分经选择后的记录
-	while (!TableLists.empty())//TableLists为用户选择的数据表集合，即From
+	string WhereAttributesName;					//where中选择属性的名字
+	Column_Type WhereAttributes;				// where中选择属性
+	SelectRecord record;						//select命令where部分经选择后的记录
+	while (!SelLists.empty())					//SelLists为用户选择的属性集合
 	{
-		SelectTable = Catalog::Get_Table(TableLists.front());//获取用户选择的数据表
-		while (!SelLists.empty())//SelLists为用户选择的属性集合
+		SelectTable = Catalog::Get_Table(TableLists.front());		//获取用户选择的数据表
+		while (!TableLists.empty())									//TableLists为用户选择的数据表集合，即From
 		{
 			Column_Type SelectColumn;
-			SelectColumn = Catalog::Get_Column(TableLists.front(), SelLists.front());//用户选择的属性
+			SelectColumn = Catalog::Get_Column(TableLists.front(), SelLists.front());				//用户选择的属性
 			Operator_type Select_Operator = Intepretor::Op_Judge(WhereLists.front().Where_Operator);//取出where中运算符
 			switch (Select_Operator)
 			{

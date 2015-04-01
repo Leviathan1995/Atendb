@@ -6,6 +6,11 @@
 #include <vector>
 #include <string>
 //Select 中的where结构体
+struct SelectRecord			//Select后的记录
+{
+	string Attributes;			//属性名
+	vector<string> selectrecord;//属性值
+};
 struct WhereList
 {
 	string Attribute;//选择的属性
@@ -21,12 +26,13 @@ class Selection
 {
 public:
 
-	static vector<string> SelLists;//即选择的属性
-	static vector<string> TableLists;//select 中from的数据表列表
-	static vector<WhereList> WhereLists;//slect 中where部分
+	static vector<string> SelLists;																//即选择的属性
+	static vector<string> TableLists;															//select 中from的数据表列表
+	static vector<WhereList> WhereLists;														//slect 中where部分
+	static vector<SelectRecord> SelectOutput;													//Select选择后的记录
 	static void SelectionInput(string *Sel, string *table, WhereList *& wherelist, int wherenum);//获取用户输入的属性和数据表和where部分
-	void Selection_Parse();//解析用户输入的Select命令
-	void Print_SelectHead();//打印Select的属性头
+	void Selection_Parse();																		//解析用户输入的Select命令
+	void Print_SelectHead();																	//打印Select的属性头
 	vector<Record> Mem_Record;
 	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
 };

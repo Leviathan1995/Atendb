@@ -6,88 +6,10 @@ using namespace std;
 //析构函数
 Catalog::~Catalog()
 {
-	SaveTable2File();//将数据表写入文件
-}
-//建立数据表
-void Catalog::CatalogCreateTable(string & Tablename,vector<Column_Type> & Attributes)
-{
-	Table_Type Tabletc;
-	Tabletc.Table_Name = Tablename;//数据表名字
-	Tabletc.Flag = CATALOG_SPACE_USED;
-	Tabletc.ColumnNum = Attributes.size();
-	short NewTableIndex = -1;//数据表的标签索引号
-	for (size_t i = 0; i < TableCatalog.size(); i++)
-	{
-		if (!(TableCatalog[i].Flag&CATALOG_SPACE_USED))
-		{
-			NewTableIndex = i;
-			TableCatalog[i] = Tabletc;
-			break;
-		}
-		if (NewTableIndex == -1)
-		{
-			TableCatalog.push_back(Tabletc);
-			NewTableIndex = TableCatalog.size() - 1;
-		}
-	}
-	Column_Type Kc;
-	short KeyIndex = -1, PreviousKeyIndex = 0;
-	for (size_t i = 0; i < Attributes.size(); i++)
-	{
-		Kc.Flag = CATALOG_SPACE_USED;
-		if (Attributes[i].IsPrimary)
-		{
-			Kc.Flag |= CATALOG_IS_PRIMARY_KEY;
-			Kc.Flag |= CATALOG_IS_UNIQUE;
-			Kc.Flag |= CATALOG_IS_NOT_NULL;
-		}
-		if (Attributes[i].IsUnique)
-			Kc.Flag |= CATALOG_IS_UNIQUE;
-		if (Attributes[i].IsNotNull)
-			Kc.Flag |= CATALOG_IS_NOT_NULL;
-		Kc.Column_TypeName = Attributes[i].Column_TypeName;
-		switch (Attributes[i].coltype)
-		{
-		case Int:
-			Kc.coltype = 0;
-			Kc.StoredLength = 4;
-			break;
-		case Char:
-			Kc.coltype = 1;
-			Kc.StoredLength = Attributes[i].RequestSize;
-		case Float:
-			Kc.coltype = 2;
-			Kc.StoredLength = 4;
-		default://默认看作是长度为255的字符串
-			Kc.coltype = 1;
-			Kc.StoredLength = 255;
-			break; 
-		}
-		Kc.Next = NULL;//下一个属性先置为空
-		KeyIndex++;
-		while (KeyIndex < (int)ColumnCatalog.size() && (ColumnCatalog[KeyIndex].Flag &CATALOG_SPACE_USED))
-			KeyIndex++;
-		if (KeyIndex >= (int)ColumnCatalog.size())
-			//索引大于属性存放数组的大小 需要开辟空间
-			ColumnCatalog.push_back(Kc);
-		else
-			ColumnCatalog[KeyIndex] = Kc;
-		if (i == 0)
-			//如果当前是第一条属性，修改TableCatalog的FirstKey
-			TableCatalog[NewTableIndex].FirstColumn = KeyIndex;
-		else
-			ColumnCatalog[PreviousKeyIndex].NextColumn = KeyIndex;
-		PreviousKeyIndex = KeyIndex;
-		//如果这个属性是主键，修改标志和Primarykey
-		if (Kc.Flag &CATALOG_HAS_PRIMARY_KEY)
-		{
-			TableCatalog[NewTableIndex].Flag |= CATALOG_HAS_PRIMARY_KEY;
-			TableCatalog[NewTableIndex].PrimaryColumn = i;
-		}
-	}
+	WriteTable2File();//将数据表写入文件
 }
 //数据表检查
-void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
+void Catalog::CatalogCheckTable(string & Tablename, vector<CatalogAttributes> & Attributes)
 {
 	for (size_t i = 0; i < TableCatalog.size(); i++)
 	{
@@ -100,13 +22,87 @@ void Catalog::CheckTable(string & Tablename, vector<Column_Type> & Attributes)
 		throw string("Atttibutes Error:Too few or too many ");
 	for (size_t i = 0; i < Attributes.size(); i++)
 	{
-		//判断记录的长度是否合法
-		if (Attributes[i].StoredLength<1 || Attributes[i].StoredLength>255)
+		//判断记录的申请长度是否合法
+		if (Attributes[i].CatalogAttributes_Length<1 || Attributes[i].CatalogAttributes_Length>255)
 			throw string("Attributes Error: Illegal length of the Attribute");
 	}
 }
+//建立数据表
+void Catalog::CatalogCreateTable(string & Tablename,vector<CatalogAttributes> & attributes)
+{
+	Table Tabletc;
+	Tabletc.Table_Name = Tablename;						//数据表名字
+	Tabletc.Flag = CATALOG_SPACE_USED;					//设定标志位
+	Tabletc.Table_Attributesnum = attributes.size();
+	short NewTableIndex = -1;							//数据表的标签索引号
+	for (int i = 0; i < TableCatalog.size(); i++)		//在现有的数据中搜寻
+	{
+		if (!(TableCatalog[i].Flag&CATALOG_SPACE_USED))	//数据表为空
+		{
+			NewTableIndex = i;
+			TableCatalog[i] = Tabletc;
+			break;
+		}
+		if (NewTableIndex == -1)						//没有空数据表供其使用
+		{
+			TableCatalog.push_back(Tabletc);
+			NewTableIndex = TableCatalog.size() - 1;	//新的数据表的索引号
+		}
+	}
+	Attributes NewTableAttributes;
+	short AttributesIndex = -1, PreviousAttributesIndex = 0;
+	for (int i = 0; i < attributes.size(); i++)
+	{
+		NewTableAttributes.Flag = CATALOG_SPACE_USED;
+		if (attributes[i].CatalogAttributes_Primary)
+		{
+			NewTableAttributes.Flag |= CATALOG_IS_PRIMARY_KEY;
+			NewTableAttributes.Flag |= CATALOG_IS_UNIQUE;
+			NewTableAttributes.Flag |= CATALOG_IS_NOT_NULL;
+		}
+		if (attributes[i].CatalogAttributes_Unique)
+			NewTableAttributes.Flag |= CATALOG_IS_UNIQUE;
+		if (attributes[i].CatalogAttributes_Null)
+			NewTableAttributes.Flag |= CATALOG_IS_NOT_NULL;
+		NewTableAttributes.Attributes_name = attributes[i].CatalogAttributes_Name;
+		switch (attributes[i].CatalogAttributes_Type)
+		{
+		case Int:
+			NewTableAttributes.Attributes_type =Int;
+			NewTableAttributes.StoredLength = 4;
+			break;
+		case Char:
+			NewTableAttributes.Attributes_type = Char;
+			NewTableAttributes.StoredLength = attributes[i].CatalogAttributes_Length;
+		case Float:
+			NewTableAttributes.Attributes_type = Float;
+			NewTableAttributes.StoredLength = 4;
+		default:
+			break; 
+		}
+		NewTableAttributes.NextAttributes = NULL;//下一个属性置为空
+		AttributesIndex++;
+		while (AttributesIndex < (int)AttributesCatalog.size() && (AttributesCatalog[AttributesIndex].Flag &CATALOG_SPACE_USED))//先寻找有没有空的记录空间
+				AttributesIndex++;
+		if (AttributesIndex >= (int)AttributesCatalog.size())		//索引大于属性存放数组的大小 需要开辟空间
+			AttributesCatalog.push_back(NewTableAttributes);
+		else
+			AttributesCatalog[AttributesIndex] = NewTableAttributes;//否则把记录放入空的记录空间
+		if (i == 0)													//如果当前是第一条属性，修改TableCatalog的FirstKey
+			TableCatalog[NewTableIndex].Table_FirstAttributes = AttributesIndex;
+		else
+			AttributesCatalog[PreviousAttributesIndex].NextAttributes = AttributesIndex;// 否则修改此表上一条属性的NextAttributes;
+		PreviousAttributesIndex = AttributesIndex;
+		//如果这个属性是主键，修改标志和Primarykey
+		if (NewTableAttributes.Flag &CATALOG_HAS_PRIMARY_KEY)
+		{
+			TableCatalog[NewTableIndex].Flag |= CATALOG_HAS_PRIMARY_KEY;
+			TableCatalog[NewTableIndex].Table_PrimaryAttributes = i;
+		}
+	}
+}
 //插入的属性进行检查
-void Catalog::CheckColumn(string & tablename, Record R)
+void Catalog::CatalogCheckColumn(string & tablename, Record R)
 {
 	bool TableFind;//插入记录的数据表是否存在
 	short NumberOfkeys = 0, FirstKeyindex = 0;
@@ -178,19 +174,19 @@ size_t Catalog::Table_Size(string &tablename)
 	return length;
 }
 //把数据写入文件
-void Catalog::SaveTable2File()
+void Catalog::WriteTable2File()
 {
 	ofstream Fout("catalog/table.dat", ios::binary);
 	Fout.seekp(0, ios::beg);
-	for (size_t i = 0; i < TableCatalog.size(); i++)
+	for (int i = 0; i < TableCatalog.size(); i++)
 	{
-		Fout.write(&TableCatalog[i].Flag, 1);
-		Fout.write(TableCatalog[i].Table_Name.c_str(), TableCatalog[i].Table_Name.length());
-		Fout.write(&TableCatalog[i].NumberColumns, 1);
-		Fout.write(&TableCatalog[i].PrimaryColumn, 1);
-		Fout.write((char *)&TableCatalog[i].IndexFlags, sizeof(long));
-		Fout.write((char *)&TableCatalog[i].FirstColumn, sizeof(short));
-		Fout.write((char *)&TableCatalog[i].FirstIndex, sizeof(short));
+		Fout.write(&TableCatalog[i].Flag, 1);														//先写入标志位
+		Fout.write(TableCatalog[i].Table_Name.c_str(), TableCatalog[i].Table_Name.length());		//再写入数据表名字
+		Fout.write(&TableCatalog[i].Table_Attributesnum, 1);										//数据表中属性的数量		
+		Fout.write(&TableCatalog[i].Table_PrimaryAttributes, 1);									//数据中的主键
+		Fout.write((char *)&TableCatalog[i].IndexFlags, sizeof(long));								//索引的标志位
+		Fout.write((char *)&TableCatalog[i].Table_FirstAttributes, sizeof(short));					//第一条属性
+		Fout.write((char *)&TableCatalog[i].FirstIndex, sizeof(short));								//该表第一条索引信息的编号
 	}
 	Fout.close();
 }

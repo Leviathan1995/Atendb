@@ -2,6 +2,7 @@
 #ifndef _INTEPRETOR_H_
 #define _INTEPRETOR_H
 #include "Insert_Into.h"
+#include "Attributes.h"
 #include "Catalog.h"
 #include "Glob_Var.h"
 #include "Record.h"
@@ -40,7 +41,7 @@ public:
 	/*
 		类型转换
 	*/
-	ColType Trasn2type(string type);//将string转换为类型
+	Attributes_Type Trasn2type(string type);//将string转换为类型
 	int String2Int(string s);//将string 转换为int
 	static const char * String2Char(string s);//将string 转换为 char *
 	float String2Float(string s);//将string 转换为float

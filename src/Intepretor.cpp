@@ -4,15 +4,15 @@
 #include <string>
 #include <stdlib.h>
 using namespace std;
-//将string类型的type转换为ColType
-ColType Intepretor::Trasn2type(string type)
+//将string类型的type转换为Attributes_Type
+Attributes_Type Intepretor::Trasn2type(string type)
 {
 	if (type == "int")
-		return ColType::Int;
+		return Attributes_Type::Int;
 	if (type == "char")
-		return ColType::Char;
+		return Attributes_Type::Char;
 	if (type == "float")
-		return ColType::Float;
+		return Attributes_Type::Float;
 	/*
 			如果不属于这三种类型，需要抛出一个错误得救
 	*/
@@ -169,17 +169,17 @@ bool Intepretor::Is_Insert(vector<string> input)
 void Intepretor::CreateTable_command(vector<string>Input)
 {
 	Command_State state = Create;
-	Table_Type table;//新建立的数据表
-	vector<Column_Type> NewTableColumn;//新的数据表中字段
-	Column_Type column;
-	Column_Type columnprimary;//primary key 约束需要的字段名变量
+	Table table;//新建立的数据表
+	vector<Attributes> NewTableAttributes;//新的数据表中字段
+	Attributes attributes;
+	Attributes attributesprimary;//primary key 约束需要的字段名变量
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (state)
 		{
 		case Create:
-			state = Table; break;
-		case Table:
+			state = Create_Table; break;
+		case Create_Table:
 			state = Table_Name; break;
 		case Table_Name:
 			state = Left_Query;
@@ -192,10 +192,10 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Column_Name://字段名
 			state = Column_type;
-			column.Column_TypeName = *i;
+			attributes.Attributes_name = *i;
 			break;
 		case Column_type://字段属性
-			column.coltype = Trasn2type(*i);
+			attributes.Attributes_type = Trasn2type(*i);
 			if (Trasn2type(*i) == Char)
 				state = Char_LeftBrackets;
 			else
@@ -207,7 +207,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = CharSize;
 			break;
 		case CharSize://Char类型大小
-			column.RequestSize = String2Int(*i);
+			attributes.RequestSize = String2Int(*i);
 			state = Char_LeftBrackets;//char的左括号
 			break;
 		case Char_RightBrackets://右括号
@@ -224,18 +224,18 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		case Not_Null_null://不为空
 			if (*i != "null")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			column.IsNotNull = true;
+			attributes.Attributes_null= true;
 			if (*(++i) == "unique")
 				state = Unique;
 			break;
 		case Unique://唯一属性
 			if (*i != "unique")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			column.IsUnique = true;
+			attributes.Attributes_unique = true;
 			if (*(++i) == ",")
 			{
 				state = ColumnEndComma;
-				NewTableColumn.push_back(column);
+				NewTableAttributes.push_back(attributes);
 			}	
 			break;
 		case ColumnEndComma://一个属性结束，至一个新的属性
@@ -257,8 +257,8 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_ColumnName://主键属性名
-			columnprimary = Catalog::Get_Column(table.Table_Name,*i);
-			columnprimary.IsPrimary = true;
+			attributesprimary = Catalog::Instance().Get_Attributes(table.Table_Name, *i);
+			attributesprimary.Attributes_primary = true;
 			if (*(++i) == ")")
 				state = PrimaryKey_RightBrackets;
 			if (*(++i) == ",")
@@ -280,8 +280,8 @@ void Intepretor::CreateTable_command(vector<string>Input)
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			break;
 		case Right_Query://建表结束，传递用户输入的参数
-			Catalog::Instance().CheckTable(table.Table_Name,NewTableColumn);//传到Catalog进行Table Check操作
-			API::Instance().CreateTable(table.Table_Name, NewTableColumn);//传到API进行操作
+			Catalog::Instance().CatalogCheckTable(table.Table_Name,NewTableAttributes);//传到Catalog进行Table Check操作
+			API::Instance().CreateTable(table.Table_Name, NewTableAttributes);//传到API进行操作
 			break;
 		default:
 			break;
@@ -294,10 +294,10 @@ void Intepretor::CreateTable_command(vector<string>Input)
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)
 {
-	Command_State State = Select;
+	Command_State State = Select;			 //命令状态
 	string Attribute[100] = {"$"}; int j = 0;//选择的属性
 	string FromLists[100] = {"$"}; int k = 0;//选择的数据表
-	WhereList WhereLists[100]; int w = 0;//where
+	WhereList WhereLists[100]; int w = 0;	 //where
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (State)
