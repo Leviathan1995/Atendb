@@ -25,8 +25,8 @@ public:
 	/*	
 		命令操作
 	*/
-	void CreateTable(string & Tablename,vector<Attributes> & Attributes);//Create
-	void Insert_Into(string &Tablename, Record R);//Insert into
+	void CreateTable(string & Tablename,vector<Attributes> & Attributes);		//Create		创建数据表
+	void Insert_Into(string &Tablename, Record R);								//Insert into	插入元组
 	//void Select(string table_name, vector<Comparison> Select_Attributes);//选择命令
 };
 inline static API & Instance()

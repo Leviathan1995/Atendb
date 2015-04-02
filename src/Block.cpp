@@ -1,15 +1,28 @@
 #include "Block.h"
-Block::Block()
+Block::Block() :Block_Content(Block_Size, 0)
 {
-	memset(Block_Data, 0, 4096);
+	Block_Dirty = false;
+	Block_Num = -1;
 }
 Block::~Block()
 {
 
 }
-Block::Block(string blockname, int offset, File_Type filetype)
+//块的更新
+void Block::Block_Update(string &filename, int blocknum, string &content)
 {
-	Block_Name = blockname;
-	Block_Offset = offset;
-	Block_FileType = filetype;
+	Block_Dirty = false;
+	Block_Pin = false;
+	this->Block_Name = filename;
+	this->Block_Num = blocknum;
+	this->Block_Content = content;
+}
+//通过文件名和块号获得对应的键值
+string Block::Buffer_ManagerGetKey(string &filename, int blocknum)
+{
+	stringstream tmp;
+	string num;
+	tmp << blocknum;
+	tmp >> num;
+	return (filename + string("@") + num);
 }

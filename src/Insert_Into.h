@@ -9,7 +9,7 @@
 //Insert_into 中的values的结构体
 struct Insert_IntoStruct
 {
-	ColType Valuetype;
+	Attributes_Type Valuetype;
 	string CharValues;
 	int  IntValues;
 	float FloatValues;

@@ -6,28 +6,96 @@ using namespace std;
 /*
 	缓冲区管理器
 */
-
-//直接写入块中
-bool Buffer_Manager::Write2Block(string & FileName, int Blocknum, string & Content)
+//写入一个空块中
+int Buffer_Manager::Buffer_ManagerWrite(string &filename, string &empty_block,int blocknum)
 {
-	assert(InBuffer(FileName, Blocknum) == true);
-	string key = B_Block::GetKey();
-	if (MemBlock_Map[key]->Content != Content)
+	string  Nouse;
+	if (blocknum != -1)											//指定块号的写入
 	{
-		MemBlock_Map[key]->Content = Content;
-		MemBlock_Map[key]->Blcok_Ditry = true;
+		if (Buffer_ManagerInBuffer(filename, blocknum) == false)//如果不在现存的块中
+			Buffer_ManagerFile2Block(filename, blocknum, Nouse);//把文件对应的块读入缓冲区中
+		Buffer_ManagerWrite2Block(filename, blocknum, empty_block);
+		return blocknum;
+		
 	}
-	return true;
 }
-/*
-	文件是否在缓冲区中
-*/
-bool Buffer_Manager::InBuffer(string FileName, int BlockNum)
+//文件是否在缓冲区中
+bool Buffer_Manager::Buffer_ManagerInBuffer(string &fileName, int blocknum)
 {
-	string Key = B_Block::GetKey();//获得文件名，块号对应的键值
+	string Key = Buffer_ManagerGetKey(fileName,blocknum);//获得文件名，块号对应的键值
 	return MemBlock_Map.count(Key) == 1;//存储块的Map结构中如果有就返回1
 
 }
+//把文件读取到缓冲区的块中
+bool Buffer_Manager::File2Block(string& fileName, const int blockNum, string& strOut)
+{
+	char *Dst = new char[Block_Size];//申请一个块大小的内存
+	if (File::Read(fileName, blockNum, Dst) == false)
+	{
+		delete[] Dst;
+		return false;
+	}
+	else
+	{
+		strOut = string(Dst, Block_Size);
+		if (IsFull())//如果缓冲区已经满了
+			Replace(fileName, blockNum, strOut);//利用替换算法 替换进来 
+		else
+			Buffer_ManagerNewBlock(fileName, blockNum, strOut);
+	}
+}
+//建立新的块
+bool Buffer_Manager::Buffer_ManagerNewBlock(string & tablename, int blocknum, string & content)
+{
+	Block * block = new Block();
+	block->Block_Update(tablename, blocknum, content);
+	Buffer_ManagerUsedBlock.push_back(block);													//将新块插入buffer中的块序列
+	Buffer_ManagerBlockMap.insert(make_pair(block->Block_GetKey(tablename, blocknum), block));	//维护Map
+	return true;
+}
+//直接写入块中
+bool Buffer_Manager::Buffer_ManagerWrite2Block(string & filename, int blocknum, string & Content)
+{
+	/*
+	用于程序调试
+	assert()是一个诊断宏，用于动态辨识程序的逻辑错误条件。其原型是： void assert(int expression);
+	如果宏的参数求值结果为非零值，则不做任何操作（no action）；如果是零值，用宽字符打印诊断消息，然后调用abort()。
+	*/
+	assert(Buffer_ManagerInBuffer(filename, blocknum) == true);
+	string key = Block::Block_GetKey(filename, blocknum);
+	if (Buffer_ManagerBlockMap[key]->Block_Content != Content)
+	{
+		Buffer_ManagerBlockMap[key]->Block_Content;
+		Buffer_ManagerBlockMap[key]->Block_Dirty = true;				//修改某一数据，并将其写回磁盘
+	}
+	return true;
+}
+//缓冲区是否已满
+bool Buffer_Manager::IsFull()
+{
+	return Buffer_ManagerUsedBlock.size() == Block_Size;
+}
+
+
+{
+	FILE *FileP = NULL;
+	if (filetype == File_Type::RECORD)
+		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
+	else if (filetype == File_Type::INDEX)
+		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
+	if (FileP == NULL)
+	{
+		throw string("build new block failness");
+	}
+	fseek(FileP, 0, SEEK_END);
+	int offset = ftell(FileP) / 4096;
+	Block block;
+	fwrite(block.Block_Data, sizeof(Byte), 4096, FileP);
+	fclose(FileP);
+	return offset;
+}
+
+
 /*
 	内存中块的置换
 	LRU ->即最少使用页面算法
@@ -49,11 +117,7 @@ bool Buffer_Manager::Replace(string & FileName, int BlockNum, string & Content)
 	MemBlock_Map.insert(make_pair(Newkey, cur));
 	return true;
 }
-//缓冲区是否已满
-bool Buffer_Manager::IsFull()
-{
-	return MemBlock_Used.size() == Block_Size;
-}
+
 //文件写入
 int Buffer_Manager::Write(string& filename,string& content,int blocknum = -1)
 {
@@ -135,25 +199,7 @@ void Buffer_Manager::CreateFile(string & tablename, File_Type filetype)
 		throw string("File type error");
 	fclose(FileP);
 }
-//建立新的块
-int Buffer_Manager::New_Block(string & tablename, File_Type filetype)
-{
-	FILE *FileP = NULL;
-	if (filetype == File_Type::RECORD)
-		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	else if (filetype == File_Type::INDEX)
-		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
-		if (FileP== NULL)
-		{
-			throw string("build new block failness");
-		}
-		fseek(FileP, 0, SEEK_END);
-		int offset = ftell(FileP) / 4096;
-		Block block;
-		fwrite(block.Block_Data, sizeof(Byte), 4096, FileP);
-		fclose(FileP);
-		return offset;
-}
+
 //读取
 Block Buffer_Manager::Read(string &tablename, File_Type filetype, int offset)
 {
@@ -164,22 +210,5 @@ Block Buffer_Manager::Read(string &tablename, File_Type filetype, int offset)
 
 
 }
-//把文件写入块中
-bool Buffer_Manager::File2Block(string& fileName, const int blockNum, string& strOut)
-{
-	char *Dst = new char[Block_Size];//申请一个块大小的内存
-	if (File::Read(fileName, blockNum, Dst) == false)
-	{
-		delete[] Dst;
-		return false;
-	}
-	else
-	{
-		strOut = string(Dst, Block_Size);
-		if (IsFull())//如果缓冲区已经满了
-			Replace(fileName, blockNum, strOut);//利用替换算法 替换进来 
-		else
-			New_Block(fileName, blockNum, strOut);
-	}
-}
+
 bool Buffer::newBlock(const std::string& fileName, const int blockNum, const std::string& content);

@@ -21,14 +21,20 @@ class Buffer_Manager
 public:
 	Buffer_Manager();
 	~Buffer_Manager();
-	static Buffer_Manager & Instance();									  //缓冲管理器实例化
-	void Buffer_ManagerWrite(string &filename, string &empty_block);	  //写入一个空块中
+	list<Block*>Buffer_ManagerUsedBlock;													//buffer中使用的块
+	map<string, Block*>Buffer_ManagerBlockMap;												//buffer中的块对应字典
+	static Buffer_Manager & Instance();														//缓冲管理器实例化
+	int Buffer_ManagerWrite(string &filename, string &empty_block,int blocknum=-1);			//返回写入的块号
+	bool Buffer_ManagerInBuffer(string & fileame, int blocknum);							//检测在不在缓冲区中
+	string Buffer_ManagerGetKey(string &filename, int blocknum);							//通过文件名和块号获得其键值
+	bool Buffer_ManagerFile2Block(string& fileName, int blocknum, string& Strout);		    //把文件读入到缓冲区块中
+	bool Buffer_ManagerNewBlock(string& fileName, int blocknum, string& content);			//申请新块
+	bool Buffer_ManagerWrite2Block(string& fileName, int blockNum, string& content);						//写入到缓冲区的块中
 
 	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
 	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在
 	Block ReadLast(string & FileName, File_Type filetype);				  //返回块
 	bool Write2Block(string& fileName,int blockNum,string& content);	  //写入块中
-	bool InBuffer(string FileName, int BlockNum);						  //检测在不在缓冲区中
 	map<string, Block*> MemBlock_Map;									  //记录使用的块
 	list<Block *> MemBlock_Used;										  //已经使用过的块
 	bool Replace(string& FileName,int blockNum,string& content);		  //替换算法

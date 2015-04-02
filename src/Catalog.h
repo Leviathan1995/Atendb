@@ -43,6 +43,14 @@ struct CatalogAttributes
 	bool CatalogAttributes_Unique;			//是否为Unique
 	short CatalogAttributes_Next;			//下一个属性
 };
+struct CatalogIndex
+{
+	char CatalogIndex_Flag;					//标志位
+	string CatalogIndex_Name;				//索引的名字
+	unsigned short CatalogIndex_InTable;	//该索引所属表在Table目录文件中的编号
+	char CatalogIndex_Key;					//该索引针对所属的表的键
+	short CatalogIndex_Next;				//该表下一条索引信息的编号，没有为-1
+};
 //数据库中的数据表实例类
 class Catalog
 {

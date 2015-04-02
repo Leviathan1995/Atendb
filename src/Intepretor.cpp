@@ -359,7 +359,8 @@ void Intepretor::Select_command(vector<string> Input)
 //Insert_into 命令
 void Intepretor::Insert_command(vector<string> input)
 {
-	vector<string> Values;
+	vector<string> Values;//一次插入记录集合
+	vector<vector<string>> Values_Lists;//多次插入的记录集合
 	Insert_IntoStruct insertintovalues;
 	Command_State state = Insert;//插入状态
 	string Inserttable;//需要插入的数据表
@@ -388,7 +389,7 @@ void Intepretor::Insert_command(vector<string> input)
 				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			state = Insert_Values_Or_Mark;
 			break;
-		case Insert_Values_Or_Mark://插入的值
+		case Insert_Values_Or_Mark://插入的是值还是字符串
 			if (*i == "\'")
 				state = Insert_Value;
 			else
@@ -397,22 +398,30 @@ void Intepretor::Insert_command(vector<string> input)
 				Values.push_back(*i);
 			}
 			break;
-		case Insert_Value:
+		case Insert_Value:			//插入的是值
 			Values.push_back(*i);
 			state = Insert_Right_Mark;
 			break;
-		case Insert_Right_Mark:
+		case Insert_Right_Mark:		//插入的是字符串
 			if (*i != "\'")
 				throw Error(0, "Interpreter", "Insert into", "语法错误!");
 			state = Insert_Comma_Or_Bracket;
 			break;
-		case Insert_Comma_Or_Bracket:
+		case Insert_Comma_Or_Bracket://继续添加还是结束此次插入
 			if (*i == ",")
 				state = Insert_Values_Or_Mark;
 			else if (*i == ")")
 				state = Insert_EndInsert;
 			break;
-		case Insert_EndInsert:
+		case Insert_Rightbracket://值列表的左括号
+			if (*i == ";")
+				state = Insert_EndInsert;
+			if (*i == ",")
+				state = Insert_Leftbracket;//还要继续插入记录
+			else 
+				throw Error(0, "Interpreter", "Insert into", "语法错误!");
+			break;
+		case Insert_EndInsert://结束插入
 			break;
 		default:
 			break;
@@ -420,7 +429,7 @@ void Intepretor::Insert_command(vector<string> input)
 	}
 	if (state = Insert_EndInsert)
 	{
-		Table_Type t = Catalog::Get_Table(Inserttable);
+		Table table = Catalog::Get_Table(Inserttable);
 		vector<Column_Type> Attributes_List = t.Table_Column;
 		if (Attributes_List.size() != Values.size())
 			throw Error(0, "Interpreter", "Insert into", "语法错误!");
