@@ -23,23 +23,25 @@ using namespace std;
 */
 struct CatalogTable
 {
-	char Catalog_Flag;						//标志位
-	string CatalogTable_Name;				//数据表名字
-	char CatalogTable_AttribtuesNum;		//属性的数目
-	char CatalogTable_PrimaryAttributes;	//数据中的主键
-	unsigned long CatalogTable_IndexFlag;	// 对每一位，0 表示该键无索引，1 表示该键有索引
-	unsigned short CatalogTable_FirstKey;	// key 目录文件中，该表第一条键信息的编号
-	short CatablogTable_FirstIndex;			// index 目录文件中，该表第一条索引信息的编号
+	char CatalogTable_Flag;						//标志位
+	string CatalogTable_Name;					//数据表名字
+	char CatalogTable_AttribtuesNum;			//属性的数目
+	char CatalogTable_PrimaryAttributes;		//数据中的主键
+	unsigned long CatalogTable_IndexFlag;		// 对每一位，0 表示该键无索引，1 表示该键有索引
+	unsigned short CatalogTable_FirstAttributes;// key 目录文件中，该表第一条键信息的编号
+	short CatablogTable_FirstIndex;				// index 目录文件中，该表第一条索引信息的编号
 };
-struct CatalogAttributes {
-	char Flag;
+struct CatalogAttributes 
+{
+	char CatalogAttributes_Flag;			//标志位
 	string CatalogAttributes_Name;			//属性的名字
-	char CatalogAttributes_Type;			// 键类型，0 表示 int，1 表示 char(n)，2 表示 float
-	char CatalogAttributes_Length;			// 键长度
-	short CatalogAttributes_NextKey;		// 该表下一条键信息的编号，若无则置 -1
+	char CatalogAttributes_Type;			//键类型，0 表示 int，1 表示 char(n)，2 表示 float
+	char CatalogAttributes_Length;			//键长度
+	short CatalogAttributes_NextKey;		//该表下一条键信息的编号，若无则置 -1
 	bool CatalogAttributes_Primary;			//是否为主键
 	bool CatalogAttributes_Null;			//是否可以为空
 	bool CatalogAttributes_Unique;			//是否为Unique
+	short CatalogAttributes_Next;			//下一个属性
 };
 //数据库中的数据表实例类
 class Catalog
@@ -62,16 +64,16 @@ public :
 	static const char CATALOG_HAS_NEXT = 0x01;
 	size_t Table_Size(string &tablename);
 	//功能需求
-	void CatalogCreateTable(string & Tablename, vector<CatalogAttributes> & catalogattributes);	//建立数据表的模式信息文件
-	void CatalogCheckTable(string &Tablename, vector<CatalogAttributes> &	catalogattributes);		//数据表的检查
+	void CatalogCreateTable(string & Tablename, vector<Attributes> & catalogattributes);	//建立数据表的模式信息文件
+	void CatalogCheckTable(string &Tablename, vector<Attributes> &	catalogattributes);		//数据表的检查
 	void CatalogCheckColumn(string &Tablename, Record R);							//检查属性是否正确
 	void CatalogInsertColumn(string tableneame, Record R);							//数据表插入属性
 	/*
 		文件存放
 		把磁盘读取的目录文件存入此处的vector变量中，对目录的修改操作直接针对此处变量
 	*/
-	vector<Table> TableCatalog;														//数据表存放容器
-	vector<Attributes>AttributesCatalog;											//属性的存放
+	vector<CatalogTable> TableCatalog;														//数据表存放容器
+	vector<CatalogAttributes>AttributesCatalog;											//属性的存放
 	/*
 		获取操作
 	*/

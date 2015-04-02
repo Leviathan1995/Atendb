@@ -6,7 +6,7 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 	string Empty_Block(Block_Size, 0);						//申请一个新的块
 	int Tuple_size = 0;										//数据表中元组需要分配的内存大小
 	for (int i = 0; i < Table_Column.size(); i++)			//Table_Column.size()数据表的属性个数
-		Tuple_size += Table_Column[i].RequestSize;
+		Tuple_size += Table_Column[i].Attributes_Length;
 	Tuple_size++;
 	int Offset = 0;//偏移量
 	while ((Offset + Tuple_size) < Block_Size)
@@ -14,9 +14,10 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 		Empty_Block.replace(Offset + Tuple_size - 1, 1, "1");//替换
 		Offset += Tuple_size;
 	}
-	Buffer_Manager::Instance().Write(FileName,Empty_Block);
+	Buffer_Manager::Instance().Buffer_ManagerWrite(FileName,Empty_Block);
 	return true;
 }
+
 //Insert into 插入记录
 bool Record_Manager::Insert_Into(Table_Type &table, Record R)
 {

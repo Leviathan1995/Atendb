@@ -22,6 +22,8 @@ public:
 	Buffer_Manager();
 	~Buffer_Manager();
 	static Buffer_Manager & Instance();									  //缓冲管理器实例化
+	void Buffer_ManagerWrite(string &filename, string &empty_block);	  //写入一个空块中
+
 	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
 	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在
 	Block ReadLast(string & FileName, File_Type filetype);				  //返回块

@@ -133,7 +133,7 @@ void Intepretor::ParseCommand()
 	if (Is_Insert(Input))
 		Insert_command(Input);
 }
-//是否为Create创建数据表命令
+//是否为Create命令
 bool Intepretor::Is_CreateTable(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
@@ -165,7 +165,7 @@ bool Intepretor::Is_Insert(vector<string> input)
 	else
 		return false;
 }
-//创建数据表
+//创建数据表Create命令
 void Intepretor::CreateTable_command(vector<string>Input)
 {
 	Command_State state = Create;
@@ -192,7 +192,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case Column_Name://字段名
 			state = Column_type;
-			attributes.Attributes_name = *i;
+			attributes.Attributes_Name= *i;
 			break;
 		case Column_type://字段属性
 			attributes.Attributes_type = Trasn2type(*i);
@@ -207,7 +207,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = CharSize;
 			break;
 		case CharSize://Char类型大小
-			attributes.RequestSize = String2Int(*i);
+			attributes.Attributes_Length = String2Int(*i);
 			state = Char_LeftBrackets;//char的左括号
 			break;
 		case Char_RightBrackets://右括号
@@ -224,14 +224,14 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		case Not_Null_null://不为空
 			if (*i != "null")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			attributes.Attributes_null= true;
+			attributes.Attributes_Null= true;
 			if (*(++i) == "unique")
 				state = Unique;
 			break;
 		case Unique://唯一属性
 			if (*i != "unique")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			attributes.Attributes_unique = true;
+			attributes.Attributes_Unique = true;
 			if (*(++i) == ",")
 			{
 				state = ColumnEndComma;
@@ -258,7 +258,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		case PrimaryKey_ColumnName://主键属性名
 			attributesprimary = Catalog::Instance().Get_Attributes(table.Table_Name, *i);
-			attributesprimary.Attributes_primary = true;
+			attributesprimary.Attributes_Primary= true;
 			if (*(++i) == ")")
 				state = PrimaryKey_RightBrackets;
 			if (*(++i) == ",")
@@ -288,9 +288,6 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		}
 	}
 }
-/*
-	Select命令
-*/
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)
 {
@@ -359,10 +356,7 @@ void Intepretor::Select_command(vector<string> Input)
 		}
 	}
 }
-
-/*
-	Insert_into 命令
-*/
+//Insert_into 命令
 void Intepretor::Insert_command(vector<string> input)
 {
 	vector<string> Values;

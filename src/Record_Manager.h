@@ -19,8 +19,11 @@ using namespace std;
 class Record_Manager
 {
 public:
-	static Record_Manager & Instance();														//实例化
+	static Record_Manager & Instance();																	//实例化
 	bool Record_ManagerCreateTable(string &tablename, const vector<Attributes>& Table_Column);			//Create建表
+	void Record_ManagerWrite();																			//将数据写入文件中
+
+
 	bool Insert_Into(Table &table,Record R);												//Insert into 插入记录
 	void PrintHead();																		//打印记录的头部
 	void Print();																			//打印记录
