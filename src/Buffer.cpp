@@ -75,7 +75,11 @@ bool Buffer_Manager::IsFull()
 {
 	return Buffer_ManagerUsedBlock.size() == Block_Size;
 }
-
+//返回块号
+int Buffer_Manager::ReadLastNumber(string & filename, string &str)
+{
+	File::Instance().ReadLastNumber(filename, str);
+}
 
 {
 	FILE *FileP = NULL;
@@ -163,17 +167,7 @@ Block Buffer_Manager::ReadLast(string & tablename,File_Type filetype)
 	block.Block_Type = filetype;
 	return block;
 }
-//返回块号
-int Buffer_Manager::ReadLastNumber(string & filename, string &str)
-{
-	ifstream In(filename, ios::binary);
-	In.seekg(-4096, ios_base::end);
-	const long Target = In.tellg();
-	char Dst[Block_Size];
-	In.read(Dst, Block_Size);
-	str = string(Dst, Block_Size);
-	return (Target / Block_Size);
-}
+
 //查找文件是否存在
 bool Buffer_Manager::File_Exist(string  &tablename, File_Type filetype)
 {

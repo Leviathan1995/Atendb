@@ -359,11 +359,10 @@ void Intepretor::Select_command(vector<string> Input)
 //Insert_into 命令
 void Intepretor::Insert_command(vector<string> input)
 {
-	vector<string> Values;//一次插入记录集合
-	vector<vector<string>> Values_Lists;//多次插入的记录集合
-	Insert_IntoStruct insertintovalues;
-	Command_State state = Insert;//插入状态
-	string Inserttable;//需要插入的数据表
+	Tuple tuple;							//单个插入的记录
+	vector<Tuple> Tuple_Lists;				//多次插入的记录集合
+	Command_State state = Insert;			//插入状态
+	string Inserttablename;					//需要插入的数据表的名字
 	for (auto i = input.begin(); i != input.end(); i++)
 	{
 		switch (state)
@@ -379,7 +378,7 @@ void Intepretor::Insert_command(vector<string> input)
 			break;
 		case InsertTable:
 			state = Insert_Values;
-			Inserttable = *i;//获取数据表的名字
+			Inserttablename = *i;//获取数据表的名字
 			break;
 		case Insert_Values:
 			state = Insert_Leftbracket;//值列表的左括号
@@ -395,11 +394,11 @@ void Intepretor::Insert_command(vector<string> input)
 			else
 			{
 				state = Insert_Comma_Or_Bracket;
-				Values.push_back(*i);
+				tuple.Tuple_content.push_back(*i);
 			}
 			break;
 		case Insert_Value:			//插入的是值
-			Values.push_back(*i);
+			tuple.Tuple_content.push_back(*i);
 			state = Insert_Right_Mark;
 			break;
 		case Insert_Right_Mark:		//插入的是字符串
@@ -420,6 +419,7 @@ void Intepretor::Insert_command(vector<string> input)
 				state = Insert_Leftbracket;//还要继续插入记录
 			else 
 				throw Error(0, "Interpreter", "Insert into", "语法错误!");
+			Tuple_Lists.push_back(tuple);//把一次插入的记录收集
 			break;
 		case Insert_EndInsert://结束插入
 			break;
@@ -429,33 +429,9 @@ void Intepretor::Insert_command(vector<string> input)
 	}
 	if (state = Insert_EndInsert)
 	{
-		Table table = Catalog::Get_Table(Inserttable);
-		vector<Column_Type> Attributes_List = t.Table_Column;
-		if (Attributes_List.size() != Values.size())
+		Table table = Catalog::Instance().CatalogGet_Table(Inserttablename);
+		vector<Attributes> Attributes_List = table.Table_AttributesList;
+		if (Attributes_List.size() != tuple.Tuple_content.size())			//插入的属性数量是否和数据表原有的属性数量匹配
 			throw Error(0, "Interpreter", "Insert into", "语法错误!");
-		Record R;
-		auto i = Attributes_List.begin();
-		auto v = Values.begin();
-		for (; i != Attributes_List.end(); i++)
-		{
-			if (i->coltype == 0)//0表示int
-			{
-				Element E(String2Int(*v));
-				R.Mem_Element.push_back(E);
-			}
-			if (i->coltype == 1)//1表示char
-			{
-				Element E(*v, i->M_Char_Num);
-				R.Mem_Element.push_back(E);
-			}
-			if (i->coltype == 2)//2表示float
-			{
-				Element E(String2Float(*v));
-				R.Mem_Element.push_back(E);
-			}
-		}
-		API::Instance().Insert_Into(Inserttable, R);
-	}
-	else
-		throw Error(0, "Intepretor", "Insert into", "语法错误");
+		API::Instance().Insert_Into(Inserttablename,Tuple_Lists);
 }

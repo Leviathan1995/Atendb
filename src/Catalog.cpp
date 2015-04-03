@@ -118,61 +118,104 @@ void Catalog::WriteTable2File()
 	}
 	Fout.close();
 }
-
-
-
-
-
-//插入的属性进行检查
-void Catalog::CatalogCheckColumn(string & tablename, Record R)
+//得到数据表
+Table & Catalog::CatalogGet_Table(string tablename)
 {
-	bool TableFind;//插入记录的数据表是否存在
-	short NumberOfkeys = 0, FirstKeyindex = 0;
-	for (size_t i = 0; i < TableCatalog.size(); i++)
+	Table * table = new Table;
+	table->Table_Name = tablename;
+	//查找表
+	short FirstAttribtuesIndex = 0;
+	unsigned long IndexFlag = 0;
+	bool Find = false;
+	for (int i = 0; i < TableCatalog.size(); i++)
 	{
-		if ((TableCatalog[i].Flag&CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].Table_Name), tablename.c_str()))
+		if (TableCatalog[i].CatalogTable_Flag&CATALOG_SPACE_USED&&!strcmp(Intepretor::String2Char(TableCatalog[i].CatalogTable_Name), tablename.c_str()))
 		{
-			TableFind = true;
-			NumberOfkeys = TableCatalog[i].NumberColumns;//数据表中的属性的数量
-			FirstKeyindex = TableCatalog[i].FirstIndex;
-			break;
+			Find = true;
+			IndexFlag = TableCatalog[i].CatalogTable_IndexFlag;							//获得该表的索引标志
+			FirstAttribtuesIndex = TableCatalog[i].CatalogTable_FirstAttributesIndex;	//第一条属性的索引
 		}
 	}
-	if (!TableFind)
-		throw Error(1001, "Catalog", "Check_Column", "数据表不存在");
-	if (R.Mem_Element.size() > NumberOfkeys)//插入的元素数量大于数据表中已规定的
-		throw string("Insert into ValueIllegal: Illegal number of columns");
-	short CurrentKeyindex = FirstKeyindex;
-	for (size_t i = 0; i < R.Mem_Element.size(); i++)
+	if (!Find)
+		throw Error(0, "Interpreter", "Insert into", "语法错误!");
+	//获得该表的所有属性
+	short CurrentAttributesIndex = FirstAttribtuesIndex;
+	while (CurrentAttributesIndex != -1)
 	{
-		switch (ColumnCatalog[i].coltype)
+		//获得单个属性的信息
+		Attributes attritbues;
+		attritbues.Attributes_Name = AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Name;
+		switch (AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Type)
 		{
-		case 0:
+		case Int:
+			attritbues.Attributes_type = Int;
 			break;
-		case 1:
-			if ((int)R.Mem_Element[i].Mem_CharNum>ColumnCatalog[CurrentKeyindex].RequestSize)
-				throw string("ValueIllegal: The value to insert is longer than the length of the key.");
+		case Char:
+			attritbues.Attributes_type = Char;
 			break;
-		case 2:
+		case Float:
+			attritbues.Attributes_type = Float;
 			break;
 		default:
 			break;
 		}
-		CurrentKeyindex = ColumnCatalog[CurrentKeyindex].NextColumn;
+		attritbues.Attributes_Length = AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Length;
+		attritbues.Attributes_Flag = 0;
+		attritbues.Attributes_Flag |= (AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag&	CATALOG_IS_PRIMARY_KEY) ? 1 : 0;
+		attritbues.Attributes_Flag |= (AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag&	CATALOG_IS_UNIQUE) ? 2 : 0;
+		attritbues.Attributes_Flag |= (AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag& CATALOG_IS_NOT_NULL) ? 4 : 0;
+		attritbues.Attributes_Flag |= (AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag& CATALOG_IS_INDEX) ? 8 : 0;
+		table->Table_AttributesList.push_back(attritbues);
+		CurrentAttributesIndex = AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_NextAttributes;
+	}
+	return *table;
+}
+//插入的记录进行检查
+void Catalog::CatalogCheckTuple(string & tablename, vector<Tuple> Tuple_Lists)
+{
+	Table table = Catalog::CatalogGet_Table(tablename);
+	bool TableFind;//插入记录的数据表是否存在
+	short NumberOfAttributes = 0, FirstAttributexindex = 0;
+	for (int i = 0; i < TableCatalog.size(); i++)
+	{
+		if ((TableCatalog[i].CatalogTable_Flag&CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].CatalogTable_Name), tablename.c_str()))
+		{
+			TableFind = true;
+			NumberOfAttributes = TableCatalog[i].CatalogTable_AttribtuesNum;			//数据表中的属性的数量
+			FirstAttributexindex = TableCatalog[i].CatalogTable_FirstAttributesIndex;	//第一条属性的索引
+			break;
+		}
+	}
+	if (!TableFind)
+		throw Error(1001, "Catalog", "Check_Attributes", "数据表不存在");
+	short CurrentKeyindex =FirstAttributexindex;
+	for (int  i = 0; i < Tuple_Lists.size(); i++)
+	{
+		Tuple tuple = Tuple_Lists[i];
+		for (int j = 0; j < tuple.Tuple_content.size();j++)
+		switch (table.Table_AttributesList[j].Attributes_type)
+		{
+		case Int:
+			break;
+		case Char:
+			if (tuple.Tuple_content[j].length()>table.Table_AttributesList[j].Attributes_Length)	//大于用户申请的长度
+				throw string("ValueIllegal: The value to insert is longer than the length of the key.");
+			break;
+		case Float:
+			break;
+		default:
+			break;
+		}
 	}
 }
+
+
 //插入元组
 void Catalog::CatalogInsertColumn(string tablename,Record R)
 {
 	
 }
-//得到数据表
-Table_Type & Catalog::Get_Table(string table_name)
-{
-	if (Mem_Table.find(table_name) == Mem_Table.end())
-		throw Error(1001, "Catalog", "Insert Column", "语法错误!");
-	return Mem_Table[table_name];
-}
+
 //得到属性
 Column_Type & Catalog::Get_Column(string tablename,string columnname)
 {

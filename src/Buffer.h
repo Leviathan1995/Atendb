@@ -29,7 +29,8 @@ public:
 	string Buffer_ManagerGetKey(string &filename, int blocknum);							//通过文件名和块号获得其键值
 	bool Buffer_ManagerFile2Block(string& fileName, int blocknum, string& Strout);		    //把文件读入到缓冲区块中
 	bool Buffer_ManagerNewBlock(string& fileName, int blocknum, string& content);			//申请新块
-	bool Buffer_ManagerWrite2Block(string& fileName, int blockNum, string& content);						//写入到缓冲区的块中
+	bool Buffer_ManagerWrite2Block(string& fileName, int blockNum, string& content);		//写入到缓冲区的块中
+	int Buffer_ManagerReadLastNumber(string & filename, string &str);						//返回块号
 
 	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
 	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在

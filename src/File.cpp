@@ -21,3 +21,13 @@ bool Write(string & filename, string & content, int & num)
 
 	return true;
 }
+int File::ReadLastNumber(string &filename,string &str)
+{
+	ifstream In(filename, ios::binary);
+	In.seekg(-4096, ios_base::end);
+	const long Target = In.tellg();
+	char Dst[Block_Size];
+	In.read(Dst, Block_Size);
+	str = string(Dst, Block_Size);
+	return (Target / Block_Size);
+}

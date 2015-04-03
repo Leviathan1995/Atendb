@@ -3,6 +3,7 @@
 #define _INTEPRETOR_H
 #include "Insert_Into.h"
 #include "Attributes.h"
+#include "Tuple.h"
 #include "Catalog.h"
 #include "Glob_Var.h"
 #include "Record.h"

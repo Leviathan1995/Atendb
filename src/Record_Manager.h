@@ -21,7 +21,7 @@ class Record_Manager
 public:
 	static Record_Manager & Instance();																	//实例化
 	bool Record_ManagerCreateTable(string &tablename, const vector<Attributes>& Table_Column);			//Create建表
-	void Record_ManagerWrite();																			//将数据写入文件中
+	bool Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists);								//insert into 插入记录
 
 
 	bool Insert_Into(Table &table,Record R);												//Insert into 插入记录

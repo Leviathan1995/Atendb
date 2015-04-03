@@ -14,6 +14,6 @@ public:
 	Tuple(){}
 	Tuple(Table & table, string &content, int begin);
 	Tuple(vector<string> & tuplecontent);
-	vector<string> Tuple_content;
+	vector<string> Tuple_content;							//元组的内容
 };
 #endif

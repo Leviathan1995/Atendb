@@ -14,39 +14,20 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 		Empty_Block.replace(Offset + Tuple_size - 1, 1, "1");//替换
 		Offset += Tuple_size;
 	}
-	Buffer_Manager::Instance().Buffer_ManagerWrite(FileName,Empty_Block);
+	Buffer_Manager::Instance().Buffer_ManagerWrite(FileName,Empty_Block);			//通过缓冲区管理写入文件
 	return true;
 }
 
 //Insert into 插入记录
-bool Record_Manager::Insert_Into(Table_Type &table, Record R)
+bool Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists)
 {
-	if (Buffer_Manager::Instance().File_Exist(table.Table_Name, File_Type::RECORD) == false)
-	{
-		Buffer_Manager::Instance().CreateFile(table.Table_Name, File_Type::RECORD);
-		Buffer_Manager::Instance().New_Block(table.Table_Name, File_Type::RECORD);
-	}
-	Block block = Buffer_Manager::Instance().ReadLast(table.Table_Name, File_Type::RECORD);
-	Byte * blockdata = block.Block_Data;
-	int record_size = table.RecordSize + 1;
-	int Total_Num = 4096 / record_size;
-	for (int i = 0; i < Total_Num; i++)
-	{
-		Byte * P_Record = blockdata + i*record_size;
-		if (P_Record[0] == 0)
-		{
-			P_Record[0] = 1;
-			WriteRecord2Block(P_Record + 1, R);
-			Buffer_Manager::Instance().Write(block);
-			return block.Block_Offset;
-		}
-	}
-	int Offset = Buffer_Manager::Instance().New_Block(table.Table_Name, File_Type::RECORD);
-	block = Buffer_Manager::Instance().Read(table.Table_Name, File_Type::RECORD, Offset);
-	Byte * P_Record = block.Block_Data;
-	P_Record[0] = 1;
-	Copy_block_to_record(P_Record, table);
-	File.Write(block);
+	string filename = table.Table_Name + ".table";
+	char Dirty = '0';
+	int Lenght = table.Table_Length + 1;
+	string InsertContent = "";
+	string str;
+	int blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, str);
+	for (int i = 0; i < Tuple_Lists.size();i++)
 }
 //把记录写入块中
 void Record_Manager::WriteRecord2Block(Byte * Position,Record R)

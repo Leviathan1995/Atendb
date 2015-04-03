@@ -13,7 +13,7 @@ public:
 	static bool Write(string & filename,string & content,int & num);//写入文件中
 	static bool Write(Block * block);								//写入文件中
 	static void CreateFile(string &filename);						//创建文件
-	static int ReadLast();
+	static int ReadLastNumber(string &filename,string &str);			//返回块号
 };
 //实例化
 File &File::Instance()
