@@ -30,6 +30,6 @@ public:
 	static queue<string> TableLists;															//select 中from的数据表列表
 	static queue<WhereList> WhereLists;															//slect 中where部分
 	static vector<SelectRecord> SelectRecords;													//经过Select后的元组
-	static vector<SelectRecord> & Select_Parse(queue<string> SelLists,queue<string> TableLists,vector<string> WhereLists);//解析用户输入的Select 语句
+	static vector<SelectRecord> & Select_Parse(queue<string> SelLists,queue<string> TableLists,queue<string> WhereLists);//解析用户输入的Select 语句
 };
 #endif
