@@ -287,14 +287,16 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			break;
 		}
 	}
+	cout << "Create table successfully" << endl;
 }
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)
 {
-	Command_State State = Select;			 //命令状态
-	string Attribute[100] = {"$"}; int j = 0;//选择的属性
-	string FromLists[100] = {"$"}; int k = 0;//选择的数据表
-	WhereList WhereLists[100]; int w = 0;	 //where
+	Command_State State = Select;				//命令状态
+	queue<string>	Attribute; int j = 0;		//选择的属性
+	queue<string>	tablelists; int k = 0;		//选择的数据表
+	queue<WhereList> Where_Lists; int w = 0;	//select 中where部分
+	WhereList wherelists;
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (State)
@@ -304,11 +306,9 @@ void Intepretor::Select_command(vector<string> Input)
 			break;
 		case SelList:
 			if (*i == "*")
-			{
-				Attribute[j] = "All";//如果是* 即选择所有的属性
-				break;
-			}
-			Attribute[j] = *i;
+				Attribute.push ("All");//如果是* 即选择所有的属性
+			else
+				Attribute.push(*i);
 			j++;
 			if (*(++i) == "from")
 				State = From;
@@ -323,7 +323,7 @@ void Intepretor::Select_command(vector<string> Input)
 			State = FromList;
 			break;
 		case FromList:
-			FromLists[k] = *i;
+			tablelists.push(*i);
 			k++;
 			if (*(++i) == ",")
 				State = FromList;
@@ -331,25 +331,30 @@ void Intepretor::Select_command(vector<string> Input)
 				State = Where;
 			break;
 		case Where:
-			WhereLists[w].Attribute = *i;
+			wherelists.Attribute = *i;
 			i++;
-			WhereLists[w].Where_Operator = *i;//运算符
+			wherelists.Where_Operator = *i;//运算符
 			i++;
 			if (*i == "'")
-				WhereLists[w].StrValue = String2Char(*(++i));
+				wherelists.StrValue = String2Char(*(++i));
 			else
-				WhereLists[w].IntValue = String2Int(*(++i));
+				wherelists.IntValue = String2Int(*(++i));
 			if (*i == "and")
+			{
 				State = And;
+				Where_Lists.push(wherelists);
+			}
 			if (*i == ";")
+			{
 				State = EndSelect;
+				Where_Lists.push(wherelists);
+			}
 			break;
 		case And:
 			State = Where;
 			break;
 		case EndSelect:
-			Selection::Selection();
-
+			API::Instance().Select(Attribute,tablelists,Where_Lists);
 			break;
 		default:
 			break; 
@@ -433,5 +438,14 @@ void Intepretor::Insert_command(vector<string> input)
 		vector<Attributes> Attributes_List = table.Table_AttributesList;
 		if (Attributes_List.size() != tuple.Tuple_content.size())			//插入的属性数量是否和数据表原有的属性数量匹配
 			throw Error(0, "Interpreter", "Insert into", "语法错误!");
-		API::Instance().Insert_Into(Inserttablename,Tuple_Lists);
+		API::Instance().Insert_Into(Inserttablename, Tuple_Lists);
+	}
+	cout << "Insert tuple successfully" << endl;
+}
+//Quit命令
+void Intepretor::Quit_command(vector<string> input)
+{
+	if (input[0] == "quit")
+		exit(0);
+
 }

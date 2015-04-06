@@ -27,7 +27,7 @@ bool Buffer_Manager::Buffer_ManagerInBuffer(string &fileName, int blocknum)
 
 }
 //把文件读取到缓冲区的块中
-bool Buffer_Manager::File2Block(string& fileName, const int blockNum, string& strOut)
+bool Buffer_Manager::Buffer_ManagerFile2Block(string& fileName, const int blockNum, string& strOut)
 {
 	char *Dst = new char[Block_Size];//申请一个块大小的内存
 	if (File::Read(fileName, blockNum, Dst) == false)
@@ -38,8 +38,8 @@ bool Buffer_Manager::File2Block(string& fileName, const int blockNum, string& st
 	else
 	{
 		strOut = string(Dst, Block_Size);
-		if (IsFull())//如果缓冲区已经满了
-			Replace(fileName, blockNum, strOut);//利用替换算法 替换进来 
+		if (Buffer_ManagerIsFull())//如果缓冲区已经满了
+			Buffer_ManagerReplace(fileName, blockNum, strOut);//利用替换算法 替换进来 
 		else
 			Buffer_ManagerNewBlock(fileName, blockNum, strOut);
 	}
@@ -71,138 +71,71 @@ bool Buffer_Manager::Buffer_ManagerWrite2Block(string & filename, int blocknum, 
 	return true;
 }
 //缓冲区是否已满
-bool Buffer_Manager::IsFull()
+bool Buffer_Manager::Buffer_ManagerIsFull()
 {
 	return Buffer_ManagerUsedBlock.size() == Block_Size;
 }
 //返回块号
-int Buffer_Manager::ReadLastNumber(string & filename, string &str)
+int Buffer_Manager::Buffer_ManagerReadLastNumber(string & filename, string &str)
 {
 	File::Instance().ReadLastNumber(filename, str);
 }
-
+//读取
+bool Buffer_Manager::Buffer_ManagerRead(string &filename,int blocknum,string &strout)
 {
-	FILE *FileP = NULL;
-	if (filetype == File_Type::RECORD)
-		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	else if (filetype == File_Type::INDEX)
-		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
-	if (FileP == NULL)
-	{
-		throw string("build new block failness");
-	}
-	fseek(FileP, 0, SEEK_END);
-	int offset = ftell(FileP) / 4096;
-	Block block;
-	fwrite(block.Block_Data, sizeof(Byte), 4096, FileP);
-	fclose(FileP);
-	return offset;
+	if (Buffer_ManagerInBuffer(filename, blocknum))
+		return Buffer_ManagerReadBlock(filename,blocknum,strout);			//如果在缓冲区就从缓冲区读取
+	else
+		return Buffer_ManagerFile2Block(filename,blocknum,strout);			//否则从文件中读取
 }
-
-
-/*
-	内存中块的置换
-	LRU ->即最少使用页面算法
-*/
-bool Buffer_Manager::Replace(string & FileName, int BlockNum, string & Content)
+//从缓冲区的块中读取,供Buffer_ManagerRead()调用
+bool Buffer_Manager::Buffer_ManagerReadBlock(string &filename, int blocknum, string &strout)
 {
-	Block * cur;
-	while ((cur = MemBlock_Used.front())->IsPin())
+	string Key = Buffer_ManagerGetKey(filename, blocknum);
+	if (Buffer_ManagerBlockMap[Key]->Block_Pin == false)						 // 在该块非常驻块时，进行LRU策略维护
 	{
-		MemBlock_Used.pop_front();
-		MemBlock_Used.push_back(cur);
+		Buffer_ManagerUsedBlock.remove(Buffer_ManagerBlockMap[Key]);			//List Buffer_ManagerUsedBlock 进行维护
+		Buffer_ManagerUsedBlock.push_back(Buffer_ManagerBlockMap[Key]);
 	}
-	if (cur->IsDirty())
-		cur->Write2File();
-	string Oldkey = cur->GetKey();
-	string Newkey = Block::GetKey();
-	cur->Update(FileName, BlockNum, Content);
-	MemBlock_Map.erase(MemBlock_Map.find(Oldkey));
-	MemBlock_Map.insert(make_pair(Newkey, cur));
+	strout = Buffer_ManagerBlockMap[Key]->Block_Content;
 	return true;
 }
-
-//文件写入
-int Buffer_Manager::Write(string& filename,string& content,int blocknum = -1)
+//不在缓冲区内，从文件中读取
+bool Buffer_Manager::Buffer_ManagerFile2Block(string &filename, int blocknum, string &strout)
 {
-	string Nouse;
-	if (blocknum != -1)//指定块号的写入
+	char *Dst = new char[Block_Size];
+	//如果从文件中读取失败，返回False
+	if (File::Read(filename, blocknum, Dst) == false)
 	{
-		if (InBuffer(filename, blocknum) == false)
-			File2Block(filename, blocknum, Nouse);	// 不在buffer中，将文件中对应的块读入buffer (传入的noUse是为与read接口兼容)
-		Write2Block(filename, blocknum, content);	// 直接将content写入buffer中的指定的blocknum块
-		return blocknum;
-	}
-	else
-	{
-		int num;
-		File::Write(filename,content,num);//先写入文件中
-		File2Block();//再把文件写入缓冲区的块中
-		return num;
-	}
-}
-//返回块
-Block Buffer_Manager::ReadLast(string & tablename,File_Type filetype)
-{
-	B_Block block;
-	FILE* fp = NULL;
-	if (filetype== File_Type::RECORD)
-		fp = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	else if (filetype == File_Type::INDEX)
-		fp = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	if (fp == NULL)
-	{
-		throw string("no such file");
-	}
-	fseek(fp, 0, SEEK_END);
-	//if (ftell(fp) == 0)
-	//	throw error();
-
-	fseek(fp, -4096, SEEK_END);
-	int offset = ftell(fp) / 4096;
-	fread(block.Block_Data , sizeof(Byte), 4096, fp);
-	fclose(fp);
-	block.Block_Offset = offset;
-	block.Block_Name = tablename;
-	block.Block_Type = filetype;
-	return block;
-}
-
-//查找文件是否存在
-bool Buffer_Manager::File_Exist(string  &tablename, File_Type filetype)
-{
-	FILE *FileP = NULL;
-	if (filetype == File_Type::RECORD)
-		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "rb");
-	else if (filetype == File_Type::INDEX)
-		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "rb");
-	if (FileP == NULL)
+		delete[] Dst;
 		return false;
+	}
 	else
-		return true;
+	{
+		strout = string(Dst, Block_Size);
+		if (Buffer_ManagerIsFull())
+			Buffer_ManagerReplace(filename,blocknum,strout);							//如果缓冲区已经满了，就进行替换
+		else
+			Buffer_ManagerNewBlock(filename, blocknum, strout);//否则申请一个新的块，加入到缓冲区内
+	}
+	delete[] Dst;
+	return true;
 }
-//创建文件
-void Buffer_Manager::CreateFile(string & tablename, File_Type filetype)
+//缓冲区已满，进行替换
+bool Buffer_Manager::Buffer_ManagerReplace(string &filename,int blocknum,string &strout)
 {
-	FILE * FileP = NULL;
-	if (filetype == File_Type::RECORD)
-		FileP = fopen(Intepretor::String2Char(tablename + ".bol"), "wb");
-	else if (filetype == File_Type::INDEX)
-		FileP = fopen(Intepretor::String2Char(tablename + ".ind"), "wb");
-	if (FileP == NULL)
-		throw string("File type error");
-	fclose(FileP);
+	Block *ReplaceBlock;
+	while ((ReplaceBlock = Buffer_ManagerUsedBlock.front())->Block_Pin)		//找到非 常驻块
+	{
+		Buffer_ManagerUsedBlock.pop_front();
+		Buffer_ManagerUsedBlock.push_back(ReplaceBlock);
+	}
+	if (ReplaceBlock->Block_Dirty)					//如果被更改过，就将其写入文件中
+		ReplaceBlock->Write2File();
+	string Key = ReplaceBlock->Block_GetKey();
+	string NewKey = Buffer_ManagerGetKey(filename, blocknum);
+	ReplaceBlock->Block_Update(filename, blocknum, strout);			//在缓冲区内进行块的更新
+	Buffer_ManagerBlockMap.erase(Buffer_ManagerBlockMap.find(Key));	//移出旧的块
+	Buffer_ManagerBlockMap.insert(make_pair(NewKey, ReplaceBlock));	//添加新的块
+	return true;
 }
-
-//读取
-Block Buffer_Manager::Read(string &tablename, File_Type filetype, int offset)
-{
-	if (InBuffer(tablename, offset))
-		return ReadBlock();//在buffer中，从buffer中
-	else
-		return File2Block();//不在buffer中，从文件中读
-
-
-}
-
-bool Buffer::newBlock(const std::string& fileName, const int blockNum, const std::string& content);

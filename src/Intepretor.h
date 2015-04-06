@@ -13,6 +13,7 @@
 #include "Elemment.h"
 #include <vector>
 #include <string>
+#include <queue>
 using namespace std;
 /*
 	接受用户输入的SQL语句，并检验用户输入的SQL语句及格式
@@ -38,6 +39,7 @@ public:
 	void CreateTable_command(vector<string >Input);		//CreateTable命令解析
 	void Select_command(vector<string> Input);			//Select命令解析
 	void Insert_command(vector<string> Input);			//Insert命令解析
+	void Quit_command(vector<string> Input);			//Quit命令解析
 	vector<string> Input;//用户输入的命令的集合
 	/*
 		类型转换

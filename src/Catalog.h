@@ -71,10 +71,11 @@ public :
 	static const char CATALOG_HAS_NEXT = 0x01;
 	size_t Table_Size(string &tablename);
 	//功能需求
-	void CatalogCreateTable(string & tablename, vector<Attributes> & catalogattributes);	//建立数据表的模式信息文件
-	void CatalogCheckTable(string &tablename, vector<Attributes> &	catalogattributes);		//数据表的检查
-	void CatalogCheckTuple(string &tablename, vector<Tuple> Tuple_Lists);					//检查属性是否正确
-	void CatalogInsertTuple(string &tableneame, vector<Tuple> Tuple_Lists);					//数据表插入属性
+	void CatalogCreateTable(string & tablename, vector<Attributes> & catalogattributes);			//建立数据表的模式信息文件
+	void CatalogCheckCreateTable(string &tablename, vector<Attributes> &	catalogattributes);		//Create数据表的检查
+	void CatalogCheckInsertTuple(string &tablename, vector<Tuple> Tuple_Lists);						//检查属性是否正确
+	void CatalogInsertTuple(string &tableneame, vector<Tuple> Tuple_Lists);							//数据表插入属性
+	void CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists);				//Select 的元组的检查
 
 	/*
 		文件存放

@@ -17,83 +17,74 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 	Buffer_Manager::Instance().Buffer_ManagerWrite(FileName,Empty_Block);			//通过缓冲区管理写入文件
 	return true;
 }
-
 //Insert into 插入记录
-bool Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists)
+bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists)
 {
+	vector<pair<Tuple, int>> insert_tuple;
+	int i, j, k;
 	string filename = table.Table_Name + ".table";
 	char Dirty = '0';
-	int Lenght = table.Table_Length + 1;
-	string InsertContent = "";
+	int Lengh = table.Table_Length + 1;
+	string InsertContent = "";						//用户插入的记录字符串
 	string str;
 	int blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, str);
-	for (int i = 0; i < Tuple_Lists.size();i++)
-}
-//把记录写入块中
-void Record_Manager::WriteRecord2Block(Byte * Position,Record R)
-{
-	for (vector<Element>::iterator I = R.Mem_Element.begin(); i != R.Mem_Element.end(); i++)
+	for (i = 0; i < Tuple_Lists.size(); i++)
 	{
-		switch (I->Mem_ColType)
+		Tuple Insert_Tuple = Tuple_Lists[i];
+		for (j = 0; j < Insert_Tuple.Tuple_content.size(); i++)
 		{
-		case Char:
-			memcpy(Position, I->Mem_Char.c_str(), I->Mem_CharNum);
-			Position += I->Mem_CharNum;
-			break;
-		case Float:
-			memcpy(Position, &I->Mem_Float, sizeof(float));
-			Position += sizeof(float);
-			break;
-		case Int:
-			memcpy(Position, &I->Mem_Int, sizeof(int));
-			Position += sizeof(int);
-			break;
-		default:
-			break;
+			if (table.Table_AttributesList[i].Attributes_Unique = true)
+			{
+				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[i], i, blocknum) == true)
+					return false;
+				Insert_Tuple.Tuple_content[i].resize(table.Table_AttributesList[i].Attributes_Length, 0);
+				InsertContent += Insert_Tuple.Tuple_content[i];
+			}
+		}
+		InsertContent += Dirty;
+		for (k = 0; k <= blocknum; k++) //查找现存块中的空间
+		{
+			string Strout;
+			Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, Strout);	//读取块中的数据
+			int Offset = Record_ManagerFindDirtyTuple(Strout, Lengh);			//找到块中空余空间的偏移量
+			if (Offset != -1)
+			{
+				Strout.replace(Offset, Lengh, InsertContent);
+				Buffer_Manager::Instance().Buffer_ManagerWrite(filename, Strout, i);
+				insert_tuple.push_back(make_pair(Insert_Tuple, i*Block_Size + Offset));
+			}
+			else
+			{
+				continue;//如果Offset=-1,说明该块中不存在已经删除的记录，继续从下一个块读
+			}
+		}
+		if (i > blocknum) //缓冲区的块已满
+		{
+			InsertContent.resize(Block_Size, 0);
+			Buffer_Manager::Instance().Buffer_ManagerWrite(filename, InsertContent);
+			insert_tuple.push_back(make_pair(Insert_Tuple,blocknum*Block_Size));
 		}
 	}
+	API::Instance().FixIndex(table, insert_tuple);				//修复索引
+	return true;
+	
 }
-//返回块中的记录
-Record Copy_block_to_record(Byte* Position, Table_Type table)
+//元组是否已经存在
+bool Record_Manager::Record_ManagerHasExisted(Table &table, string &content, int num, int blocknum)
 {
-	vector<Column_Type> Attributes = table.Table_Column;
-	Record R;
-	int Target_Int;
-	float Target_Float;
-	char Target_Char[255];
-	for (vector<Column_Type>::iterator i = Attributes.begin(); i != Attributes.end(); i++)
+
+}
+//
+int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)
+{
+	int Offset = 0;
+	while ((Offset + size) < strout.size())
 	{
-		Element e;
-		Target_Int = *((int*)p);
-		Target_Float = *((float*)p);
-		memset(Target_Char, 0, 255);
-		//字段属性,0 表示 int，1 表示 char(n)，2 表示 float
-		switch (i->coltype)
-		{
-		case 0:
-			e.Mem_ColType =Int;
-			e.Mem_Int = Target_Int;
-			Position += 4;
-			break;
-		case 1:
-			memcpy(Target_Char, Position, i->M_Char_Num);
-			e.Mem_ColType = Float;
-			Position += 4;
-			break;
-		case 2:
-			e.Mem_ColType = Float;
-			e.Mem_Float = Target_Float;
-			Position += 4;
-			break;
-		default:
-			break;
-		}
-		R.Mem_Element.push_back(e);
+		string str = strout.substr(Offset, size);	
+		string Dirty = str.substr(size - 1, 1);		//size-1 后全部替换为1
+		if (Dirty == "1")							//如果找到被修改的位置				
+			return Offset;							//返回偏移量
+		Offset += size;
 	}
-	return R;
-
-}
-void Record_Manager::PrintHead()
-{
-
+	return -1;
 }

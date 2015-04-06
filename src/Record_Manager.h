@@ -21,16 +21,9 @@ class Record_Manager
 public:
 	static Record_Manager & Instance();																	//实例化
 	bool Record_ManagerCreateTable(string &tablename, const vector<Attributes>& Table_Column);			//Create建表
-	bool Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists);								//insert into 插入记录
-
-
-	bool Insert_Into(Table &table,Record R);												//Insert into 插入记录
-	void PrintHead();																		//打印记录的头部
-	void Print();																			//打印记录
-	void PrintEnd();																		//打印记录的尾部
-	bool HasExisted(Table &table, string content, int num, int BlockNum);
-	void WriteRecord2Block(Byte *Positon, Record R);										//将一条记录按顺序拷贝到p的位置
-	Record Copy_block_to_record(Byte* Position, Table table);
+	bool Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists);							//insert into 插入记录
+	bool Record_ManagerHasExisted(Table &table, string &content, int num, int BlockNum);				//元组记录是否存在
+	int Record_ManagerFindDirtyTuple(string &strout, int size);											//返回脏读的偏移量
 };
 //实例化
 inline Record_Manager & Record_Manager::Instance()

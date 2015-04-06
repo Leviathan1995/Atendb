@@ -9,7 +9,7 @@ Catalog::~Catalog()
 	WriteTable2File();//将数据表写入文件
 }
 //数据表检查
-void Catalog::CatalogCheckTable(string & Tablename, vector<Attributes> & Attributes)
+void Catalog::CatalogCheckCreateTable(string & Tablename, vector<Attributes> & Attributes)
 {
 	for (size_t i = 0; i < TableCatalog.size(); i++)
 	{
@@ -80,7 +80,7 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Attributes> & attribu
 		default:
 			break; 
 		}
-		NewTableAttributes.CatalogAttributes_Next = NULL;//下一个属性置为空
+		NewTableAttributes.CatalogAttributes_NextAttributes = NULL;//下一个属性置为空
 		AttributesIndex++;
 		while (AttributesIndex < (int)AttributesCatalog.size() && (AttributesCatalog[AttributesIndex].CatalogAttributes_Flag &CATALOG_SPACE_USED))//先寻找有没有空的记录空间
 				AttributesIndex++;
@@ -91,7 +91,7 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Attributes> & attribu
 		if (i == 0)													//如果当前是第一条属性，修改TableCatalog的FirstKey
 			TableCatalog[NewTableIndex].CatablogTable_FirstIndex = AttributesIndex;
 		else
-			AttributesCatalog[PreviousAttributesIndex].CatalogAttributes_NextKey = AttributesIndex;// 否则修改此表上一条属性的NextAttributes;
+			AttributesCatalog[PreviousAttributesIndex].CatalogAttributes_NextAttributes = AttributesIndex;// 否则修改此表上一条属性的NextAttributes;
 		PreviousAttributesIndex = AttributesIndex;
 		//如果这个属性是主键，修改标志和Primarykey
 		if (NewTableAttributes.CatalogAttributes_Flag &CATALOG_HAS_PRIMARY_KEY)
@@ -113,7 +113,7 @@ void Catalog::WriteTable2File()
 		Fout.write(&TableCatalog[i].CatalogTable_AttribtuesNum, 1);												//数据表中属性的数量		
 		Fout.write(&TableCatalog[i].CatalogTable_PrimaryAttributes, 1);											//数据中的主键
 		Fout.write((char *)&TableCatalog[i].CatalogTable_IndexFlag, sizeof(long));								//索引的标志位
-		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributes, sizeof(short));						//第一条属性
+		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributesIndex, sizeof(short));						//第一条属性
 		Fout.write((char *)&TableCatalog[i].CatablogTable_FirstIndex, sizeof(short));								//该表第一条索引信息的编号
 	}
 	Fout.close();
@@ -171,7 +171,7 @@ Table & Catalog::CatalogGet_Table(string tablename)
 	return *table;
 }
 //插入的记录进行检查
-void Catalog::CatalogCheckTuple(string & tablename, vector<Tuple> Tuple_Lists)
+void Catalog::CatalogCheckInsertTuple(string & tablename, vector<Tuple> Tuple_Lists)
 {
 	Table table = Catalog::CatalogGet_Table(tablename);
 	bool TableFind;//插入记录的数据表是否存在
@@ -208,33 +208,8 @@ void Catalog::CatalogCheckTuple(string & tablename, vector<Tuple> Tuple_Lists)
 		}
 	}
 }
-
-
-//插入元组
-void Catalog::CatalogInsertColumn(string tablename,Record R)
+//对Select 的元组和属性进行检查
+void Catalog::CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists)
 {
-	
-}
 
-//得到属性
-Column_Type & Catalog::Get_Column(string tablename,string columnname)
-{
-	Table_Type TableInstance;
-	TableInstance=Catalog::Get_Table(columnname);
-	for (auto i = TableInstance.Table_Column.begin(); i != TableInstance.Table_Column.end(); i++)
-	{
-		if (i->Column_TypeName == columnname)
-			return *i;
-	}
-}
-//获取字段的长度
-size_t Catalog::Table_Size(string &tablename)
-{
-	size_t length = 0;
-	Table_Type t = Get_Table(tablename);
-	for (auto Len = t.Table_Column.begin(); Len != t.Table_Column.end(); Len++)
-	{
-		length += Len->StoredLength;
-	}
-	return length;
 }

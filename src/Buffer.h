@@ -31,19 +31,10 @@ public:
 	bool Buffer_ManagerNewBlock(string& fileName, int blocknum, string& content);			//申请新块
 	bool Buffer_ManagerWrite2Block(string& fileName, int blockNum, string& content);		//写入到缓冲区的块中
 	int Buffer_ManagerReadLastNumber(string & filename, string &str);						//返回块号
-
-	Block Read(string &tablename, File_Type filetype, int offset);		  //读取
-	bool File_Exist(string &tablename, File_Type filetyppe);			  //文件是否存在
-	Block ReadLast(string & FileName, File_Type filetype);				  //返回块
-	bool Write2Block(string& fileName,int blockNum,string& content);	  //写入块中
-	map<string, Block*> MemBlock_Map;									  //记录使用的块
-	list<Block *> MemBlock_Used;										  //已经使用过的块
-	bool Replace(string& FileName,int blockNum,string& content);		  //替换算法
-	static void CreateFile(string &tablename, File_Type filetype);        //创建文件
-	bool IsFull();														  //缓冲区是否已满
-	int ReadLastNumber(string & filename, string &str);					  //返回块号
-	bool File2Block(string& fileName, int blockNum, string& Strout);	  //把文件写入块中
-	bool newBlock(string& fileName,int blockNum,string& content);		  //申请新块
+	bool Buffer_ManagerRead(string &filename, int blocknum, string &strout);				//从文件中读取
+	bool Buffer_ManagerIsFull();															//缓冲区的块是否已满
+	bool Buffer_ManagerReadBlock(string &filename,int blocknum,string &strout);				//从缓冲区的块中读取
+	bool Buffer_ManagerReplace(string &filename, int blocknum, string &strout);				//块中已满，进行替换
 };
 //缓冲管理区的实例化
 inline Buffer_Manager & Buffer_Manager::Instance()
