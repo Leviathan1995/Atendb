@@ -92,7 +92,8 @@ public :
 		析构函数
 	*/
 	~Catalog();
-	void WriteTable2File();															//将数据写入文件，由析构函数调用
+	void WriteTable2File();															//将数据表写入文件，由析构函数调用
+	void WriteAttributes2File();													//把数据属性写入文件，由析构函数调用
 };
 
 #endif

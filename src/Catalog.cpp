@@ -7,6 +7,39 @@ using namespace std;
 Catalog::~Catalog()
 {
 	WriteTable2File();//将数据表写入文件
+	WriteAttributes2File();//将数据属性写入文件
+}
+//把数据表写入文件
+void Catalog::WriteTable2File()
+{
+	ofstream Fout("catalog/table.dat", ios::binary);
+	Fout.seekp(0, ios::beg);
+	for (int i = 0; i < TableCatalog.size(); i++)
+	{
+		Fout.write(&TableCatalog[i].CatalogTable_Flag, 1);														//先写入标志位
+		Fout.write(TableCatalog[i].CatalogTable_Name.c_str(), TableCatalog[i].CatalogTable_Name.length());		//再写入数据表名字
+		Fout.write(&TableCatalog[i].CatalogTable_AttribtuesNum, 1);												//数据表中属性的数量		
+		Fout.write(&TableCatalog[i].CatalogTable_PrimaryAttributes, 1);											//数据中的主键
+		Fout.write((char *)&TableCatalog[i].CatalogTable_IndexFlag, sizeof(long));								//索引的标志位
+		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributesIndex, sizeof(short));					//第一条属性
+		Fout.write((char *)&TableCatalog[i].CatablogTable_FirstIndex, sizeof(short));							//该表第一条索引信息的编号
+	}
+	Fout.close();
+}
+//把数据属写入文件
+void Catalog::WriteAttributes2File()
+{
+	ofstream Fout("catalog/attributes.dat", ios::binary);
+	Fout.seekp(0, ios::beg);
+	for (size_t i = 0; i < AttributesCatalog.size(); i++)
+	{
+
+		Fout.write(&AttributesCatalog[i].CatalogAttributes_Flag, 1);
+		Fout.write(AttributesCatalog[i].CatalogAttributes_Name.c_str(), AttributesCatalog[i].CatalogAttributes_Name.length());
+		Fout.write(&AttributesCatalog[i].CatalogAttributes_Type, 1);
+		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_Length, 1);
+		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_NextAttributes, sizeof(short));
+	}
 }
 //数据表检查
 void Catalog::CatalogCheckCreateTable(string & Tablename, vector<Attributes> & Attributes)
@@ -101,23 +134,6 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Attributes> & attribu
 		}
 	}
 }
-//把数据写入文件
-void Catalog::WriteTable2File()
-{
-	ofstream Fout("catalog/table.dat", ios::binary);
-	Fout.seekp(0, ios::beg);
-	for (int i = 0; i < TableCatalog.size(); i++)
-	{
-		Fout.write(&TableCatalog[i].CatalogTable_Flag, 1);														//先写入标志位
-		Fout.write(TableCatalog[i].CatalogTable_Name.c_str(), TableCatalog[i].CatalogTable_Name.length());		//再写入数据表名字
-		Fout.write(&TableCatalog[i].CatalogTable_AttribtuesNum, 1);												//数据表中属性的数量		
-		Fout.write(&TableCatalog[i].CatalogTable_PrimaryAttributes, 1);											//数据中的主键
-		Fout.write((char *)&TableCatalog[i].CatalogTable_IndexFlag, sizeof(long));								//索引的标志位
-		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributesIndex, sizeof(short));						//第一条属性
-		Fout.write((char *)&TableCatalog[i].CatablogTable_FirstIndex, sizeof(short));								//该表第一条索引信息的编号
-	}
-	Fout.close();
-}
 //得到数据表
 Table & Catalog::CatalogGet_Table(string tablename)
 {
@@ -211,5 +227,38 @@ void Catalog::CatalogCheckInsertTuple(string & tablename, vector<Tuple> Tuple_Li
 //对Select 的元组和属性进行检查
 void Catalog::CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists)
 {
+	bool Find = false;
+	int size = tablelists.size();
+	for (int j = 0; j < size; j++)
+	{
+		string tablename = tablelists.front();
+		for (auto i = TableCatalog.begin(); i != TableCatalog.end(); i++)
+		{
+			if (tablename == i->CatalogTable_Name)
+			{
+				break;
+				Find = true;
+			}
+		}
+		if (!Find)
+			throw Error(1001, "Catalog", "Select tuple", "No such table");
+	}
+
+	bool Find = false;
+	int size = attributes.size();
+	for (int j = 0; j < size; j++)
+	{
+		string tablename = attributes.front();
+		for (auto i = AttributesCatalog.begin(); i != AttributesCatalog.end(); i++)
+		{
+			if (tablename == i->CatalogAttributes_Name)
+			{
+				break;
+				Find = true;
+			}
+		}
+		if (!Find)
+			throw Error(1001, "Catalog", "Select tuple", "No such Attribtues");
+	}
 
 }

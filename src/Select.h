@@ -26,14 +26,10 @@ class Selection
 {
 public:
 
-	static vector<string> SelLists;																//即选择的属性
-	static vector<string> TableLists;															//select 中from的数据表列表
-	static vector<WhereList> WhereLists;														//slect 中where部分
-	static vector<SelectRecord> SelectOutput;													//Select选择后的记录
-	static void SelectionInput(string *Sel, string *table, WhereList *& wherelist, int wherenum);//获取用户输入的属性和数据表和where部分
-	void Selection_Parse();																		//解析用户输入的Select命令
-	void Print_SelectHead();																	//打印Select的属性头
-	vector<Record> Mem_Record;
-	vector<Column_Type> Mem_SelectColumn;//经过选择后的元组
+	static queue<string> SelLists;																//即选择的属性
+	static queue<string> TableLists;															//select 中from的数据表列表
+	static queue<WhereList> WhereLists;															//slect 中where部分
+	static vector<SelectRecord> SelectRecords;													//经过Select后的元组
+	static vector<SelectRecord> & Select_Parse(queue<string> SelLists,queue<string> TableLists,vector<string> WhereLists);//解析用户输入的Select 语句
 };
 #endif

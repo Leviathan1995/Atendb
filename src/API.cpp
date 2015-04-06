@@ -29,5 +29,7 @@ void API::Insert_Into(string & tablename, vector<Tuple> Tuple_Lists)
 //Select 选择元组
 void API::Select(queue<string> attributes, queue<string>tablelists, queue<WhereList> wherelists)
 {
-	
+	Catalog::Instance().CatalogCheckSelectTuple(attributes, tablelists);		//传递至Catalog 检查Select是否正确
+	vector<SelectRecord> SelectRecords;
+	SelectRecords = Selection::Select_Parse(attributes, tablelists, wherelists);
 }
