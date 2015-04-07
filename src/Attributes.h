@@ -14,6 +14,9 @@ public:
 	size_t Attributes_Length;
 	string Attributes_Name;
 	Attributes_Type Attributes_type;
+	bool Attributes_null;
+	bool Attributes_primary;
+	bool Attributes_unique;
 	bool Attributes_Null();
 	bool Attributes_Primary();
 	bool Attributes_Unique();

@@ -7,8 +7,10 @@
 #include "Intepretor.h"
 #include "Attributes.h"
 #include "Table.h"
+#include "Tuple.h"
 #include <string>
 #include <vector>
+#include <queue>
 #include <map>
 using namespace std;
 

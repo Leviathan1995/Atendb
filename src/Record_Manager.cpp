@@ -5,7 +5,7 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 	string FileName = tablename + ".table";
 	string Empty_Block(Block_Size, 0);						//申请一个新的块
 	int Tuple_size = 0;										//数据表中元组需要分配的内存大小
-	for (int i = 0; i < Table_Column.size(); i++)			//Table_Column.size()数据表的属性个数
+	for (size_t i = 0; i < Table_Column.size(); i++)			//Table_Column.size()数据表的属性个数
 		Tuple_size += Table_Column[i].Attributes_Length;
 	Tuple_size++;
 	int Offset = 0;//偏移量
@@ -24,16 +24,16 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 	int i, j, k;
 	string filename = table.Table_Name + ".table";
 	char Dirty = '0';
-	int Lengh = table.Table_Length + 1;
+	int Lengh = table.Table_Length() + 1;
 	string InsertContent = "";						//用户插入的记录字符串
 	string str;
 	int blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, str);
-	for (i = 0; i < Tuple_Lists.size(); i++)
+	for (size_t i = 0; i < Tuple_Lists.size(); i++)
 	{
 		Tuple Insert_Tuple = Tuple_Lists[i];
-		for (j = 0; j < Insert_Tuple.Tuple_content.size(); i++)
+		for (size_t j = 0; j < Insert_Tuple.Tuple_content.size(); i++)
 		{
-			if (table.Table_AttributesList[i].Attributes_Unique = true)
+			if (table.Table_AttributesList[i].Attributes_Unique()== true)
 			{
 				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[i], i, blocknum) == true)
 					return false;

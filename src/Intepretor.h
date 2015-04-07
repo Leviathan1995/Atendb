@@ -10,7 +10,6 @@
 #include "Error.h"
 #include "API.h"
 #include "Select.h"
-#include "Elemment.h"
 #include <vector>
 #include <string>
 #include <queue>
@@ -35,7 +34,6 @@ public:
 	bool Is_Select(vector<string> Input);				//是否为Select命令
 	bool Is_Insert(vector<string> Input);				//是否为Insert命令
 	bool Is_Quit(vector<string> Input);					//是否为Quit命令
-	bool Is_Insert(vector<string> Input);				//是否为Insert命令
 	void CreateTable_command(vector<string >Input);		//CreateTable命令解析
 	void Select_command(vector<string> Input);			//Select命令解析
 	void Insert_command(vector<string> Input);			//Insert命令解析

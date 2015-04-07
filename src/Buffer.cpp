@@ -6,6 +6,16 @@ using namespace std;
 /*
 	缓冲区管理器
 */
+Buffer_Manager::~Buffer_Manager()
+{
+	for (auto i = Buffer_ManagerUsedBlock.begin(); i != Buffer_ManagerUsedBlock.end(); i++)
+	{
+		if ((*i)->Block_Dirty)
+		{
+			File::Write(*i);
+		}
+	}
+}
 //写入一个空块中
 int Buffer_Manager::Buffer_ManagerWrite(string &filename, string &empty_block,int blocknum)
 {
@@ -23,10 +33,10 @@ int Buffer_Manager::Buffer_ManagerWrite(string &filename, string &empty_block,in
 bool Buffer_Manager::Buffer_ManagerInBuffer(string &fileName, int blocknum)
 {
 	string Key = Buffer_ManagerGetKey(fileName,blocknum);//获得文件名，块号对应的键值
-	return MemBlock_Map.count(Key) == 1;//存储块的Map结构中如果有就返回1
+	return Buffer_ManagerBlockMap.count(Key) == 1;//存储块的Map结构中如果有就返回1
 
 }
-//把文件读取到缓冲区的块中
+//从文件读取，写入到缓冲区的块中
 bool Buffer_Manager::Buffer_ManagerFile2Block(string& fileName, const int blockNum, string& strOut)
 {
 	char *Dst = new char[Block_Size];//申请一个块大小的内存
@@ -83,10 +93,10 @@ int Buffer_Manager::Buffer_ManagerReadLastNumber(string & filename, string &str)
 //读取
 bool Buffer_Manager::Buffer_ManagerRead(string &filename,int blocknum,string &strout)
 {
-	if (Buffer_ManagerInBuffer(filename, blocknum))
-		return Buffer_ManagerReadBlock(filename,blocknum,strout);			//如果在缓冲区就从缓冲区读取
+	if (Buffer_ManagerInBuffer(filename, blocknum)) //检测是否在缓冲区内
+		return Buffer_ManagerReadBlock(filename,blocknum,strout);//如果在缓冲区就从缓冲区读取
 	else
-		return Buffer_ManagerFile2Block(filename,blocknum,strout);			//否则从文件中读取
+		return Buffer_ManagerFile2Block(filename,blocknum,strout);//否则从文件中读取
 }
 //从缓冲区的块中读取,供Buffer_ManagerRead()调用
 bool Buffer_Manager::Buffer_ManagerReadBlock(string &filename, int blocknum, string &strout)
@@ -132,7 +142,7 @@ bool Buffer_Manager::Buffer_ManagerReplace(string &filename,int blocknum,string 
 	}
 	if (ReplaceBlock->Block_Dirty)					//如果被更改过，就将其写入文件中
 		ReplaceBlock->Write2File();
-	string Key = ReplaceBlock->Block_GetKey();
+	string Key = ReplaceBlock->Block_GetKey(filename,blocknum);
 	string NewKey = Buffer_ManagerGetKey(filename, blocknum);
 	ReplaceBlock->Block_Update(filename, blocknum, strout);			//在缓冲区内进行块的更新
 	Buffer_ManagerBlockMap.erase(Buffer_ManagerBlockMap.find(Key));	//移出旧的块

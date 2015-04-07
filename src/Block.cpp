@@ -18,7 +18,7 @@ void Block::Block_Update(string &filename, int blocknum, string &content)
 	this->Block_Content = content;
 }
 //通过文件名和块号获得对应的键值
-string Block::Buffer_ManagerGetKey(string &filename, int blocknum)
+string Block::Block_GetKey(string &filename, int blocknum)
 {
 	stringstream tmp;
 	string num;

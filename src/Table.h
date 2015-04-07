@@ -11,6 +11,6 @@ public:
 	Table(){}
 	string Table_Name;								//数据表的名字
 	vector<Attributes> Table_AttributesList;		//属性的集合
-	size_t Table_Length();
+	size_t Table_Length();							//数据表的长度
 };
 #endif

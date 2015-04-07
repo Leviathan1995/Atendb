@@ -12,7 +12,7 @@ public:
 	Block(string blockname, int offset, File_Type filetype);
 	~Block();
 	void Block_Update(string &filename, int blocknum, string &content);	//块的更新
-	static string Block_GetKey();										//获取块的键值
+	static string Block_GetKey(string & filename,int blocknum);			//获取块的键值
 	string Block_Name;													//块的名字
 	int Block_Num;														//块的偏移量
 	bool Block_Pin;														//是否为常驻块

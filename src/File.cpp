@@ -10,7 +10,7 @@ bool Write(string & filename, string & content, int & num)
 		File::CreateFile(filename);
 		Out.open(filename, ios::in | ios::out | ios::binary);
 	}
-	Out.seekp(0, ios_base::end);
+	Out.seekp(0, ios_base::end);									
 	long End = Out.tellp();
 	num = (End / Block_Size);                                                                // 将(块)尾号作为传出参数
 	string toBeWrite(Block_Size, 0);                                                     // ensure the rest of the 'toBeWrite' is 0

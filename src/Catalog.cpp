@@ -21,8 +21,8 @@ void Catalog::WriteTable2File()
 		Fout.write(&TableCatalog[i].CatalogTable_AttribtuesNum, 1);												//数据表中属性的数量		
 		Fout.write(&TableCatalog[i].CatalogTable_PrimaryAttributes, 1);											//数据中的主键
 		Fout.write((char *)&TableCatalog[i].CatalogTable_IndexFlag, sizeof(long));								//索引的标志位
-		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributesIndex, sizeof(short));					//第一条属性
-		Fout.write((char *)&TableCatalog[i].CatablogTable_FirstIndex, sizeof(short));							//该表第一条索引信息的编号
+		Fout.write((char *)&TableCatalog[i].CatalogTable_FirstAttributesIndex, sizeof(short));					//第一条属性在"attritbutes.dat"中的下标
+		Fout.write((char *)&TableCatalog[i].CatablogTable_FirstIndex, sizeof(short));							//该表第一条索引信息在"index.dat"编号
 	}
 	Fout.close();
 }
@@ -34,11 +34,11 @@ void Catalog::WriteAttributes2File()
 	for (size_t i = 0; i < AttributesCatalog.size(); i++)
 	{
 
-		Fout.write(&AttributesCatalog[i].CatalogAttributes_Flag, 1);
-		Fout.write(AttributesCatalog[i].CatalogAttributes_Name.c_str(), AttributesCatalog[i].CatalogAttributes_Name.length());
-		Fout.write(&AttributesCatalog[i].CatalogAttributes_Type, 1);
-		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_Length, 1);
-		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_NextAttributes, sizeof(short));
+		Fout.write(&AttributesCatalog[i].CatalogAttributes_Flag, 1);		//属性的标志位
+		Fout.write(AttributesCatalog[i].CatalogAttributes_Name.c_str(), AttributesCatalog[i].CatalogAttributes_Name.length());//属性的名字
+		Fout.write(&AttributesCatalog[i].CatalogAttributes_Type, 1);		//属性的类型
+		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_Length, 1);	//属性的长度
+		Fout.write((char *)&AttributesCatalog[i].CatalogAttributes_NextAttributes, sizeof(short));		//下一条属性在该表的下标
 	}
 }
 //数据表检查
@@ -93,9 +93,9 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Attributes> & attribu
 			NewTableAttributes.CatalogAttributes_Flag |= CATALOG_IS_UNIQUE;
 			NewTableAttributes.CatalogAttributes_Flag |= CATALOG_IS_NOT_NULL;
 		}
-		if (attributes[i].Attributes_Unique)
+		if (attributes[i].Attributes_Unique())
 			NewTableAttributes.CatalogAttributes_Flag|= CATALOG_IS_UNIQUE;
-		if (attributes[i].Attributes_Null)
+		if (attributes[i].Attributes_Null())
 			NewTableAttributes.CatalogAttributes_Flag|= CATALOG_IS_NOT_NULL;
 		NewTableAttributes.CatalogAttributes_Name = attributes[i].Attributes_Name;
 		switch (attributes[i].Attributes_type)
@@ -244,8 +244,8 @@ void Catalog::CatalogCheckSelectTuple(queue<string> attributes, queue<string>tab
 			throw Error(1001, "Catalog", "Select tuple", "No such table");
 	}
 
-	bool Find = false;
-	int size = attributes.size();
+	Find = false;
+	size = attributes.size();
 	for (int j = 0; j < size; j++)
 	{
 		string tablename = attributes.front();

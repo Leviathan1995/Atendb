@@ -168,6 +168,9 @@ bool Intepretor::Is_Insert(vector<string> input)
 //创建数据表Create命令
 void Intepretor::CreateTable_command(vector<string>Input)
 {
+	/*
+		建表的模式信息一律按照 Table.cpp Attribtues.cpp 中的规则
+	*/
 	Command_State state = Create;
 	Table table;//新建立的数据表
 	vector<Attributes> NewTableAttributes;//新的数据表中字段
@@ -195,7 +198,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			attributes.Attributes_Name= *i;
 			break;
 		case Column_type://字段属性
-			attributes.Attributes_type = Trasn2type(*i);
+			attributes.Attributes_type= Trasn2type(*i);
 			if (Trasn2type(*i) == Char)
 				state = Char_LeftBrackets;
 			else
@@ -207,7 +210,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = CharSize;
 			break;
 		case CharSize://Char类型大小
-			attributes.Attributes_Length = String2Int(*i);
+			attributes.Attributes_Length= String2Int(*i);
 			state = Char_LeftBrackets;//char的左括号
 			break;
 		case Char_RightBrackets://右括号
@@ -224,14 +227,14 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		case Not_Null_null://不为空
 			if (*i != "null")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			attributes.Attributes_Null= true;
+			attributes.Attributes_null= true;
 			if (*(++i) == "unique")
 				state = Unique;
 			break;
 		case Unique://唯一属性
 			if (*i != "unique")
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
-			attributes.Attributes_Unique = true;
+			attributes.Attributes_unique = true;
 			if (*(++i) == ",")
 			{
 				state = ColumnEndComma;
@@ -257,8 +260,12 @@ void Intepretor::CreateTable_command(vector<string>Input)
 			state = PrimaryKey_ColumnName;
 			break;
 		case PrimaryKey_ColumnName://主键属性名
-			attributesprimary = Catalog::Instance().Get_Attributes(table.Table_Name, *i);
-			attributesprimary.Attributes_Primary= true;
+			for (auto j = NewTableAttributes.begin(); j != NewTableAttributes.end(); j++)
+			{
+				if (*i == j->Attributes_Name)
+					attributesprimary = *j;
+			}
+			attributesprimary.Attributes_primary= true;
 			if (*(++i) == ")")
 				state = PrimaryKey_RightBrackets;
 			if (*(++i) == ",")
@@ -280,7 +287,7 @@ void Intepretor::CreateTable_command(vector<string>Input)
 				throw Error(0, "Interpreter", "Create table", "语法错误!");
 			break;
 		case Right_Query://建表结束，传递用户输入的参数
-			Catalog::Instance().CatalogCheckTable(table.Table_Name,NewTableAttributes);//传到Catalog进行Table Check操作
+			Catalog::Instance().CatalogCheckCreateTable(table.Table_Name,NewTableAttributes);//传到Catalog进行Table Check操作
 			API::Instance().CreateTable(table.Table_Name, NewTableAttributes);//传到API进行操作
 			break;
 		default:

@@ -5,13 +5,14 @@
 #include "Intepretor.h"
 #include <vector>
 #include <string>
+#include <queue>
 //Select 中的where结构体
 struct SelectRecord			//Select后的记录
 {
 	string AttributesName;		//属性名
 	vector<string> selectrecords;//属性值
 };
-struct WhereList
+const struct WhereList
 {
 	string Attribute;//选择的属性
 	string Where_Operator;//运算符号

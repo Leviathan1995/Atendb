@@ -16,8 +16,9 @@ vector<SelectRecord> & Selection::Select_Parse(queue<string> attributes, queue<s
 					SelectRecord selectrecord; //选择的一列记录
 					selectrecord.AttributesName = table.Table_AttributesList[table_attributes_size].Attributes_Name; //获得数据表的属性名
 					string record;				//单个记录值
-					int table_blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name,record);//读取块号
-					Buffer_Manager::Instance().Buffer_ManagerRead(table.Table_Name, table_blocknum, record);
+					int table_blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, record);	//读取块号
+					Buffer_Manager::Instance().Buffer_ManagerRead(table.Table_Name, table_blocknum, record);				//从缓冲区读取记录
+				}
 			}
 		}
 	}
