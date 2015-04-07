@@ -23,18 +23,18 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 	vector<pair<Tuple, int>> insert_tuple;
 	string filename = table.Table_Name + ".table";
 	char Dirty = '0';
-	int Lengh = table.Table_Length() + 1;
+	int Lengh = table.Table_Length() + 1;           //一条记录的长度
 	string InsertContent = "";						//用户插入的记录字符串
 	string str;
-	int blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, str);
+	int blocknum = Buffer_Manager::Instance().Buffer_ManagerReadLastNumber(table.Table_Name, str); //获得块号
 	for (size_t i = 0; i < Tuple_Lists.size(); i++)
 	{
-		Tuple Insert_Tuple = Tuple_Lists[i];
-		for (size_t j = 0; j < Insert_Tuple.Tuple_content.size(); i++)
+		Tuple Insert_Tuple = Tuple_Lists[i];     //一条记录
+		for (size_t j = 0; j < Insert_Tuple.Tuple_content.size(); i++) //一条记录中的一个字段
 		{
-			if (table.Table_AttributesList[j].Attributes_Unique()== true)
+			if (table.Table_AttributesList[j].Attributes_Unique()== true)//如果这个字段的属性是Unique
 			{
-				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[j], j, blocknum) == true)
+				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[j], j, blocknum) == true) //传递的参数为数据表 table,字段的内容，第几个属性，块号
 					return false;
 				Insert_Tuple.Tuple_content[j].resize(table.Table_AttributesList[j].Attributes_Length, 0);
 				InsertContent += Insert_Tuple.Tuple_content[j];
@@ -69,10 +69,20 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 	return true;
 	
 }
-//元组是否已经存在,num代表记录的条数
+//元组是否已经存在,num代表第几个属性，content为字段内容
 bool Record_Manager::Record_ManagerHasExisted(Table &table, string &content, int num, int blocknum)
 {
-	vector<Tuple> TestTuple = Record_ManagerSelectTuple(table,blocknum);//遍历搜寻
+	bool Has = false;
+	vector<Tuple> SearchTuple = Record_ManagerSelectTuple(table,blocknum);//遍历搜寻的元组
+	for (int i = 0; i <= SearchTuple.size(); i++)
+	{
+		if (SearchTuple[i].Tuple_content[num] == content)
+		{
+			Has = true;
+			break;
+		}
+	}
+
 }
 //获得选择的元组
 vector<Tuple> Record_Manager::Record_ManagerSelectTuple(Table & table,int blocknum)
@@ -80,25 +90,26 @@ vector<Tuple> Record_Manager::Record_ManagerSelectTuple(Table & table,int blockn
 	string filename = table.Table_Name + ".table";
 	vector<Tuple> Selected;
 	size_t size = table.Table_Length() + 1; //数据表一条记录的长度,加1是包含dirty标志位
-	for (int i = 0; i < blocknum; i++)
+	for (int i = 0; i < blocknum; i++)//遍历所有块
 	{
 		string strout;
-		Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, strout); //读出Block的内容
+		Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, strout); //读出Block的内容,strout为块的所有内容
 		size_t Pointer = 0;
 		while ((Pointer + size) < strout.size()) //一条记录一条记录的获取
 		{
 			string substring = strout.substr(Pointer, size); //从Pointer开始，复制size大小的字符串
 			vector<string> vec = Record_ManagerString2Tuple(table.Table_AttributesList, substring);//将字符串分割为元组
-			Tuple * tmp = new Tuple(vec);
+			Tuple * NewTuple = new Tuple(vec);  //将Vector<string> 构造为Vector<Tuple>类型
+			Selected.push_back(*NewTuple);
 			Pointer += size;
 		}
 	}
 	return Selected;
 }
-//将string转为Tuple
+//将string转为Tuple ，存放形式仍然为vector<string>
 vector<string> Record_Manager::Record_ManagerString2Tuple(vector<Attributes> attribtues, string tuple_str)
 {
-	vector<Attributes>::iterator i;
+	vector<Attributes>::iterator i;//数据表元素的智能指针
 	vector<string> result;
 	int ptr = 0;
 	for (i = attribtues.begin(); i != attribtues.end(); i++)
