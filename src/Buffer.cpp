@@ -114,7 +114,7 @@ bool Buffer_Manager::Buffer_ManagerFile2Block(string &filename, int blocknum, st
 	{
 		strout = string(Dst, Block_Size);
 		if (Buffer_ManagerIsFull())
-			Buffer_ManagerReplace(filename,blocknum,strout);							//如果缓冲区已经满了，就进行替换
+			Buffer_ManagerReplace(filename,blocknum,strout);//如果缓冲区已经满了，就进行替换
 		else
 			Buffer_ManagerNewBlock(filename, blocknum, strout);//否则申请一个新的块，加入到缓冲区内
 	}

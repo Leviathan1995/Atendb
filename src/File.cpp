@@ -4,7 +4,7 @@
 bool Write(string & filename, string & content, int & num)
 {
 	ofstream Out(filename, ios::in | ios::out | ios::binary);	//  写追加到文件尾
-	if (Out == 0)//如果文件不存在
+	if (!Out)//如果文件不存在
 	{
 		//文件不存在，即创建文件
 		File::CreateFile(filename);
@@ -30,4 +30,22 @@ int File::ReadLastNumber(string &filename,string &str)
 	In.read(Dst, Block_Size);
 	str = string(Dst, Block_Size);
 	return (Target / Block_Size);
+}
+bool File::Read(string & filename, int blocknum, char *& dst)
+{
+	ifstream In(filename, ios::binary | fstream::ate);
+	if (!In)
+	{
+		File::CreateFile(filename);
+		In.open(filename, ios::binary | fstream::ate);
+	}
+	if ((size_t)In.tellg() <= blocknum*Block_Size)// 文件中不存在该块(可能出现的错误读操作) ==, <=?
+	{
+		In.close();
+		return false;
+	}
+	In.seekg(blocknum*Block_Size);
+	In.read(dst, Block_Size);
+	In.close();
+	return true;
 }
