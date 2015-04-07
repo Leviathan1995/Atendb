@@ -302,8 +302,7 @@ void Intepretor::Select_command(vector<string> Input)
 	Command_State State = Select;				//命令状态
 	queue<string>	Attribute; int j = 0;		//选择的属性
 	queue<string>	tablelists; int k = 0;		//选择的数据表
-	queue<WhereList> Where_Lists; int w = 0;	//select 中where部分
-	WhereList wherelists;
+	queue<string> Where_Lists; int w = 0;		//select 中where部分
 	for (auto i = Input.begin(); i != Input.end(); i++)
 	{
 		switch (State)
@@ -311,7 +310,7 @@ void Intepretor::Select_command(vector<string> Input)
 		case Select:
 			State = SelList;
 			break;
-		case SelList:
+		case SelList: //选择的属性
 			if (*i == "*")
 				Attribute.push ("All");//如果是* 即选择所有的属性
 			else
@@ -329,7 +328,7 @@ void Intepretor::Select_command(vector<string> Input)
 				throw Error(0, "Interpreter", "Select", "语法错误!");
 			State = FromList;
 			break;
-		case FromList:
+		case FromList: //from 的数据表
 			tablelists.push(*i);
 			k++;
 			if (*(++i) == ",")
@@ -338,24 +337,15 @@ void Intepretor::Select_command(vector<string> Input)
 				State = Where;
 			break;
 		case Where:
-			wherelists.Attribute = *i;
+			Where_Lists.push(*i);    //压入属性
 			i++;
-			wherelists.Where_Operator = *i;//运算符
+			Where_Lists.push(*i);	//压入运算符
 			i++;
-			if (*i == "'")
-				wherelists.StrValue = String2Char(*(++i));
-			else
-				wherelists.IntValue = String2Int(*(++i));
+			Where_Lists.push(*i);	//压入比较值
 			if (*i == "and")
-			{
 				State = And;
-				Where_Lists.push(wherelists);
-			}
 			if (*i == ";")
-			{
 				State = EndSelect;
-				Where_Lists.push(wherelists);
-			}
 			break;
 		case And:
 			State = Where;

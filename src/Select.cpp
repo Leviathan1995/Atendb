@@ -1,7 +1,7 @@
 #include "Select.h"
 using namespace std;
 //解析用户的Select输入
-vector<SelectRecord> & Selection::Select_Parse(queue<string> attributes, queue<string>tablelists, queue<WhereList> wherelists)
+vector<SelectRecord> & Selection::Select_Parse(queue<string> attributes, queue<string>tablelists, queue<string> wherelists)
 {
 	if (attributes.front() == "All") //select * from table where ...
 	{

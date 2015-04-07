@@ -11,9 +11,7 @@ Buffer_Manager::~Buffer_Manager()
 	for (auto i = Buffer_ManagerUsedBlock.begin(); i != Buffer_ManagerUsedBlock.end(); i++)
 	{
 		if ((*i)->Block_Dirty)
-		{
 			File::Write(*i);
-		}
 	}
 }
 //写入一个空块中
@@ -35,24 +33,6 @@ bool Buffer_Manager::Buffer_ManagerInBuffer(string &fileName, int blocknum)
 	string Key = Buffer_ManagerGetKey(fileName,blocknum);//获得文件名，块号对应的键值
 	return Buffer_ManagerBlockMap.count(Key) == 1;//存储块的Map结构中如果有就返回1
 
-}
-//从文件读取，写入到缓冲区的块中
-bool Buffer_Manager::Buffer_ManagerFile2Block(string& fileName, const int blockNum, string& strOut)
-{
-	char *Dst = new char[Block_Size];//申请一个块大小的内存
-	if (File::Read(fileName, blockNum, Dst) == false)
-	{
-		delete[] Dst;
-		return false;
-	}
-	else
-	{
-		strOut = string(Dst, Block_Size);
-		if (Buffer_ManagerIsFull())//如果缓冲区已经满了
-			Buffer_ManagerReplace(fileName, blockNum, strOut);//利用替换算法 替换进来 
-		else
-			Buffer_ManagerNewBlock(fileName, blockNum, strOut);
-	}
 }
 //建立新的块
 bool Buffer_Manager::Buffer_ManagerNewBlock(string & tablename, int blocknum, string & content)

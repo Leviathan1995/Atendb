@@ -27,7 +27,7 @@ void API::Insert_Into(string & tablename, vector<Tuple> Tuple_Lists)
 		throw Error(0, "API ", "Insert_Into", "Insert failed : violation of the constraint 'unique'");
 }
 //Select 选择元组
-void API::Select(queue<string> attributes, queue<string>tablelists, queue<WhereList> wherelists)
+void API::Select(queue<string> attributes, queue<string>tablelists, queue<string> wherelists)
 {
 	Catalog::Instance().CatalogCheckSelectTuple(attributes, tablelists);		//传递至Catalog 检查Select是否正确
 	vector<SelectRecord> SelectRecords;

@@ -24,6 +24,8 @@ public:
 	bool Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists);							//insert into 插入记录
 	bool Record_ManagerHasExisted(Table &table, string &content, int num, int BlockNum);				//元组记录是否存在
 	int Record_ManagerFindDirtyTuple(string &strout, int size);											//返回脏读的偏移量
+	vector<Tuple> Record_ManagerSelectTuple(Table & table, int blocknum);								//选择元组
+	vector<string> Record_ManagerString2Tuple(vector<Attributes> attributes, string tuple_str);			//将元组转换为属性
 };
 //实例化
 inline Record_Manager & Record_Manager::Instance()

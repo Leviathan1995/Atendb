@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include "Block.h"
 using namespace std;
 /*
 	缓存管理器
@@ -21,7 +22,7 @@ class Buffer_Manager
 public:
 	Buffer_Manager();
 	~Buffer_Manager();
-	list<Block*>Buffer_ManagerUsedBlock;													//buffer中使用的块
+	list<Block *> Buffer_ManagerUsedBlock;													//buffer中使用的块
 	map<string, Block*>Buffer_ManagerBlockMap;												//buffer中的块对应字典
 	static Buffer_Manager & Instance();														//缓冲管理器实例化
 	int Buffer_ManagerWrite(string &filename, string &empty_block,int blocknum=-1);			//写入，返回写入的块号

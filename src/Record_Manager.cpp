@@ -21,7 +21,6 @@ bool Record_Manager::Record_ManagerCreateTable(string &tablename, const vector<A
 bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tuple_Lists)
 {
 	vector<pair<Tuple, int>> insert_tuple;
-	int i, j, k;
 	string filename = table.Table_Name + ".table";
 	char Dirty = '0';
 	int Lengh = table.Table_Length() + 1;
@@ -33,16 +32,16 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 		Tuple Insert_Tuple = Tuple_Lists[i];
 		for (size_t j = 0; j < Insert_Tuple.Tuple_content.size(); i++)
 		{
-			if (table.Table_AttributesList[i].Attributes_Unique()== true)
+			if (table.Table_AttributesList[j].Attributes_Unique()== true)
 			{
-				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[i], i, blocknum) == true)
+				if (Record_ManagerHasExisted(table, Insert_Tuple.Tuple_content[j], j, blocknum) == true)
 					return false;
-				Insert_Tuple.Tuple_content[i].resize(table.Table_AttributesList[i].Attributes_Length, 0);
-				InsertContent += Insert_Tuple.Tuple_content[i];
+				Insert_Tuple.Tuple_content[j].resize(table.Table_AttributesList[j].Attributes_Length, 0);
+				InsertContent += Insert_Tuple.Tuple_content[j];
 			}
 		}
 		InsertContent += Dirty;
-		for (k = 0; k <= blocknum; k++) //查找现存块中的空间
+		for (int k = 0; k <= blocknum; k++) //查找现存块中的空间
 		{
 			string Strout;
 			Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, Strout);	//读取块中的数据
@@ -58,6 +57,7 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 				continue;//如果Offset=-1,说明该块中不存在已经删除的记录，继续从下一个块读
 			}
 		}
+		int i;
 		if (i > blocknum) //缓冲区的块已满
 		{
 			InsertContent.resize(Block_Size, 0);
@@ -69,16 +69,51 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 	return true;
 	
 }
-//元组是否已经存在
+//元组是否已经存在,num代表记录的条数
 bool Record_Manager::Record_ManagerHasExisted(Table &table, string &content, int num, int blocknum)
 {
-
+	vector<Tuple> TestTuple = Record_ManagerSelectTuple(table,blocknum);//遍历搜寻
+}
+//获得选择的元组
+vector<Tuple> Record_Manager::Record_ManagerSelectTuple(Table & table,int blocknum)
+{
+	string filename = table.Table_Name + ".table";
+	vector<Tuple> Selected;
+	size_t size = table.Table_Length() + 1; //数据表一条记录的长度,加1是包含dirty标志位
+	for (int i = 0; i < blocknum; i++)
+	{
+		string strout;
+		Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, strout); //读出Block的内容
+		size_t Pointer = 0;
+		while ((Pointer + size) < strout.size()) //一条记录一条记录的获取
+		{
+			string substring = strout.substr(Pointer, size); //从Pointer开始，复制size大小的字符串
+			vector<string> vec = Record_ManagerString2Tuple(table.Table_AttributesList, substring);//将字符串分割为元组
+			Tuple * tmp = new Tuple(vec);
+			Pointer += size;
+		}
+	}
+	return Selected;
+}
+//将string转为Tuple
+vector<string> Record_Manager::Record_ManagerString2Tuple(vector<Attributes> attribtues, string tuple_str)
+{
+	vector<Attributes>::iterator i;
+	vector<string> result;
+	int ptr = 0;
+	for (i = attribtues.begin(); i != attribtues.end(); i++)
+	{
+		string tmp = tuple_str.substr(ptr, (*i).Attributes_Length);
+		ptr += (*i).Attributes_Length;
+		result.push_back(tmp);
+	}
+	return result;
 }
 //
 int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)
 {
 	int Offset = 0;
-	while ((Offset + size) < strout.size())
+	while ((size_t)(Offset + size) < strout.size())
 	{
 		string str = strout.substr(Offset, size);	
 		string Dirty = str.substr(size - 1, 1);		//size-1 后全部替换为1
