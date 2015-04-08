@@ -41,7 +41,8 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 			}
 		}
 		InsertContent += Dirty;
-		for (int k = 0; k <= blocknum; k++) //查找现存块中的空间
+		int k;
+		for ( k = 0; k <= blocknum; k++) //查找现存块中的空间
 		{
 			string Strout;
 			Buffer_Manager::Instance().Buffer_ManagerRead(filename, i, Strout);	//读取块中的数据
@@ -57,8 +58,7 @@ bool  Record_Manager::Record_ManagerInsert_Into(Table &table, vector<Tuple> Tupl
 				continue;//如果Offset=-1,说明该块中不存在已经删除的记录，继续从下一个块读
 			}
 		}
-		int i;
-		if (i > blocknum) //缓冲区的块已满
+		if (k> blocknum) //缓冲区的块已满
 		{
 			InsertContent.resize(Block_Size, 0);
 			Buffer_Manager::Instance().Buffer_ManagerWrite(filename, InsertContent);
@@ -74,7 +74,7 @@ bool Record_Manager::Record_ManagerHasExisted(Table &table, string &content, int
 {
 	bool Has = false;
 	vector<Tuple> SearchTuple = Record_ManagerSelectTuple(table,blocknum);//遍历搜寻的元组
-	for (int i = 0; i <= SearchTuple.size(); i++)
+	for (size_t i = 0; i <= SearchTuple.size(); i++)
 	{
 		if (SearchTuple[i].Tuple_content[num] == content)
 		{
@@ -82,7 +82,7 @@ bool Record_Manager::Record_ManagerHasExisted(Table &table, string &content, int
 			break;
 		}
 	}
-
+	return Has;
 }
 //获得选择的元组
 vector<Tuple> Record_Manager::Record_ManagerSelectTuple(Table & table,int blocknum)
@@ -98,7 +98,7 @@ vector<Tuple> Record_Manager::Record_ManagerSelectTuple(Table & table,int blockn
 		while ((Pointer + size) < strout.size()) //一条记录一条记录的获取
 		{
 			string substring = strout.substr(Pointer, size); //从Pointer开始，复制size大小的字符串
-			vector<string> vec = Record_ManagerString2Tuple(table.Table_AttributesList, substring);//将字符串分割为元组
+			vector<string> vec = Record_ManagerString2Tuple(table.Table_AttributesList, substring);//将字符串记录分割为元组
 			Tuple * NewTuple = new Tuple(vec);  //将Vector<string> 构造为Vector<Tuple>类型
 			Selected.push_back(*NewTuple);
 			Pointer += size;

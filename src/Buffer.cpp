@@ -24,8 +24,9 @@ int Buffer_Manager::Buffer_ManagerWrite(string &filename, string &empty_block,in
 			Buffer_ManagerFile2Block(filename, blocknum, Nouse);//把文件对应的块读入缓冲区中
 		Buffer_ManagerWrite2Block(filename, blocknum, empty_block);
 		return blocknum;
-		
 	}
+	else
+		throw Error(0, "Buffer_Manager", "Buffer_ManagerWrite", "not assign blocknum");
 }
 //文件是否在缓冲区中
 bool Buffer_Manager::Buffer_ManagerInBuffer(string &fileName, int blocknum)
@@ -68,7 +69,7 @@ bool Buffer_Manager::Buffer_ManagerIsFull()
 //返回块号
 int Buffer_Manager::Buffer_ManagerReadLastNumber(string & filename, string &str)
 {
-	File::Instance().ReadLastNumber(filename, str);
+	return File::Instance().ReadLastNumber(filename, str);
 }
 //读取
 bool Buffer_Manager::Buffer_ManagerRead(string &filename,int blocknum,string &strout)

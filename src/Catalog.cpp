@@ -134,6 +134,16 @@ void Catalog::CatalogCreateTable(string & Tablename,vector<Attributes> & attribu
 		}
 	}
 }
+//得到数据表的模式信息
+CatalogTable &Catalog::CatalogGet_CatalogTable(string tablename)
+{
+	for (auto i = TableCatalog.begin(); i != TableCatalog.end(); i++)
+	{
+		if (i->CatalogTable_Name == tablename)
+			return *i;
+	}
+	
+}
 //得到数据表
 Table & Catalog::CatalogGet_Table(string tablename)
 {

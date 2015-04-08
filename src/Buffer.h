@@ -19,6 +19,7 @@ using namespace std;
 #define MAX_FILESIZE   256	// 文件的最大长度
 class Buffer_Manager
 {
+	friend class Block;
 public:
 	Buffer_Manager();
 	~Buffer_Manager();

@@ -63,14 +63,14 @@ public :
 		return CatalogManagent;
 	}
 	// 标志位相关
-	static const char CATALOG_SPACE_USED = 0x80;
-	static const char CATALOG_HAS_PRIMARY_KEY = 0x40;
-	static const char CATALOG_HAS_INDEX = 0x20;
-	static const char CATALOG_IS_PRIMARY_KEY = 0x10;
-	static const char CATALOG_IS_UNIQUE = 0x08;
-	static const char CATALOG_IS_NOT_NULL = 0x04;
-	static const char CATALOG_IS_INDEX = 0x02;
-	static const char CATALOG_HAS_NEXT = 0x01;
+	static const unsigned char CATALOG_SPACE_USED = 0x80;
+	static const unsigned char CATALOG_HAS_PRIMARY_KEY = 0x40;
+	static const unsigned char CATALOG_HAS_INDEX = 0x20;
+	static const unsigned char CATALOG_IS_PRIMARY_KEY = 0x10;
+	static const unsigned char CATALOG_IS_UNIQUE = 0x08;
+	static const unsigned char CATALOG_IS_NOT_NULL = 0x04;
+	static const unsigned char CATALOG_IS_INDEX = 0x02;
+	static const unsigned char CATALOG_HAS_NEXT = 0x01;
 	size_t Table_Size(string &tablename);
 	//功能需求
 	void CatalogCreateTable(string & tablename, vector<Attributes> & catalogattributes);			//建立数据表的模式信息文件
@@ -89,6 +89,7 @@ public :
 		获取操作
 	*/
 	static Table & CatalogGet_Table(string tablename);												//得到 数据表
+	static CatalogTable & CatalogGet_CatalogTable(string tablename);								//得到 数据表的模式信息
 	static CatalogAttributes & CatalogGet_Attributes(string tablename,string attributesname);		//得到 数据表中的属性
 	/*
 		析构函数
