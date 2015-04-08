@@ -3,6 +3,7 @@ using namespace std;
 //解析用户的Select输入
 vector<SelectRecord> & Selection::Select_Parse(queue<string> attributes, queue<string>tablelists, queue<string> wherelists)
 {
+
 	if (attributes.front() == "All") //select * from table where ...
 	{
 		while (tablelists.size()!=0)
@@ -23,7 +24,12 @@ vector<SelectRecord> & Selection::Select_Parse(queue<string> attributes, queue<s
 					selectrecord.AttributesName = table.Table_AttributesList[i].Attributes_Name; //获得数据表的属性名
 					CatalogTable catalogtable = Catalog::Instance().CatalogGet_CatalogTable(tablelists.front());//得到数据表的模式信息
 					int Tableattributesnum = catalogtable.CatalogTable_AttribtuesNum;//得到属性的数目
-					for (int )
+					for (int k = 0; k < record.size(); k++)
+					{
+						selectrecord.selectrecords.push_back(record[i+k]); //获取第i个属性的记录列
+						k += Tableattributesnum;
+					}
+					SelectRecords.push_back(selectrecord); //收集第i个属性的记录列
 				}
 			}
 		}
