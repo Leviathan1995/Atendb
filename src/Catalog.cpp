@@ -196,7 +196,7 @@ Table & Catalog::CatalogGet_Table(string tablename)
 	}
 	return *table;
 }
-//得到 数据表中的属性的列号，也就是第几个属性
+//得到 数据表中的属性的列号，也就是第几个属性,如果没有这个属性就返回-1
 int Catalog::Catalog_GetAttributesNumber(string & attributesname, Table & table)
 {
 	int Number = 0;
@@ -209,6 +209,7 @@ int Catalog::Catalog_GetAttributesNumber(string & attributesname, Table & table)
 		}
 		Number++;
 	}
+	return -1;
 }
 //插入的记录进行检查
 void Catalog::CatalogCheckInsertTuple(string & tablename, vector<Tuple> Tuple_Lists)
