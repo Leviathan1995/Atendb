@@ -21,6 +21,7 @@ bool Write(string & filename, string & content, int & num)
 
 	return true;
 }
+//·µ»Ø¿éºÅ
 int File::ReadLastNumber(string &filename,string &str)
 {
 	ifstream In(filename, ios::binary);

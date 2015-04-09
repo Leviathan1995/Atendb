@@ -120,6 +120,25 @@ vector<string> Record_Manager::Record_ManagerString2Tuple(vector<Attributes> att
 	}
 	return result;
 }
+//再将vector<string>形式的记录转换为tuple
+vector<Tuple> Record_Manager::Record_Manager2Tuple(vector<string> tuple_str, Table &table)
+{
+	vector<Tuple> Record_Tuple;
+	int AttributesNum = table.Table_AttributesList.size();//属性总数
+	int Tuple_StrNum = tuple_str.size();	
+	int Record_Num = Tuple_StrNum / AttributesNum;   //数据表中记录的条数
+	while (Record_Num--)
+	{
+		Tuple tuple;
+		for (int i = 0; i < AttributesNum; i++)
+		{
+			tuple.Tuple_content.push_back(tuple_str.front());
+			tuple_str.pop_back();
+		}
+		Record_Tuple.push_back(tuple);
+	}
+	return Record_Tuple;
+}
 //
 int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)
 {

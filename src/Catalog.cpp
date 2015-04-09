@@ -196,6 +196,20 @@ Table & Catalog::CatalogGet_Table(string tablename)
 	}
 	return *table;
 }
+//得到 数据表中的属性的列号，也就是第几个属性
+int Catalog::Catalog_GetAttributesNumber(string & attributesname, Table & table)
+{
+	int Number = 0;
+	for (auto i = table.Table_AttributesList.begin(); i != table.Table_AttributesList.end(); i++)
+	{
+		if (i->Attributes_Name == attributesname)
+		{
+			Number++;
+			return Number;
+		}
+		Number++;
+	}
+}
 //插入的记录进行检查
 void Catalog::CatalogCheckInsertTuple(string & tablename, vector<Tuple> Tuple_Lists)
 {

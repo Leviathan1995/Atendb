@@ -17,6 +17,6 @@ public:
 	bool Block_Pin;														//是否为常驻块
 	bool Block_Dirty;													//脏读 标志位
 	bool Write2File();													//写入文件中
-	string Block_Content;
+	string Block_Content;												//块中存放的记录
 };
 #endif

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 using namespace std;
 //将string类型的type转换为Attributes_Type
-Attributes_Type Intepretor::Trasn2type(string type)
+Attributes_Type Intepretor::Trasn2Attributestype(string type)
 {
 	if (type == "int")
 		return Attributes_Type::Int;

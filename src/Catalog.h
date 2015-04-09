@@ -91,6 +91,7 @@ public :
 	static Table & CatalogGet_Table(string tablename);												//得到 数据表
 	static CatalogTable & CatalogGet_CatalogTable(string tablename);								//得到 数据表的模式信息
 	static CatalogAttributes & CatalogGet_Attributes(string tablename,string attributesname);		//得到 数据表中的属性
+	static int Catalog_GetAttributesNumber(string & attributesname,Table &table);					//得到 数据表中的属性的列号，也就是第几个属性
 	/*
 		析构函数
 	*/
