@@ -4,7 +4,7 @@
    
    
 <h2>SQL查询语言：</h2>
-            Create:
+            Create table:
                         创建数据表
                         Create table r
                                     (A1 D1,
@@ -22,3 +22,6 @@
                         Select * from table;
                         Select * from table where attributes op value;
 
+            Create index:
+                        创建索引
+                        Create index index_name on table_name(column_name);
