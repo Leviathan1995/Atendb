@@ -27,6 +27,7 @@ public:
 	vector<Tuple> Record_ManagerSelectTuple(Table & table, int blocknum);								//选择元组
 	vector<string> Record_ManagerString2Tuple(vector<Attributes> attributes, string tuple_str);			//将记录转换为vector<string> 形式
 	vector<Tuple> Record_Manager2Tuple(vector<string> tuple_str,Table &table);							//再将vector<string>形式的记录转换为tuple
+	vector<pair<string, int>> Record_ManagerGetTupleOffset(Table & table, string & attributesname, int BlcokId);//获得某属性记录的所有偏移量
 };
 //实例化
 inline Record_Manager & Record_Manager::Instance()

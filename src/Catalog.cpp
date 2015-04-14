@@ -287,6 +287,7 @@ void Catalog::CatalogCheckSelectTuple(queue<string> attributes, queue<string>tab
 	}
 
 }
+//检查用户准备建立的索引
 void Catalog::CatalogCheckCreateIndex(string &indexname, string &tablename, string &attributesname)
 {
 	short FirstAttributesIndex = 0, FirstIndexIndex = 0;

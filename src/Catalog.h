@@ -79,6 +79,7 @@ public :
 	void CatalogInsertTuple(string &tableneame, vector<Tuple> Tuple_Lists);							//数据表插入属性
 	void CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists);				//Select 的元组的检查
 	void CatalogCheckCreateIndex(string & indexname, string &tablename, string &attributesname);	//对建立索引的检查
+	void CatalogCreateIndex(string &indexname, string &tablename, string &attributesname);			//建立索引
 
 	/*
 		文件存放

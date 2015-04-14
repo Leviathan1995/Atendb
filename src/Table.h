@@ -12,5 +12,6 @@ public:
 	string Table_Name;								//数据表的名字
 	vector<Attributes> Table_AttributesList;		//属性的集合
 	size_t Table_Length();							//数据表的长度
+	Attributes GetAttributes(string &attributesname);//得到属性
 };
 #endif

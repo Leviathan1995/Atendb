@@ -139,6 +139,17 @@ vector<Tuple> Record_Manager::Record_Manager2Tuple(vector<string> tuple_str, Tab
 	}
 	return Record_Tuple;
 }
+//获得某个属性的记录的所有偏移量
+vector<pair<string, int>> Record_Manager::Record_ManagerGetTupleOffset(Table &table, string & attributesname,int BlockId)
+{
+	string Filename = table.Table_Name + ".table";
+	string Content;
+	if (Buffer_Manager::Instance().Buffer_ManagerRead(Filename, BlockId, Content) == false)
+		return vector<pair<string, int>>();
+	vector<pair<string, int>> Info; //属性全部记录的偏移量集合
+	size_t size = 1 + table.Table_Length;
+
+}
 //
 int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)
 {

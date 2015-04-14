@@ -21,6 +21,16 @@ void API::CreateTable(string & tablename, vector<Attributes> &Attributes)
 void API::CreateIndex(string & indexname, string &tablename, string & attributesname)
 {
 	Catalog::Instance().CatalogCheckCreateIndex(indexname,tablename,attributesname);
+	Table table = Catalog::Instance().CatalogGet_Table(tablename);
+	Attributes attributes = table.GetAttributes(attributesname);
+	Catalog::Instance().CatalogCreateIndex(indexname, tablename, attributesname);
+	size_t BlockNum = 0;
+	vector<pair<string, int>> Info;
+	while (true)
+	{
+		Info.clear();
+		Info = Record_Manager::Instance().
+	}
 }
 //Insert into ²åÈë¼ÇÂ¼
 void API::Insert_Into(string & tablename, vector<Tuple> Tuple_Lists)
