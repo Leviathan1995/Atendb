@@ -147,8 +147,15 @@ vector<pair<string, int>> Record_Manager::Record_ManagerGetTupleOffset(Table &ta
 	if (Buffer_Manager::Instance().Buffer_ManagerRead(Filename, BlockId, Content) == false)
 		return vector<pair<string, int>>();
 	vector<pair<string, int>> Info; //属性全部记录的偏移量集合
-	size_t size = 1 + table.Table_Length;
+	size_t Length = 1 + table.Table_Length;
+	size_t AttributesBegin = table.GetAttributesBegin(attributesname);
+	size_t AttributesEnd = table.GetAttributesEnd(attributesname);
+	size_t Offset = 0;//Block内的一个偏移
+	while ((Offset + Length) < Content.size())
+	{
+		string tuple = Content.substr(Offset, Length);
 
+	}
 }
 //
 int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)
