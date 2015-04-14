@@ -60,6 +60,17 @@ enum Command_State
 	Insert_Comma_Or_Bracket,//Insert into values中是括号还是值
 	Insert_Right_Mark,		//
 	Insert_EndInsert,		//insert into values的end
+
+	//创建索引
+	CreateIndex_Create,
+	CreateIndex_Index,
+	CreateIndex_IndexName,
+	CreateIndex_On,
+	CreateIndex_TableName,
+	CreateIndex_Leftbrackets,
+	CreateIndex_AttributesName,
+	CreateIndex_Rightbrackets,
+	CreateIndex_End,
 };
 //字段属性
 enum Attributes_Type

@@ -4,7 +4,7 @@ API::API()
 {
 
 }
-//Create建表
+//Create table建表
 void API::CreateTable(string & tablename, vector<Attributes> &Attributes)
 {
 	try
@@ -16,6 +16,11 @@ void API::CreateTable(string & tablename, vector<Attributes> &Attributes)
 		throw;
 	}
 	Record_Manager::Instance().Record_ManagerCreateTable(tablename, Attributes);//传给磁盘管理系统创建表
+}
+//Create index 建索引
+void API::CreateIndex(string & indexname, string &tablename, string & attributesname)
+{
+	Catalog::Instance().CatalogCheckCreateIndex(indexname,tablename,attributesname);
 }
 //Insert into 插入记录
 void API::Insert_Into(string & tablename, vector<Tuple> Tuple_Lists)

@@ -78,6 +78,7 @@ public :
 	void CatalogCheckInsertTuple(string &tablename, vector<Tuple> Tuple_Lists);						//检查属性是否正确
 	void CatalogInsertTuple(string &tableneame, vector<Tuple> Tuple_Lists);							//数据表插入属性
 	void CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists);				//Select 的元组的检查
+	void CatalogCheckCreateIndex(string & indexname, string &tablename, string &attributesname);	//对建立索引的检查
 
 	/*
 		文件存放
@@ -85,6 +86,7 @@ public :
 	*/
 	static vector<CatalogTable> TableCatalog;														//数据表存放容器
 	static vector<CatalogAttributes>AttributesCatalog;												//属性的存放
+	static vector<CatalogIndex> IndexCatalog;
 	/*
 		获取操作
 	*/

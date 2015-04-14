@@ -31,10 +31,12 @@ public:
 		ÃüÁî
 	*/
 	bool Is_CreateTable(vector<string> Input);			//ÊÇ·ñÎªCreateTableÃüÁî
+	bool Is_CreateIndex(vector<string> Input);			//ÊÇ·ñÎªCreateIndexÃüÁî
 	bool Is_Select(vector<string> Input);				//ÊÇ·ñÎªSelectÃüÁî
 	bool Is_Insert(vector<string> Input);				//ÊÇ·ñÎªInsertÃüÁî
 	bool Is_Quit(vector<string> Input);					//ÊÇ·ñÎªQuitÃüÁî
 	void CreateTable_command(vector<string >Input);		//CreateTableÃüÁî½âÎö
+	void CreateIndex_command(vector<string> Input);		//CreateIndexÃüÁî½âÎö
 	void Select_command(vector<string> Input);			//SelectÃüÁî½âÎö
 	void Insert_command(vector<string> Input);			//InsertÃüÁî½âÎö
 	void Quit_command(vector<string> Input);			//QuitÃüÁî½âÎö

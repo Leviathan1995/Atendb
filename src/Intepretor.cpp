@@ -133,10 +133,18 @@ void Intepretor::ParseCommand()
 	if (Is_Insert(Input))
 		Insert_command(Input);
 }
-//是否为Create命令
+//是否为CreateTable命令
 bool Intepretor::Is_CreateTable(vector<string> input)
 {
 	if (input.size() >= 2 && input[0] == "create"&&input[1] == "table")
+		return true;
+	else
+		return false;
+}
+//是否为CreateIndex命令
+bool Intepretor::Is_CreateIndex(vector<string> input)
+{
+	if (input.size() >= 2 && input[0] == "create"&&input[1] == "index")
 		return true;
 	else
 		return false;
@@ -165,7 +173,7 @@ bool Intepretor::Is_Insert(vector<string> input)
 	else
 		return false;
 }
-//创建数据表Create命令
+//创建数据表CreateTable命令
 void Intepretor::CreateTable_command(vector<string>Input)
 {
 	/*
@@ -295,6 +303,64 @@ void Intepretor::CreateTable_command(vector<string>Input)
 		}
 	}
 	cout << "Create table successfully" << endl;
+}
+//Create index命令
+void Intepretor::CreateIndex_command(vector<string> Input)
+{
+	Command_State State = Create;
+	string IndexName, TableName,AttributesName;
+	for (auto i = Input.begin(); i != Input.end(); i++)
+	{
+		switch (State)
+		{
+		case CreateIndex_Create:
+			if (*i == "create")
+				State = CreateIndex_Index;
+			else
+				throw Error(0, "Interpreter", "Create index", "语法错误!");
+			break;
+		case CreateIndex_Index:
+			if (*i == "index")
+				State = CreateIndex_IndexName;
+			else
+				throw Error(0, "Interpreter", "Create index", "语法错误!");
+			break;
+		case CreateIndex_IndexName:
+			IndexName = *i;
+			State = CreateIndex_On;
+			break;
+		case CreateIndex_On:
+			if (*i == "on")
+				State = CreateIndex_TableName;
+			else
+				throw Error(0, "Interpreter", "Create index", "语法错误!");
+			break;
+		case CreateIndex_TableName:
+			TableName = *i;
+			State = CreateIndex_Leftbrackets;
+			break;
+		case CreateIndex_Leftbrackets:
+			if (*i == "(")
+				State = CreateIndex_AttributesName;
+			else
+				throw Error(0, "Interpreter", "Create index", "语法错误!");
+			break;
+		case CreateIndex_AttributesName:
+			AttributesName = *i;
+			State = CreateIndex_Rightbrackets;
+			break;
+		case CreateIndex_Rightbrackets:
+			if (*i == ")")
+				State = CreateIndex_End;
+			else
+				throw Error(0, "Interpreter", "Create index", "语法错误!");
+			break;
+		case CreateIndex_End:
+			API::Instance().CreateIndex(IndexName, TableName, AttributesName);
+		default:
+			break;
+		}
+	}
 }
 //选择Select命令
 void Intepretor::Select_command(vector<string> Input)

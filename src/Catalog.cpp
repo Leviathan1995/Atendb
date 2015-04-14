@@ -287,3 +287,56 @@ void Catalog::CatalogCheckSelectTuple(queue<string> attributes, queue<string>tab
 	}
 
 }
+void Catalog::CatalogCheckCreateIndex(string &indexname, string &tablename, string &attributesname)
+{
+	short FirstAttributesIndex = 0, FirstIndexIndex = 0;
+	unsigned long IndexFlags = 0;
+	bool TableFind = false, HasIndex = false;
+	for (size_t i = 0; i < TableCatalog.size(); i++)
+	{
+		if ((TableCatalog[i].CatalogTable_Flag & CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].CatalogTable_Name), tablename.c_str()))
+		{
+			TableFind = true;
+			//获得该表的索引标志位
+			IndexFlags = TableCatalog[i].CatalogTable_IndexFlag;
+			//获得该表第一条属性，索引（如果有）的位置
+			FirstAttributesIndex = TableCatalog[i].CatalogTable_FirstAttributesIndex;
+			if (TableCatalog[i].CatalogTable_Flag &CATALOG_HAS_INDEX)
+			{
+				HasIndex = true;
+				FirstIndexIndex = TableCatalog[i].CatablogTable_FirstIndex;
+			}
+			break;
+		}
+	}
+	if (!TableFind)
+		throw Error(0, "Catalog", "Create index", "no such table");
+	//检查属性是否存在，属性是否是Unique
+	bool AttributesFind = false;
+	short CurrentAttributesIndex = FirstAttributesIndex, AttribtuesNumber = -1;
+	while (CurrentAttributesIndex != -1 && !TableFind)
+	{
+		AttribtuesNumber++;
+		if (!strcmp(Intepretor::String2Char(AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Name), attributesname.c_str()))
+		{
+			AttributesFind = true;
+			if (!(AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag &CATALOG_IS_UNIQUE))
+				throw Error(0, "Catalog", "Create index", "Attribtues is not unique");
+			break;
+		}
+		CurrentAttributesIndex = AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_NextAttributes;
+	}
+	if (!AttributesFind)
+		throw Error(0, "Catalog", "Create index", "no such attribtues");
+	//检查索引是否冲突
+	if ((IndexFlags >> AttribtuesNumber) & 1)
+		throw Error(0, "Catalog", "Create index", "The index is already exist");
+	//检查indexname
+	for (size_t i = 0; i < IndexCatalog.size(); i++)
+	{
+		if ((IndexCatalog[i].CatalogIndex_Flag & CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(IndexCatalog[i].CatalogIndex_Name), indexname.c_str()))
+		{
+			throw Error(0, "Catalog", "Create index", "An index of the same name already exists.");
+		}
+	}
+}
