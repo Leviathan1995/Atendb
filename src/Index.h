@@ -13,7 +13,7 @@ public:
 	Index_Manager(){}
 	Index_Manager(Index_Manager &);
 	~Index_Manager(){}
-	Index_Manager & Instance(); //实例化
+	static Index_Manager & Instance(); //实例化
 	void Index_CreateIndex(string & tablename,vector<Attributes> & attributes); //供API::CreateTable 调用
 	void Index_CreataIndex(string & tablename, Attributes & attributes);//供API::CreateIndex 调用
 	void Index_DropIndex(string &tablename,vector<string> & AttributesName);//供API:;DropTable 调用

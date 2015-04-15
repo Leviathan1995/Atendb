@@ -139,23 +139,27 @@ vector<Tuple> Record_Manager::Record_Manager2Tuple(vector<string> tuple_str, Tab
 	}
 	return Record_Tuple;
 }
-//获得某个属性的记录的所有偏移量
-vector<pair<string, int>> Record_Manager::Record_ManagerGetTupleOffset(Table &table, string & attributesname,int BlockId)
+//获得某个属性的记录的所有偏移量,BlockID为块号
+vector<pair<string, int>> Record_Manager::Record_ManagerGetTupleOffset(Table &table, string & attributesname,int BlockID)
 {
 	string Filename = table.Table_Name + ".table";
 	string Content;
-	if (Buffer_Manager::Instance().Buffer_ManagerRead(Filename, BlockId, Content) == false)
+	if (Buffer_Manager::Instance().Buffer_ManagerRead(Filename, BlockID, Content) == false)
 		return vector<pair<string, int>>();
 	vector<pair<string, int>> Info; //属性全部记录的偏移量集合
 	size_t Length = 1 + table.Table_Length;
-	size_t AttributesBegin = table.GetAttributesBegin(attributesname);
-	size_t AttributesEnd = table.GetAttributesEnd(attributesname);
+	size_t AttributesBegin = table.GetAttributesBegin(attributesname);//这个属性在记录中起点
+	size_t AttributesEnd = table.GetAttributesEnd(attributesname);//这个属性在记录中的终点
 	size_t Offset = 0;//Block内的一个偏移
 	while ((Offset + Length) < Content.size())
 	{
 		string tuple = Content.substr(Offset, Length);
-
+		string tuplestr = Content.substr(Offset + AttributesBegin, AttributesEnd - AttributesBegin); //截取这个属性的字符串
+		Offset += Block_Size*BlockID;
+		Info.push_back(pair<string, int>(tuplestr, Offset));
+		Offset += Length;
 	}
+	return Info;
 }
 //
 int Record_Manager::Record_ManagerFindDirtyTuple(string &strout, int size)

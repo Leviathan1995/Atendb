@@ -8,6 +8,7 @@
 #include "Buffer.h"
 #include "Catalog.h"
 #include "Select.h"
+#include "Index.h"
 #include <string>
 #include <vector>
 #include <queue>

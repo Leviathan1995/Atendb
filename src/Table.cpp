@@ -16,3 +16,27 @@ Attributes Table::GetAttributes(string & attribtuesname)
 			return *i;
 	}
 }
+//得到这个属性在模式信息表的中起点偏移量
+size_t Table::GetAttributesBegin(string &attributesname)
+{
+	size_t Begin = 0;
+	for (auto i = Table_AttributesList.begin(); i != Table_AttributesList.end(); i++)
+	{
+		if (i->Attributes_Name == attributesname)
+			return Begin;
+		Begin += i->Attributes_Length;
+	}
+	return 0;
+}
+//得到这个属性在模式信息表的中终点偏移量
+size_t Table::GetAttributesEnd(string &attributesname)
+{
+	size_t End = 0;
+	for (auto i = Table_AttributesList.begin(); i != Table_AttributesList.end(); i++)
+	{
+		if (i->Attributes_Name == attributesname)
+			return End+=i->Attributes_Length;
+		End+= i->Attributes_Length;
+	}
+	return 0;
+}

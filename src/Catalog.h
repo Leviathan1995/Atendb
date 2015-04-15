@@ -49,8 +49,8 @@ struct CatalogIndex
 	char CatalogIndex_Flag;					//标志位
 	string CatalogIndex_Name;				//索引的名字
 	unsigned short CatalogIndex_InTable;	//该索引所属表在Table目录文件中的编号
-	char CatalogIndex_Key;					//该索引针对所属的表的键
-	short CatalogIndex_Next;				//该表下一条索引信息的编号，没有为-1
+	string CatalogIndex_Attributes;			//该索引针对所属的表的键
+	short CatalogIndex_NextIndex;			//该表下一条索引信息的编号，没有为-1
 };
 //数据库中的数据表实例类
 class Catalog
@@ -79,7 +79,7 @@ public :
 	void CatalogInsertTuple(string &tableneame, vector<Tuple> Tuple_Lists);							//数据表插入属性
 	void CatalogCheckSelectTuple(queue<string> attributes, queue<string>tablelists);				//Select 的元组的检查
 	void CatalogCheckCreateIndex(string & indexname, string &tablename, string &attributesname);	//对建立索引的检查
-	void CatalogCreateIndex(string &indexname, string &tablename, string &attributesname);			//建立索引
+	void CatalogCreateIndex(string &indexname, string &tablename, string &attributesname);			//建立索引的模式表信息
 
 	/*
 		文件存放

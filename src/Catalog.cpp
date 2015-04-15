@@ -341,3 +341,70 @@ void Catalog::CatalogCheckCreateIndex(string &indexname, string &tablename, stri
 		}
 	}
 }
+//建立索引的模式表信息
+void Catalog::CatalogCreateIndex(string &indexname, string &tablename, string &attributesname)
+{
+	//从数据表中的模式信息找到这个表的模式信息
+	short TableIndex = 0, FirstAttribtuesIndex = 0, FirstIndexIndex = 0;
+	for (size_t i = 0; i < TableCatalog.size(); i++)
+	{
+		if ((TableCatalog[i].CatalogTable_Flag & CATALOG_SPACE_USED) && !strcmp(Intepretor::String2Char(TableCatalog[i].CatalogTable_Name), tablename.c_str()))
+		{
+			TableIndex = i;
+			FirstAttribtuesIndex = TableCatalog[i].CatalogTable_FirstAttributesIndex;
+			FirstIndexIndex = TableCatalog[i].CatablogTable_FirstIndex;
+			break;
+		}
+	}
+	//在AttributesCatalog中找到这个属性。设标志位为Catalog_is_Index
+	short CurrentAttributesIndex = FirstAttribtuesIndex, AttributesNum = 1;
+	while (CurrentAttributesIndex != -1)
+	{
+		AttributesNum++;
+		if (strcmp(Intepretor::String2Char(AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Name), attributesname.c_str()) == 0)
+		{
+			AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_Flag |= CATALOG_IS_INDEX;
+			break;
+		}
+		CurrentAttributesIndex = AttributesCatalog[CurrentAttributesIndex].CatalogAttributes_NextAttributes;
+	}
+	TableCatalog[TableIndex].CatalogTable_IndexFlag |= 1 << AttributesNum; //设置TableCatalog的索引标志
+	//在IndexCatalog中查找空间
+	CatalogIndex indexcatalog;
+	indexcatalog.CatalogIndex_Flag = CATALOG_SPACE_USED;
+	indexcatalog.CatalogIndex_Name = indexname;//赋索引的名字
+	indexcatalog.CatalogIndex_InTable = TableIndex;//属于哪个数据表
+	indexcatalog.CatalogIndex_Attributes = attributesname;//属于哪个属性
+	indexcatalog.CatalogIndex_NextIndex = -1;
+	//写入IndexCatalog模式信息表中
+	int NewIndexIndex = -1;
+	//找IndexCatalog模式信息表中的空余空间
+	for (size_t i = 0; i < IndexCatalog.size(); i++)
+	{
+		if (!(IndexCatalog[i].CatalogIndex_Flag & CATALOG_SPACE_USED))
+		{
+			NewIndexIndex = i;
+			IndexCatalog[i] = indexcatalog;
+			break;
+		}
+	}
+	//没有空闲空间，重新开辟
+	if (NewIndexIndex == -1)
+	{
+		IndexCatalog.push_back(indexcatalog);
+		NewIndexIndex = IndexCatalog.size() - 1;
+	}
+	// 如果之前该表已有索引，就把新索引和该表的其他索引连接起来，否则它就是该表的第一条索引
+	if (!(TableCatalog[TableIndex].CatalogTable_Flag & CATALOG_HAS_INDEX))
+	{
+		TableCatalog[TableIndex].CatalogTable_Flag |= CATALOG_HAS_INDEX;
+		TableCatalog[TableIndex].CatablogTable_FirstIndex = NewIndexIndex;
+	}
+	else//数据表之前没有索引
+	{
+		int CurrentIndexIndex = FirstIndexIndex;
+		while (IndexCatalog[CurrentIndexIndex].CatalogIndex_NextIndex != -1)
+			CurrentIndexIndex = IndexCatalog[CurrentIndexIndex].CatalogIndex_NextIndex;
+		IndexCatalog[CurrentIndexIndex].CatalogIndex_NextIndex = NewIndexIndex;
+	}
+}

@@ -26,10 +26,15 @@ void API::CreateIndex(string & indexname, string &tablename, string & attributes
 	Catalog::Instance().CatalogCreateIndex(indexname, tablename, attributesname);
 	size_t BlockNum = 0;
 	vector<pair<string, int>> Info;
+	//逐块建立索引
 	while (true)
 	{
 		Info.clear();
-		Info = Record_Manager::Instance().
+		Info = Record_Manager::Instance().Record_ManagerGetTupleOffset(table, attributesname, BlockNum);
+		if (Info.empty()) //如果记录不存在
+			break;
+		Index_Manager::Instance().Index_InsertIndex(tablename, attributes, Info);
+		BlockNum++;
 	}
 }
 //Insert into 插入记录
