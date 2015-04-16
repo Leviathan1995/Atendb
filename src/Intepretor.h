@@ -48,6 +48,7 @@ public:
 	static int String2Int(string s);//将string 转换为int
 	static const char * String2Char(string s);//将string 转换为 char *
 	float String2Float(string s);//将string 转换为float
+	int ForBytes2Int(string & Content, int start, int end);
 	//运算符号选择
 	static enum Operator_type  Op_Judge(string Op);
 };

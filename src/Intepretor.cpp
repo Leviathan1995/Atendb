@@ -4,6 +4,17 @@
 #include <string>
 #include <stdlib.h>
 using namespace std;
+int Intepretor::ForBytes2Int(string & Content,int start,int end)
+{
+	int Start = 0;
+	unsigned char L = 255;
+	for (int i = start; i < end; i++)
+	{
+		Start <<=8;
+		Start += (Content[i] & L);
+	}
+	return Start;
+}
 //将string类型的type转换为Attributes_Type
 Attributes_Type Intepretor::Trasn2Attributestype(string type)
 {
@@ -510,5 +521,4 @@ void Intepretor::Quit_command(vector<string> input)
 {
 	if (input[0] == "quit")
 		exit(0);
-
 }
