@@ -7,13 +7,6 @@
 //  Copyright © 2015年 Leviathan. All rights reserved.
 //
 
-//
-//  bitcask.cpp
-//  Biubitcask
-//
-//  Created by Leviathan on 15/12/13.
-//  Copyright © 2015年 Leviathan. All rights reserved.
-//
 
 #include <iostream>
 #include <fstream>
