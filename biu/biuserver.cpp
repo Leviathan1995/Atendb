@@ -5,6 +5,7 @@
 //  Created by Leviathan on 15/12/22.
 //  Copyright © 2015年 Leviathan. All rights reserved.
 //
+
 #include <iostream>
 #include <memory.h>
 #include <string>
@@ -12,6 +13,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "biu_api.h"
 using namespace std;
 
 #define PORT 8888    					/*侦听端口地址*/
@@ -30,9 +32,9 @@ void process_conn_server(int s)
             return;
         }
         /*
-          响应客户端
-        */
-        string req;//=str(buffer);
+         响应客户端
+         */
+        string req=string(buffer);
         response=biu_api(req);
         write(s,response.c_str(), response.length());/*发给客户端*/
     }
@@ -93,4 +95,6 @@ int main()
             close(client_socket);						/*在父进程中关闭客户端的连接*/
         }
     }
+    return 0;
 }
+
