@@ -23,30 +23,10 @@
 #include "bitcask.h"
 using namespace std;
 
-
-int main()
+bitcask::bitcask()
 {
-    bitcask bit;
-    bit.init();
-    //bit.insert_data("shq", "lsy");
-    //bit.insert_data("pp", "uu");
-    
-     for (int i=140; i<145; i++) {
-     string d="shq"+to_string(i);
-     string s="lsy"+to_string(i);
-     bit.insert_data(d,s);
-     }
-     cout<<bit.response;
-     //*/
-    bit.read_datainfo("shq143");
-    cout<<bit.response;
-    bit.delete_data("shq141");
-    cout<<bit.response;
-    bit.update_data("shq20", "lsy i love you");
-    cout<<bit.response;
-    return 0;
+    start=false;
 }
-
 
 bitcask::~bitcask()
 {
@@ -58,12 +38,11 @@ bitcask::~bitcask()
 void bitcask::init()
 {
     response+="The Biu bitcask storage system  (Version 1.0.1) \n";
-    
     response+=cmd+"the bitcask is running...\n";
     activefile=0;
     long len;
     fstream hint;
-    hint.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/hint.bin",ios::binary|ios::app);
+    hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
         response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
@@ -79,7 +58,7 @@ void bitcask::init()
         response+=cmd+"load index to memory...\n";
         bitcask_index search;
         fstream hint;
-        hint.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/hint.bin",ios::binary|ios::in);
+        hint.open(filepath+"hint.bin",ios::binary|ios::in);
         if (!hint) {
             response+=cmd+prompt+"the file hint.bin open failure!\n";
         }
@@ -94,7 +73,7 @@ void bitcask::init()
         }
     }
     fstream filelog;
-    filelog.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/filelog.bin",ios::binary|ios::in);
+    filelog.open(filepath+"filelog.bin",ios::binary|ios::in);
     if (!filelog) {
         response+=cmd+prompt+"the file filelog.bin open failure!\n";
     }
@@ -103,11 +82,12 @@ void bitcask::init()
     if (activefile==0) {
         response+=cmd+prompt+"create file filelog.bin successful!\n";
         activefile=1;
-        filelog.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/filelog.bin",ios::binary|ios::app);
+        filelog.open(filepath+"filelog.bin",ios::binary|ios::app);
         filelog.write((char *)(&activefile), sizeof(int));
         filelog.close();
         return ;
     }
+    start=true;
 }
 
 void bitcask::insert_data(string key,string value)
@@ -130,7 +110,7 @@ void bitcask::insert_data(string key,string value)
     bitcask_index newindex;
     newindex.key=key;
     newindex.file_id=fileprev+to_string(activefile);
-    datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+newindex.file_id,ios::binary|ios::in|ios::app);
+    datafile.open(filepath+newindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
         response+=cmd+prompt+newindex.file_id+" open failure\n";
     newindex.value_pos=datafile.tellg();
@@ -154,7 +134,7 @@ void bitcask::write_data(bitcask_data newdata)
 {
     string file=fileprev+to_string(activefile);
     fstream datafile;
-    datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::app);
+    datafile.open(filepath+file,ios::binary|ios::app);
     if(!datafile)
         response+=cmd+prompt+file+" open file "+file+" failure!\n";
     datafile.write((char *)(&newdata),sizeof(newdata));
@@ -164,7 +144,7 @@ void bitcask::write_data(bitcask_data newdata)
 void bitcask::write_index(bitcask_index newindex)
 {
     fstream hint;
-    hint.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/hint.bin",ios::binary|ios::app);
+    hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
         response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
@@ -200,7 +180,7 @@ bitcask_data bitcask::read_data(string key)
     {
         string file=search_index.file_id;
         fstream datafile;
-        datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::in|ios::beg);
+        datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
         if(!datafile)
             response+=cmd+prompt+"open file "+file+" failure\n";
         datafile.seekg(search_index.value_pos,ios::beg);
@@ -262,7 +242,7 @@ void bitcask::update_data(string key, string value)
     
     //update index
     upindex.file_id=fileprev+to_string(activefile);
-    datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+upindex.file_id,ios::binary|ios::in|ios::app);
+    datafile.open(filepath+upindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
         response+=cmd+prompt+"the file "+upindex.file_id+" open failure!\n";
     upindex.value_pos=datafile.tellg();
@@ -293,8 +273,8 @@ void bitcask::update_index(bitcask_index upindex,string key)
 void bitcask::merge()
 {
     /*
-     merge data in file
-     :delete data in file
+        merge data in file
+        function: delete data in file
      */
     int beans=1;
     long value_pos;
@@ -302,7 +282,7 @@ void bitcask::merge()
     for (;beans<=activefile;beans++) {
         string file=fileprev+to_string(beans);
         fstream datafile;
-        datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::in|ios::beg);
+        datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
         if (!datafile) {
             response+=cmd+prompt+"the data file "+file+" open failure!\n";
         }
@@ -316,7 +296,7 @@ void bitcask::merge()
         }
         datafile.close();
         //write to file
-        datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::out);
+        datafile.open(filepath+file,ios::binary|ios::out);
         if (!datafile) {
             response+=cmd+prompt+"the data file "+file+" open failure!\n";
         }
@@ -341,7 +321,7 @@ void bitcask::merge()
         {
             string file=fileprev+to_string(activefile);
             fstream datafile;
-            datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::in|ios::beg);
+            datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
             if (!datafile) {
                 response+=cmd+"the data file "+file+" open failure!\n";
             }
@@ -356,7 +336,7 @@ void bitcask::merge()
             for (int pos=1; pos<activefile; pos++) {
                 string mergefile=fileprev+to_string(pos);
                 fstream datafile;
-                datafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+mergefile,ios::binary|ios::in|ios::app);
+                datafile.open(filepath+mergefile,ios::binary|ios::in|ios::app);
                 if (!datafile) {
                     response+=cmd+prompt+"the data file "+file+" open failure!\n";
                 }
@@ -382,7 +362,7 @@ void bitcask::merge()
             else
             {
                 fstream newdatafile;
-                newdatafile.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/"+file,ios::binary|ios::out);
+                newdatafile.open(filepath+file,ios::binary|ios::out);
                 if (!newdatafile) {
                     response+=cmd+prompt+"the data file "+file+" open failure!\n";
                 }
@@ -401,7 +381,7 @@ void bitcask::flush()
 {
     //write index file to index file hint.bin
     fstream hint;
-    hint.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/hint.bin",ios::binary|ios::out);
+    hint.open(filepath+"hint.bin",ios::binary|ios::out);
     if (!hint) {
         response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
@@ -413,7 +393,7 @@ void bitcask::flush()
     hint.close();
     //write active file number to file filelog.bin
     fstream filelog;
-    filelog.open("/Users/Leviathan/Documents/Biubitcask/Biubitcask/filelog.bin",ios::binary|ios::out);
+    filelog.open(filepath+"filelog.bin",ios::binary|ios::out);
     if (!filelog) {
         response+=cmd+prompt+"the filelog.bin open failuer!\n";
     }
