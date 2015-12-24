@@ -173,7 +173,7 @@ bitcask_data bitcask::read_data(string key)
     {
         string file=search_index.file_id;
         fstream datafile;
-        datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
+        datafile.open(filepath+file,ios::binary|ios::in);
         if(!datafile)
             response+=cmd+prompt+"open file "+file+" failure\n";
         datafile.seekg(search_index.value_pos,ios::beg);
@@ -275,7 +275,7 @@ void bitcask::merge()
     for (;beans<=activefile;beans++) {
         string file=fileprev+to_string(beans);
         fstream datafile;
-        datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
+        datafile.open(filepath+file,ios::binary|ios::in);
         if (!datafile) {
             response+=cmd+prompt+"the data file "+file+" open failure!\n";
         }
@@ -314,7 +314,7 @@ void bitcask::merge()
         {
             string file=fileprev+to_string(activefile);
             fstream datafile;
-            datafile.open(filepath+file,ios::binary|ios::in|ios::beg);
+            datafile.open(filepath+file,ios::binary|ios::in);
             if (!datafile) {
                 response+=cmd+"the data file "+file+" open failure!\n";
             }

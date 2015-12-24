@@ -18,7 +18,7 @@ using namespace std;
 
 #define filemax 4096 //4kb
 
-const string filepath="/Users/Leviathan/Documents/Biubitcask/Biubitcask/";
+const string filepath="/home/leviathan/Downloads/Biunew/biu";
 const string fileprev="biu";
 const string prompt="Biu : ";
 const string cmd=">>> ";

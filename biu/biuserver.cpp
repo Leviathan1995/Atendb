@@ -63,12 +63,11 @@ int main()
     
     //绑定地址结构到套接字描述符
     //error =
-    bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    if(error < 0){/*出错*/
+    error=bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    if(error < 0){
         cout<<"bind error"<<endl;
         return -1;
     }
-    
     /*设置侦听*/
     error = listen(server_socket, BACKLOG);
     if(error < 0){										/*出错*/
