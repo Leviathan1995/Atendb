@@ -44,9 +44,9 @@ void exec(bitcask & bit,vector<string> cmd)
     else if([](string cmd){return cmd=="read";}(cmd[0]))
         bit.read_datainfo(cmd[1]);
 }
-string biu_api(string req)
+
+string biu_api(string req,bitcask &bit)
 {
-    bitcask bit;
     if (bit.start==false)
     {
         bit.init();
@@ -62,5 +62,4 @@ string biu_api(string req)
     }
     return bit.response;
 }
-
 
