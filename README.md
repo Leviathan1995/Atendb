@@ -7,11 +7,11 @@
 * Hint file:Hint中每一项的数据结构,与数据文件中的数据结构非常相似,不同的是它并不存储具体的value值,而是存储value的位置.每次引擎重启时,遍历Hint加载索引至内存中.
 
 ##Biu使用
-######Biu为C/S结构,首先启动Biu服务端
+#####Biu为C/S结构,首先启动Biu服务端
 	./bius
-######然后启动客户端
+#####然后启动客户端
 	./client
-######通过客户端进行数据的操作
+#####通过客户端进行数据的操作
 	insert(key,value)
 	update(key,value)
 	delete(key)
