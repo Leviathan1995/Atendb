@@ -18,7 +18,7 @@ using namespace std;
 
 #define filemax 4096 //4kb
 
-const string filepath="/home/leviathan/Downloads/Biunew/biu";
+const string filepath="/home/leviathan/Documents/";
 const string fileprev="biu";
 const string prompt="Biu : ";
 const string cmd=">>> ";
@@ -51,6 +51,7 @@ class bitcask
 public:
     bitcask();
     bool start;
+    bool finish;
     string response;
     unordered_map<string,bitcask_index> index;
     int activefile;
@@ -71,4 +72,3 @@ public:
 };
 
 #endif /* bitcask_h */
-
