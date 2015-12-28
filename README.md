@@ -24,7 +24,7 @@
 * read(key):终端读取显示数据
 
 ##License:
-  MIT
+         MIT
 
 
 
