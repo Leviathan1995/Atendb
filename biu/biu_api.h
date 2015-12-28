@@ -15,7 +15,7 @@
 #include "bitcask.h"
 using namespace std;
 
-string biu_api(string req);
+string biu_api(string req,bitcask &bit);
 void exec(bitcask & bit,vector<string> cmd);
 vector<string> intepretor(string req);
 
