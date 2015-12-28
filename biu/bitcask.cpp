@@ -19,6 +19,7 @@ using namespace std;
 bitcask::bitcask()
 {
     start=false;
+    finish=false;
 }
 
 bitcask::~bitcask()
@@ -30,6 +31,7 @@ bitcask::~bitcask()
 
 void bitcask::init()
 {
+    this->start=true;
     response+="The Biu bitcask storage system  (Version 1.0.1) \n";
     response+=cmd+"the bitcask is running...\n";
     activefile=0;
@@ -196,7 +198,7 @@ void bitcask::read_datainfo(string key)
         response+=cmd+"file id :"+index.file_id+"\n";
         response+=cmd+"value pos :"+to_string(index.value_pos)+"\n";
         response+=cmd+"value length :"+to_string(data.value_len)+"\n";
-        response+=cmd+"time :"+ctime(&data.timestamp)+"\n";
+        response+=cmd+"time :"+ctime(&data.timestamp);
     }
     else
         return;
