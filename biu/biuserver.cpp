@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "biu_api.h"
+#include "bitcask.h"
 using namespace std;
 
 #define PORT 8888    					/*侦听端口地址*/
@@ -25,7 +26,8 @@ void process_conn_server(int s)
 {
     ssize_t size = 0;
     char buffer[1024];				    //数据的缓冲区
-    string response="oh!";
+    string resp;
+    bitcask bit;
     for(;;){
         size = read(s, buffer, 1024);		    //从套接字中读取数据放到缓冲区buffer中
         if(size == 0){				    //没有数据
@@ -35,8 +37,11 @@ void process_conn_server(int s)
          响应客户端
          */
         string req=string(buffer);
-        response=biu_api(req);
-        write(s,response.c_str(), response.length());/*发给客户端*/
+	if(req=="quit")
+	    return;
+        resp=biu_api(req,bit);
+        write(s,resp.c_str(), resp.length());/*发给客户端*/
+	bit.response="";
     }
 }
 
@@ -96,4 +101,3 @@ int main()
     }
     return 0;
 }
-
