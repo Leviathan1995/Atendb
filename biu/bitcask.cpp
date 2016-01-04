@@ -19,7 +19,6 @@ using namespace std;
 bitcask::bitcask()
 {
     start=false;
-    finish=false;
 }
 
 bitcask::~bitcask()
