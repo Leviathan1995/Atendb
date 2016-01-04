@@ -1,37 +1,44 @@
--module(complex1).
+-module(biu).
 -export([start/1, stop/0, init/1]).
--export([foo/1, bar/1]).
+-export([insert/2,delete/1,update/2,read/1]).
 
-start(ExtPrg) ->
-    spawn(?MODULE, init, [ExtPrg]).
+start(Biu) ->
+    spawn(?MODULE, init, [Biu]).
 stop() ->
-    complex ! stop.
+    biulib ! stop.
 
-foo(X) ->
-    call_port({foo, X}).
-bar(Y) ->
-    call_port({bar, Y}).
+insert(Key,Value) ->
+    call_port({insert,Key,Value}).
+
+delete(Key) ->
+    call_port({delete,Key}).
+
+update(Key,Value) ->
+    call_port({update,Key,Value}).
+
+read(Key) ->
+    call_port({read,Key}).
 
 call_port(Msg) ->
-    complex ! {call, self(), Msg},
+    biulib ! {call, self(), Msg},
     receive
-	{complex, Result} ->
+	{biulib, Result} ->
 	    io:format("~s",[Result])
     end.
 
-init(ExtPrg) ->
-    register(complex, self()),
+init(Biu) ->
+    register(biulib, self()),
     process_flag(trap_exit, true),
-    Port = open_port({spawn, ExtPrg}, [{packet, 2}]),
+    Port = open_port({spawn, Biu}, [{packet, 2}]),
     loop(Port).
 
 loop(Port) ->
     receive
 	{call, Caller, Msg} ->
-	    Port ! {self(), {command, encode(Msg)}},
+	    Port ! {self(), {command,encode(Msg)}},
 	    receive
 		{Port, {data, Data}} ->
-		    Caller ! {complex, Data}
+		    Caller ! {biulib, Data}
 	    end,
 	    loop(Port);
 	stop ->
@@ -41,10 +48,10 @@ loop(Port) ->
 		    exit(normal)
 	    end;
 	{'EXIT', Port, Reason} ->
-	    exit(port_terminated)
+	    exit({port_terminated,Reason})
     end.
 
-encode({foo, X}) -> [1, X];
-encode({bar, Y}) -> [2, Y].
-
-decode([Int]) -> list_to_atom([Int]).
+encode({insert,Key,Value}) -> [1]++[Key]++["@"]++[Value];
+encode({update,Key,Value}) -> [2]++[Key]++["@"]++[Value];
+encode({delete,Key}) -> [3]++[Key];
+encode({read,Key}) -> [4]++[Key].
