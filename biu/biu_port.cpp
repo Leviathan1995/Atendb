@@ -1,26 +1,65 @@
+//
+//  biu_port.cpp
+//  Biubitcask
+//
+//  Created by Leviathan on 15/12/22.
+//  Copyright © 2015年 Leviathan. All rights reserved.
+//
 
-/* port.c */
 #include <iostream>
+#include <string>
+#include "biu_comm.h"
+#include "biu_api.h"
+#include "bitcask.h"
 using namespace std;
 typedef unsigned char byte;
 
-int main() {
-  int fn, arg, res;
-  byte buf[100];
-  while (read_cmd(buf) > 0)
-  {
-    fn = buf[0];
-    arg = buf[1];
-    
-    if (fn == 1) {
-      res = foo(arg);
-    } else if (fn == 2) {
-      res = bar(arg);
+string bts(byte *buff,int length)
+{
+    string str;
+    for (int index=1; index<length; index++) {
+        str+=buff[index];
     }
+    return str;
+}
 
-    buf[0] ='a';
-    buf[1]='c';
-    buf[2]='<';
-    write_cmd(buf,3);
-  }
+int stb(byte *buff,string response)
+{
+    for (int index=0; index<response.length(); index++) {
+        buff[index]=response[index];
+    }
+    return response.length();
+}
+
+int main()
+{
+    int fn,length;
+    string response;
+    byte buff[1024];
+    bitcask bit;
+    while ((length=read_cmd(buff)) > 0)
+    {
+        fn = buff[0];
+        string req=bts(buff,length);
+        if (fn==1) {
+            req="insert@"+req;
+        }
+        else if(fn==2)
+        {
+            req="update@"+req;
+        }
+        else if(fn==3)
+        {
+            req="delete@"+req;
+        }
+        else if(fn==4)
+        {
+            req="read@"+req;
+        }
+        response=biu_api(req,bit);
+        bit.response="";
+        length=stb(buff,response);
+        write_cmd(buff,length);
+    }
+    return 0;
 }
