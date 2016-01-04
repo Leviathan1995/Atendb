@@ -1,18 +1,26 @@
-/* erl_comm.c */
+//
+//  biu_comm.cpp
+//  Biubitcask
+//
+//  Created by Leviathan on 15/12/22.
+//  Copyright © 2015年 Leviathan. All rights reserved.
+//
 
-typedef unsigned char byte;
+#include <iostream>
+#include "biu_comm.h"
+using namespace std;
 
-read_cmd(byte *buf)
+int read_cmd(byte *buff)
 {
   int len;
 
-  if (read_exact(buf, 2) != 2)
+  if (read_exact(buff, 2) != 2)
     return(-1);
-  len = (buf[0] << 8) | buf[1];
-  return read_exact(buf, len);
+  len = (buff[0] << 8) | buff[1];
+  return read_exact(buff, len);
 }
 
-write_cmd(byte *buf, int len)
+int write_cmd(byte *buff, int len)
 {
   byte li;
 
@@ -22,15 +30,15 @@ write_cmd(byte *buf, int len)
   li = len & 0xff;
   write_exact(&li, 1);
 
-  return write_exact(buf, len);
+  return write_exact(buff, len);
 }
 
-read_exact(byte *buf, int len)
+int read_exact(byte *buff, int len)
 {
   int i, got=0;
 
   do {
-    if ((i = read(0, buf+got, len-got)) <= 0)
+    if ((i = read(0, buff+got, len-got)) <= 0)
       return(i);
     got += i;
   } while (got<len);
@@ -38,12 +46,12 @@ read_exact(byte *buf, int len)
   return(len);
 }
 
-write_exact(byte *buf, int len)
+int write_exact(byte *buff, int len)
 {
   int i, wrote = 0;
 
   do {
-    if ((i = write(1, buf+wrote, len-wrote)) <= 0)
+    if ((i = write(1, buff+wrote, len-wrote)) <= 0)
       return (i);
     wrote += i;
   } while (wrote<len);
