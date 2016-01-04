@@ -22,13 +22,17 @@ vector<string> intepretor(string req)
             token+=c;
         else if(c=='.'||c=='_')
             token+=c;
-        else if(c==','||c=='('||c==')'||c=='"'||c=='\'')
+        else if(c=='@')
         {
             if (token!="") {
                 cmd.push_back(token);
                 token="";
             }
         }
+    }
+    if (token!="") {
+        cmd.push_back(token);
+        token="";
     }
     return cmd;
 }
