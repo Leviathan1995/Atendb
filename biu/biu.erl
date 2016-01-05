@@ -1,9 +1,9 @@
 -module(biu).
--export([start/1, stop/0, init/1]).
+-export([start/0, stop/0, init/1]).
 -export([insert/2,delete/1,update/2,read/1]).
 
-start(Biu) ->
-    spawn(?MODULE, init, [Biu]).
+start() ->
+    spawn(?MODULE, init, ["./biustorge"]).
 stop() ->
     biulib ! stop.
 
