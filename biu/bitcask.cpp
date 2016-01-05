@@ -1,7 +1,7 @@
 
 //
 //  bitcask.cpp
-//  Bius
+//  Biu
 //
 //  Created by Leviathan on 15/12/23.
 //  Copyright © 2015年 Leviathan. All rights reserved.
@@ -18,43 +18,45 @@ using namespace std;
 
 bitcask::bitcask()
 {
-    start=false;
+    _start=false;
+    _activefile=0;
+    _finish=false;
+    _response="";
 }
 
 bitcask::~bitcask()
 {
     merge();
     flush();
-    response+="bye bye!\n";
+    _response+="bye bye!\n";
 }
 
 void bitcask::init()
 {
-    this->start=true;
-    response+="The Biu bitcask storage system  (Version 1.0.1) \n";
-    response+=cmd+"the bitcask is running...\n";
-    activefile=0;
+    this->_start=true;
+    _response+="The Biu bitcask storage system  (Version 1.0.1) \n";
+    _response+=cmd+"the bitcask is running...\n";
     long len;
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
-        response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
     len=hint.tellg();
     if (len==0) {
-        response+=cmd+prompt+"create file hint.bin successful!\n";
+        _response+=cmd+prompt+"create file hint.bin successful!\n";
     }
     else
     {
         /*
          load index to memory
          */
-        response+=cmd+"load index to memory...\n";
+        _response+=cmd+"load index to memory...\n";
         bitcask_index search;
         fstream hint;
         hint.open(filepath+"hint.bin",ios::binary|ios::in);
         if (!hint) {
-            response+=cmd+prompt+"the file hint.bin open failure!\n";
+            _response+=cmd+prompt+"the file hint.bin open failure!\n";
         }
         while ((hint.read((char *)(&search), sizeof(search)))) {
             bitcask_index insert;
@@ -69,26 +71,26 @@ void bitcask::init()
     fstream filelog;
     filelog.open(filepath+"filelog.bin",ios::binary|ios::in);
     if (!filelog) {
-        response+=cmd+prompt+"the file filelog.bin open failure!\n";
+        _response+=cmd+prompt+"the file filelog.bin open failure!\n";
     }
-    filelog.read((char *)(&activefile),sizeof(int));
+    filelog.read((char *)(&_activefile),sizeof(int));
     filelog.close();
-    if (activefile==0) {
-        response+=cmd+prompt+"create file filelog.bin successful!\n";
-        activefile=1;
+    if (_activefile==0) {
+        _response+=cmd+prompt+"create file filelog.bin successful!\n";
+        _activefile=1;
         filelog.open(filepath+"filelog.bin",ios::binary|ios::app);
-        filelog.write((char *)(&activefile), sizeof(int));
+        filelog.write((char *)(&_activefile), sizeof(int));
         filelog.close();
         return ;
     }
-    start=true;
+    _start=true;
 }
 
 void bitcask::insert_data(string key,string value)
 {
     bitcask_index search=read_index(key);
     if (search.key!="") {
-        response+=cmd+prompt+"the data "+key+" already exist!\n";
+        _response+=cmd+prompt+"the data "+key+" already exist!\n";
         return ;
     }
     //add data
@@ -103,15 +105,15 @@ void bitcask::insert_data(string key,string value)
     fstream datafile;
     bitcask_index newindex;
     newindex.key=key;
-    newindex.file_id=fileprev+to_string(activefile);
+    newindex.file_id=fileprev+to_string(_activefile);
     datafile.open(filepath+newindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
-        response+=cmd+prompt+newindex.file_id+" open failure\n";
+        _response+=cmd+prompt+newindex.file_id+" open failure\n";
     newindex.value_pos=datafile.tellg();
     if (newindex.value_pos>filemax||filemax-newindex.value_pos<sizeof(newdata)) {
-        activefile++;
+        _activefile++;
         newindex.value_pos=0;
-        newindex.file_id=fileprev+to_string(activefile);
+        newindex.file_id=fileprev+to_string(_activefile);
     }
     newindex.timestamp=newdata.timestamp;
     newindex.value_len=sizeof(newdata);
@@ -121,16 +123,16 @@ void bitcask::insert_data(string key,string value)
     write_index(newindex);
     //add to memory index array
     index[key]=newindex;
-    response+=cmd+"the data "+key+" insert successful\n";
+    _response+=cmd+"the data "+key+" insert successful\n";
 }
 
 void bitcask::write_data(bitcask_data newdata)
 {
-    string file=fileprev+to_string(activefile);
+    string file=fileprev+to_string(_activefile);
     fstream datafile;
     datafile.open(filepath+file,ios::binary|ios::app);
     if(!datafile)
-        response+=cmd+prompt+file+" open file "+file+" failure!\n";
+        _response+=cmd+prompt+file+" open file "+file+" failure!\n";
     datafile.write((char *)(&newdata),sizeof(newdata));
     datafile.close();
 }
@@ -140,7 +142,7 @@ void bitcask::write_index(bitcask_index newindex)
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
-        response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
     hint.write((char *)(&newindex), sizeof(newindex));
     hint.close();
@@ -176,13 +178,13 @@ bitcask_data bitcask::read_data(string key)
         fstream datafile;
         datafile.open(filepath+file,ios::binary|ios::in);
         if(!datafile)
-            response+=cmd+prompt+"open file "+file+" failure\n";
+            _response+=cmd+prompt+"open file "+file+" failure\n";
         datafile.seekg(search_index.value_pos,ios::beg);
         datafile.read((char *)(&search_data),sizeof(search_data));
         return search_data;
     }
     else
-        response+=cmd+prompt+"the data "+key+" does not exist!\n";
+        _response+=cmd+prompt+"the data "+key+" does not exist!\n";
     return search_data;
 }
 
@@ -192,12 +194,12 @@ void bitcask::read_datainfo(string key)
     bitcask_index index=read_index(key);
     if(index.value_valid==true)
     {
-        response+=cmd+"key :"+key+"\n";
-        response+=cmd+"value :"+data.value+"\n";
-        response+=cmd+"file id :"+index.file_id+"\n";
-        response+=cmd+"value pos :"+to_string(index.value_pos)+"\n";
-        response+=cmd+"value length :"+to_string(data.value_len)+"\n";
-        response+=cmd+"time :"+ctime(&data.timestamp);
+        _response+=cmd+"key :"+key+"\n";
+        _response+=cmd+"value :"+data.value+"\n";
+        _response+=cmd+"file id :"+index.file_id+"\n";
+        _response+=cmd+"value pos :"+to_string(index.value_pos)+"\n";
+        _response+=cmd+"value length :"+to_string(data.value_len)+"\n";
+        _response+=cmd+"time :"+ctime(&data.timestamp);
     }
     else
         return;
@@ -210,10 +212,10 @@ void bitcask::delete_data(string key)
     {
         delindex.value_valid=false;
         index[key]=delindex;
-        response+=cmd+prompt+"the data "+key+" already delete!\n";
+        _response+=cmd+prompt+"the data "+key+" already delete!\n";
     }
     else
-        response+=cmd+"the data "+key+" does not exist!\n";
+        _response+=cmd+"the data "+key+" does not exist!\n";
 }
 
 void bitcask::update_data(string key, string value)
@@ -221,7 +223,7 @@ void bitcask::update_data(string key, string value)
     
     bitcask_index search=read_index(key);
     if (search.key=="") {
-        response+=cmd+prompt+"the data "+key+" does not exist!\n";
+        _response+=cmd+prompt+"the data "+key+" does not exist!\n";
         return;
     }
     //update data
@@ -235,13 +237,13 @@ void bitcask::update_data(string key, string value)
     updata.timestamp=time(0);
     
     //update index
-    upindex.file_id=fileprev+to_string(activefile);
+    upindex.file_id=fileprev+to_string(_activefile);
     datafile.open(filepath+upindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
-        response+=cmd+prompt+"the file "+upindex.file_id+" open failure!\n";
+        _response+=cmd+prompt+"the file "+upindex.file_id+" open failure!\n";
     upindex.value_pos=datafile.tellg();
     if (upindex.value_pos>filemax||filemax-upindex.value_pos<sizeof(updata)) {
-        activefile++;
+        _activefile++;
     }
     upindex.timestamp=updata.timestamp;
     upindex.value_len=sizeof(updata);
@@ -249,7 +251,7 @@ void bitcask::update_data(string key, string value)
     datafile.close();
     write_data(updata);
     update_index(upindex,key);
-    response+=cmd+"the data "+key+" update successful\n";
+    _response+=cmd+"the data "+key+" update successful\n";
 }
 
 void bitcask::update_index(bitcask_index upindex,string key)
@@ -267,18 +269,18 @@ void bitcask::update_index(bitcask_index upindex,string key)
 void bitcask::merge()
 {
     /*
-        merge data in file
-        function: delete data in file
+     merge data in file
+     function: delete data in file
      */
     int beans=1;
     long value_pos;
     vector<bitcask_data> data_array;
-    for (;beans<=activefile;beans++) {
+    for (;beans<=_activefile;beans++) {
         string file=fileprev+to_string(beans);
         fstream datafile;
         datafile.open(filepath+file,ios::binary|ios::in);
         if (!datafile) {
-            response+=cmd+prompt+"the data file "+file+" open failure!\n";
+            _response+=cmd+prompt+"the data file "+file+" open failure!\n";
         }
         bitcask_data beans_data;
         datafile.seekg(0,ios::beg);
@@ -292,7 +294,7 @@ void bitcask::merge()
         //write to file
         datafile.open(filepath+file,ios::binary|ios::out);
         if (!datafile) {
-            response+=cmd+prompt+"the data file "+file+" open failure!\n";
+            _response+=cmd+prompt+"the data file "+file+" open failure!\n";
         }
         datafile.seekg(0, ios::beg);
         for(auto data:data_array)
@@ -309,15 +311,16 @@ void bitcask::merge()
     /*
      merge file
      */
-    if (activefile>=2)
+    if (
+        _activefile>=2)
     {
-        while (activefile>1)
+        while (_activefile>1)
         {
-            string file=fileprev+to_string(activefile);
+            string file=fileprev+to_string(_activefile);
             fstream datafile;
             datafile.open(filepath+file,ios::binary|ios::in);
             if (!datafile) {
-                response+=cmd+"the data file "+file+" open failure!\n";
+                _response+=cmd+"the data file "+file+" open failure!\n";
             }
             bitcask_data beans_data;
             datafile.seekg(0,ios::beg);
@@ -327,12 +330,12 @@ void bitcask::merge()
             }
             datafile.close();
             //write to file
-            for (int pos=1; pos<activefile; pos++) {
+            for (int pos=1; pos<_activefile; pos++) {
                 string mergefile=fileprev+to_string(pos);
                 fstream datafile;
                 datafile.open(filepath+mergefile,ios::binary|ios::in|ios::app);
                 if (!datafile) {
-                    response+=cmd+prompt+"the data file "+file+" open failure!\n";
+                    _response+=cmd+prompt+"the data file "+file+" open failure!\n";
                 }
                 long mergefile_end=datafile.tellg();
                 bitcask_data merge_data=data_array.back();
@@ -351,14 +354,14 @@ void bitcask::merge()
                 datafile.close();
             }
             if (data_array.size()==0) {
-                activefile--;
+                _activefile--;
             }
             else
             {
                 fstream newdatafile;
                 newdatafile.open(filepath+file,ios::binary|ios::out);
                 if (!newdatafile) {
-                    response+=cmd+prompt+"the data file "+file+" open failure!\n";
+                    _response+=cmd+prompt+"the data file "+file+" open failure!\n";
                 }
                 newdatafile.seekg(0, ios::beg);
                 for(auto data:data_array)
@@ -377,7 +380,7 @@ void bitcask::flush()
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::out);
     if (!hint) {
-        response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd+prompt+"the file hint.bin open failure!\n";
     }
     hint.seekg(0,ios::beg);
     for (auto indexinfo:index) {
@@ -389,7 +392,7 @@ void bitcask::flush()
     fstream filelog;
     filelog.open(filepath+"filelog.bin",ios::binary|ios::out);
     if (!filelog) {
-        response+=cmd+prompt+"the filelog.bin open failuer!\n";
+        _response+=cmd+prompt+"the filelog.bin open failuer!\n";
     }
-    filelog.write((char *)(&activefile), sizeof(int));
+    filelog.write((char *)(&_activefile), sizeof(int));
 }
