@@ -1,6 +1,6 @@
 //
-//  biu.cpp
-//  Biubitcask
+//  biu_api.cpp
+//  Biu
 //
 //  Created by Leviathan on 15/12/22.
 //  Copyright © 2015年 Leviathan. All rights reserved.
@@ -51,7 +51,7 @@ void exec(bitcask & bit,vector<string> cmd)
 
 string biu_api(string req,bitcask &bit)
 {
-    if (bit.start==false)
+    if (bit._start==false)
     {
         bit.init();
         vector<string> cmd;
@@ -64,6 +64,6 @@ string biu_api(string req,bitcask &bit)
         cmd=intepretor(req);
         exec(bit,cmd);
     }
-    return bit.response;
+    return bit._response;
 }
 
