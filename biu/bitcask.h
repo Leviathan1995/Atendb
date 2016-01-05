@@ -7,8 +7,8 @@
 //
 
 
-#ifndef bitcask_h
-#define bitcask_h
+#ifndef _BITCASK_H
+#define _BITCASK_H
 
 #include <iostream>
 #include <vector>
@@ -49,12 +49,9 @@ struct bitcask_index
 class bitcask
 {
 public:
+    
+    //function
     bitcask();
-    bool start;
-    bool finish;
-    string response;
-    unordered_map<string,bitcask_index> index;
-    int activefile;
     void init();
     void insert_data(string key,string value);
     void write_data(bitcask_data newdata);
@@ -66,9 +63,16 @@ public:
     void delete_data(string key);
     void update_data(string key,string value);
     void update_index(bitcask_index upindex,string key);
-    ~bitcask();
     void merge();
     void flush(); //flush index :hint.bin
+    ~bitcask();
+
+    //data
+    unordered_map<string,bitcask_index> index;
+    int _activefile;
+    bool _start;
+    bool _finish;
+    string _response;
 };
 
-#endif /* bitcask_h */
+#endif /* _BITCASK_H */
