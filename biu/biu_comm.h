@@ -1,6 +1,6 @@
 //
 //  biu_comm.h
-//  Bitcask
+//  Biu
 //
 //  Created by Leviathan on 16/1/5.
 //  Copyright © 2016年 Leviathan. All rights reserved.
@@ -20,4 +20,4 @@ int read_exact(byte *buff,int len);
 int write_exact(byte *buff,int len);
 
 
-#endif
+#endif/* _BIU_COMM_H */
