@@ -1,6 +1,6 @@
 //
 //  biu_comm.cpp
-//  Biubitcask
+//  Biu
 //
 //  Created by Leviathan on 15/12/22.
 //  Copyright © 2015年 Leviathan. All rights reserved.
