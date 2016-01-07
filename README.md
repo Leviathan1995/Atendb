@@ -1,5 +1,5 @@
 #The Biu
-   Biu是基于Bitcask模型的存储引擎。Bitcask是一个日志型的基于hash表结构和key-value存储模型.
+   Biu是基于Bitcask模型的存储引擎。Bitcask是一个日志型的基于hash表结构和key-value存储模型。底层存储使用C++,Tcp服务器使用Erlang实现
    
 ##Bitcask模型
 * 日志型的数据文件:即所有写操作只追加而不修改旧的数据.
