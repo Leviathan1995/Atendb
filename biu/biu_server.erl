@@ -1,9 +1,9 @@
 -module(biu_server).
--import(biu,[insert/2,update/2,delete/1,read/1]).
+-import(biu,[insert/2,update/2,delete/1,read/1,stop/0,start/0]).
 -export([start_server/0]).
 
 start_server() ->
-	{ok, Listen} = gen_tcp:listen(1320,
+	{ok, Listen} = gen_tcp:listen(1323,
 			 [binary, {packet, 4},{reuseaddr, true}, {active, true}]),
 	spawn(fun() -> par_connect(Listen) end).
 
@@ -18,6 +18,8 @@ loop(Socket) ->
 	    Lstr = binary_to_term(Request),
 	    Tstr=list_to_tuple(Lstr),
 	    case Tstr of
+		{start} ->
+			Response=biu:start();
 		{insert,Key,Value} ->
 			Response=biu:insert(Key,Value);
 		{update,Key,Value} ->
@@ -25,7 +27,10 @@ loop(Socket) ->
 		{delete,Key} ->
 			Response=biu:delete(Key);
 		{read,Key} ->
-			Response=biu:read(Key)
+			Response=biu:read(Key);
+		{stop} ->
+			Response=biu:stop()
+
 	    end,
 	    gen_tcp:send(Socket, term_to_binary(Response)), 
 	    loop(Socket);
