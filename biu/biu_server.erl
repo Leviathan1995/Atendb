@@ -1,39 +1,46 @@
--module(biu_server).
--import(biu,[insert/2,update/2,delete/1,read/1,stop/0,start/0]).
--export([start_server/0]).
+-module(biu_client).
+-export([biu_start/0,biu_insert/2,biu_update/2,biu_delete/1,biu_read/1,biu_stop/0]).
 
-start_server() ->
-	{ok, Listen} = gen_tcp:listen(1323,
-			 [binary, {packet, 4},{reuseaddr, true}, {active, true}]),
-	spawn(fun() -> par_connect(Listen) end).
+biu_client() ->
+    {ok, Socket} = 
+	gen_tcp:connect("localhost", 1323,
+			[binary, {packet, 4}]),
+    Socket.
 
-par_connect(Listen) ->
-	{ok,Socket}=gen_tcp:accept(Listen),
-	spawn(fun() -> par_connect(Listen) end),
-	loop(Socket).
+biu_start() ->
+    Socket=biu_client(),
+    ok=gen_tcp:send(Socket,term_to_binary([start])),
+    response(Socket).
 
-loop(Socket) ->
+biu_insert(Key,Value) ->
+    Socket=biu_client(),
+    ok = gen_tcp:send(Socket,term_to_binary([insert,Key,Value])),
+    response(Socket).
+
+biu_update(Key,Value) ->
+    Socket=biu_client(),
+    ok=gen_tcp:send(Socket,term_to_binary([update,Key,Value])),
+    response(Socket).
+
+biu_delete(Key) ->
+    Socket=biu_client(),
+    ok=gen_tcp:send(Socket,term_to_binary([delete,Key])),
+    response(Socket).
+
+biu_read(Key) ->
+    Socket=biu_client(),
+    ok=gen_tcp:send(Socket,term_to_binary([read,Key])),
+    response(Socket).
+
+biu_stop() ->
+    Socket=biu_client(),
+    ok=gen_tcp:send(Socket,term_to_binary([stop])),
+    response(Socket).
+
+response(Socket)->
     receive
-	{tcp, Socket, Request} ->
-	    Lstr = binary_to_term(Request),
-	    Tstr=list_to_tuple(Lstr),
-	    case Tstr of
-		{start} ->
-			Response=biu:start();
-		{insert,Key,Value} ->
-			Response=biu:insert(Key,Value);
-		{update,Key,Value} ->
-			Response=biu:update(Key,Value);
-		{delete,Key} ->
-			Response=biu:delete(Key);
-		{read,Key} ->
-			Response=biu:read(Key);
-		{stop} ->
-			Response=biu:stop()
-
-	    end,
-	    gen_tcp:send(Socket, term_to_binary(Response)), 
-	    loop(Socket);
-	{tcp_closed, Socket} ->
-	    io:format("Server socket closed~n")
+	{tcp,Socket,Bin} ->
+	    Val = binary_to_term(Bin),
+	    io:format("~s",[Val]),
+	    gen_tcp:close(Socket)
     end.
