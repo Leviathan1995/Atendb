@@ -3,7 +3,7 @@
 
 biu_client() ->
     {ok, Socket} = 
-	gen_tcp:connect("localhost", 1318,
+	gen_tcp:connect("localhost", 1320,
 			[binary, {packet, 4}]),
     Socket.
 
@@ -15,8 +15,7 @@ biu_insert(Key,Value)->
 response(Socket)->
     receive
 	{tcp,Socket,Bin} ->
-	    io:format("Client received binary = ~p~n",[Bin]),
 	    Val = binary_to_term(Bin),
-	    io:format("Client result = ~p~n",[Val]),
+	    io:format("~s",[Val]),
 	    gen_tcp:close(Socket)
     end.
