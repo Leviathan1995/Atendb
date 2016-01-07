@@ -1,8 +1,9 @@
 -module(biu_server).
+-import(biu,[insert/2]).
 -export([start_server/0]).
 
 start_server() ->
-	{ok, Listen} = gen_tcp:listen(1318,
+	{ok, Listen} = gen_tcp:listen(1320,
 			 [binary, {packet, 4},{reuseaddr, true}, {active, true}]),
 	spawn(fun() -> par_connect(Listen) end).
 
@@ -13,15 +14,14 @@ par_connect(Listen) ->
 
 loop(Socket) ->
     receive
-	{tcp, Socket, Response} ->
-	    Lstr = binary_to_term(Response),
-	    io:format("Server (unpacked)  ~p~n",[Lstr]),
+	{tcp, Socket, Request} ->
+	    Lstr = binary_to_term(Request),
 	    Tstr=list_to_tuple(Lstr),
 	    case Tstr of
 		{insert,Key,Value} ->
-			io:format("shq")
+			Response=biu:insert(Key,Value)
 	    end,
-	    gen_tcp:send(Socket, term_to_binary(Lstr)), 
+	    gen_tcp:send(Socket, term_to_binary(Response)), 
 	    loop(Socket);
 	{tcp_closed, Socket} ->
 	    io:format("Server socket closed~n")
