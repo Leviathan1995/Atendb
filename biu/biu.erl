@@ -3,9 +3,11 @@
 -export([insert/2,delete/1,update/2,read/1]).
 
 start() ->
-    spawn(?MODULE, init, ["./biustorge"]).
+    spawn(?MODULE, init, ["./biustorge"]),
+    "hello".
 stop() ->
-    biulib ! stop.
+    biulib ! stop,
+    "bye bye".
 
 insert(Key,Value) ->
     call_port({insert,Key,Value}).
