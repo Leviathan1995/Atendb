@@ -1,5 +1,5 @@
 -module(biu_server).
--import(biu,[insert/2]).
+-import(biu,[insert/2,update/2,delete/1,read/1]).
 -export([start_server/0]).
 
 start_server() ->
@@ -19,7 +19,13 @@ loop(Socket) ->
 	    Tstr=list_to_tuple(Lstr),
 	    case Tstr of
 		{insert,Key,Value} ->
-			Response=biu:insert(Key,Value)
+			Response=biu:insert(Key,Value);
+		{update,Key,Value} ->
+			Response=biu:update(Key,Value);
+		{delete,Key} ->
+			Response=biu:delete(Key);
+		{read,Key} ->
+			Response=biu:read(Key)
 	    end,
 	    gen_tcp:send(Socket, term_to_binary(Response)), 
 	    loop(Socket);
