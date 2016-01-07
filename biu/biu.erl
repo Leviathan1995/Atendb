@@ -23,7 +23,7 @@ call_port(Msg) ->
     biulib ! {call, self(), Msg},
     receive
 	{biulib, Result} ->
-	    io:format("~s",[Result])
+	    Result
     end.
 
 init(Biu) ->
