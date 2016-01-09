@@ -1,13 +1,17 @@
 -module(biu).
--export([start/0, stop/0, init/1]).
+-export([connect/0, start/0,stop/0, init/1]).
 -export([insert/2,delete/1,update/2,read/1]).
 
-start() ->
+connect() ->
     spawn(?MODULE, init, ["./biustorge"]),
-    "hello".
+    "connect successfully!".
+
+start() ->
+    call_port({start}).
+
 stop() ->
     biulib ! stop,
-    "bye bye".
+    "bye bye!".
 
 insert(Key,Value) ->
     call_port({insert,Key,Value}).
@@ -56,4 +60,5 @@ loop(Port) ->
 encode({insert,Key,Value}) -> [1]++[Key]++["@"]++[Value];
 encode({update,Key,Value}) -> [2]++[Key]++["@"]++[Value];
 encode({delete,Key}) -> [3]++[Key];
-encode({read,Key}) -> [4]++[Key].
+encode({read,Key}) -> [4]++[Key];
+encode({start}) ->[5].
