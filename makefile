@@ -1,17 +1,30 @@
-all:bius client
+## erlang source file
 
-bius:bitcask.o biu_api.o biuserver.o
-	g++ -g bitcask.o biu_api.o biuserver.o -o bius
-biuserver.o:biu/biuserver.cpp biu/biu_api.h
-	g++ -std=c++11 -g -c biu/biuserver.cpp
-biu_api.o:biu/biu_api.cpp biu/biu_api.h
-	g++ -std=c++11 -g -c biu/biu_api.cpp
+.SUFFIXES: .erl .beam 
+ 
+.erl.beam:
+	erlc -W $<
+ 
+ERL = erl -boot start_clean
+
+MODS=biu/biu biu/biu_client biu/biu_server
+
+all:compile biustorge
+
+compile: ${MODS:%=%.beam}
+
+## c++ source file
+
+biustorge:bitcask.o biu_api.o biu_comm.o biu_port.o
+	g++ -g bitcask.o biu_api.o biu_comm.o biu_port.o -o biustorge
 bitcask.o:biu/bitcask.cpp biu/bitcask.h
 	g++ -std=c++11 -g -c biu/bitcask.cpp
+biu_api.o:biu/biu_api.cpp biu/biu_api.h biu/bitcask.h
+	g++ -std=c++11 -g -c biu/biu_api.cpp
+biu_comm.o:biu/biu_comm.cpp biu/biu_comm.h
+	g++ -std=c++11 -g -c biu/biu_comm.cpp
+biu_port.o:biu/biu_port.cpp biu/biu_comm.h biu/biu_api.h biu/bitcask.h
+	g++ -std=c++11 -g -c biu/biu_port.cpp
 
-client:biuclient.o		
-	g++ -g biuclient.o -o client
-biuclient.o:biu/biuclient.cpp
-	g++  -std=c++11 -g -c biu/biuclient.cpp
-clean:	
-	rm -f bius client  *.o
+clean:
+	rm -rf *.o *.beam
