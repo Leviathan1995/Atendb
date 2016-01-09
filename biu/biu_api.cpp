@@ -47,23 +47,15 @@ void exec(bitcask & bit,vector<string> cmd)
         bit.delete_data(cmd[1]);
     else if([](string cmd){return cmd=="read";}(cmd[0]))
         bit.read_datainfo(cmd[1]);
+    else if([](string cmd){return cmd=="start";}(cmd[0]))
+        bit.start();
 }
 
 string biu_api(string req,bitcask &bit)
 {
-    if (bit._start==false)
-    {
-        bit.init();
-        vector<string> cmd;
-        cmd=intepretor(req);
-        exec(bit,cmd);
-    }
-    else
-    {
-        vector<string> cmd;
-        cmd=intepretor(req);
-        exec(bit,cmd);
-    }
+    vector<string> cmd;
+    cmd=intepretor(req);
+    exec(bit,cmd);
     return bit._response;
 }
 
