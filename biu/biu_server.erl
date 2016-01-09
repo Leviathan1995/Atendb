@@ -3,7 +3,7 @@
 -export([start_server/0]).
 
 start_server() ->
-	{ok, Listen} = gen_tcp:listen(1323,
+	{ok, Listen} = gen_tcp:listen(1335,
 			 [binary, {packet, 4},{reuseaddr, true}, {active, true}]),
 	spawn(fun() -> par_connect(Listen) end).
 
@@ -18,19 +18,20 @@ loop(Socket) ->
 	    Lstr = binary_to_term(Request),
 	    Tstr=list_to_tuple(Lstr),
 	    case Tstr of
-		{start} ->
+	    	{connect} ->
+	    		Response=biu:connect();
+	    	{start} ->
 			Response=biu:start();
-		{insert,Key,Value} ->
+	    	{insert,Key,Value} ->
 			Response=biu:insert(Key,Value);
-		{update,Key,Value} ->
+ 	    	{update,Key,Value} ->
 			Response=biu:update(Key,Value);
-		{delete,Key} ->
+	    	{delete,Key} ->
 			Response=biu:delete(Key);
-		{read,Key} ->
+	    	{read,Key} ->
 			Response=biu:read(Key);
 		{stop} ->
 			Response=biu:stop()
-
 	    end,
 	    gen_tcp:send(Socket, term_to_binary(Response)), 
 	    loop(Socket);
