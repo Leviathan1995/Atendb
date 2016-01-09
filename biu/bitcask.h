@@ -52,6 +52,7 @@ public:
     
     //function
     bitcask();
+    void start();
     void init();
     void insert_data(string key,string value);
     void write_data(bitcask_data newdata);
