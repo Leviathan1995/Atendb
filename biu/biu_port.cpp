@@ -56,8 +56,12 @@ int main()
         {
             req="read@"+req;
         }
+        else if(fn==5)
+        {
+            req="start@";
+        }
         response=biu_api(req,bit);
-        bit.response="";
+        bit._response="";
         length=stb(buff,response);
         write_cmd(buff,length);
     }
