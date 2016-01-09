@@ -1,4 +1,3 @@
-
 //
 //  bitcask.cpp
 //  Biu
@@ -29,6 +28,11 @@ bitcask::~bitcask()
     merge();
     flush();
     _response+="bye bye!\n";
+}
+
+void bitcask::start()
+{
+    this->init();
 }
 
 void bitcask::init()
