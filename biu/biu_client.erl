@@ -3,7 +3,7 @@
 
 biu_client() ->
     {ok, Socket} = 
-	gen_tcp:connect("localhost", 1335,
+	gen_tcp:connect("localhost", 1343,
 			[binary, {packet, 4}]),
     Socket.
 
