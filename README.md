@@ -18,11 +18,15 @@
 	$ erl
 	1> biu_client:biu_connect().   #连接服务器
 	2> biu_client:biu_start().     #启动biu存储引擎
+	
 #####通过客户端进行数据的操作
 	3>biu_client:biu_insert("biu","bitcask").
 	4>biu_client:biu_update("biu","leviathan").
 	5>biu_client:biu_read("biu").
 	6>biu_client:biu_delete("biu").
+
+#####客户端与服务器断开连接
+	7>biu_client:biu_stop().
 	
 ##Biu接口
 * insert(key,value):插入数据
@@ -32,8 +36,3 @@
 
 ##License:
 MIT
-
-
-
-
-
