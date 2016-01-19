@@ -39,28 +39,28 @@ void bitcask::init()
 {
     this->_start=true;
     _response+="The Biu bitcask storage system  (Version 1.0.1) \n";
-    _response+=cmd+"the bitcask is running...\n";
+    _response+=cmd_prompt+"the bitcask is running...\n";
     long len;
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
-        _response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd_prompt+"the file hint.bin open failure!\n";
     }
     len=hint.tellg();
     if (len==0) {
-        _response+=cmd+prompt+"create file hint.bin successful!\n";
+        _response+=cmd_prompt+"create file hint.bin successful!\n";
     }
     else
     {
         /*
          load index to memory
          */
-        _response+=cmd+"load index to memory...\n";
+        _response+=cmd_prompt+"load index to memory...\n";
         bitcask_index search;
         fstream hint;
         hint.open(filepath+"hint.bin",ios::binary|ios::in);
         if (!hint) {
-            _response+=cmd+prompt+"the file hint.bin open failure!\n";
+            _response+=cmd_prompt+"the file hint.bin open failure!\n";
         }
         while ((hint.read((char *)(&search), sizeof(search)))) {
             bitcask_index insert;
@@ -75,12 +75,12 @@ void bitcask::init()
     fstream filelog;
     filelog.open(filepath+"filelog.bin",ios::binary|ios::in);
     if (!filelog) {
-        _response+=cmd+prompt+"the file filelog.bin open failure!\n";
+        _response+=cmd_prompt+"the file filelog.bin open failure!\n";
     }
     filelog.read((char *)(&_activefile),sizeof(int));
     filelog.close();
     if (_activefile==0) {
-        _response+=cmd+prompt+"create file filelog.bin successful!\n";
+        _response+=cmd_prompt+"create file filelog.bin successful!\n";
         _activefile=1;
         filelog.open(filepath+"filelog.bin",ios::binary|ios::app);
         filelog.write((char *)(&_activefile), sizeof(int));
@@ -94,7 +94,7 @@ void bitcask::insert_data(string key,string value)
 {
     bitcask_index search=read_index(key);
     if (search.key!="") {
-        _response+=cmd+prompt+"the data "+key+" already exist!\n";
+        _response+=cmd_prompt+"the data "+key+" already exist!\n";
         return ;
     }
     //add data
@@ -104,7 +104,7 @@ void bitcask::insert_data(string key,string value)
     newdata.value=value;
     newdata.value_len=int(value.length());
     newdata.timestamp=time(0);
-    
+
     //add index
     fstream datafile;
     bitcask_index newindex;
@@ -112,7 +112,7 @@ void bitcask::insert_data(string key,string value)
     newindex.file_id=fileprev+to_string(_activefile);
     datafile.open(filepath+newindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
-        _response+=cmd+prompt+newindex.file_id+" open failure\n";
+        _response+=cmd_prompt+newindex.file_id+" open failure\n";
     newindex.value_pos=datafile.tellg();
     if (newindex.value_pos>filemax||filemax-newindex.value_pos<sizeof(newdata)) {
         _activefile++;
@@ -136,7 +136,7 @@ void bitcask::write_data(bitcask_data newdata)
     fstream datafile;
     datafile.open(filepath+file,ios::binary|ios::app);
     if(!datafile)
-        _response+=cmd+prompt+file+" open file "+file+" failure!\n";
+        _response+=cmd_prompt+file+" open file "+file+" failure!\n";
     datafile.write((char *)(&newdata),sizeof(newdata));
     datafile.close();
 }
@@ -146,7 +146,7 @@ void bitcask::write_index(bitcask_index newindex)
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
-        _response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd_prompt+"the file hint.bin open failure!\n";
     }
     hint.write((char *)(&newindex), sizeof(newindex));
     hint.close();
@@ -182,13 +182,13 @@ bitcask_data bitcask::read_data(string key)
         fstream datafile;
         datafile.open(filepath+file,ios::binary|ios::in);
         if(!datafile)
-            _response+=cmd+prompt+"open file "+file+" failure\n";
+            _response+=cmd_prompt+"open file "+file+" failure\n";
         datafile.seekg(search_index.value_pos,ios::beg);
         datafile.read((char *)(&search_data),sizeof(search_data));
         return search_data;
     }
     else
-        _response+=cmd+prompt+"the data "+key+" does not exist!\n";
+        _response+=cmd_prompt+"the data "+key+" does not exist!\n";
     return search_data;
 }
 
@@ -216,18 +216,18 @@ void bitcask::delete_data(string key)
     {
         delindex.value_valid=false;
         index[key]=delindex;
-        _response+=cmd+prompt+"the data "+key+" already delete!\n";
+        _response+=cmd_prompt+"the data "+key+" already delete!\n";
     }
     else
-        _response+=cmd+"the data "+key+" does not exist!\n";
+        _response+=cmd_prompt+"the data "+key+" does not exist!\n";
 }
 
 void bitcask::update_data(string key, string value)
 {
-    
+
     bitcask_index search=read_index(key);
     if (search.key=="") {
-        _response+=cmd+prompt+"the data "+key+" does not exist!\n";
+        _response+=cmd_prompt+"the data "+key+" does not exist!\n";
         return;
     }
     //update data
@@ -239,12 +239,12 @@ void bitcask::update_data(string key, string value)
     updata.value=value;
     updata.value_len=int(value.length());
     updata.timestamp=time(0);
-    
+
     //update index
     upindex.file_id=fileprev+to_string(_activefile);
     datafile.open(filepath+upindex.file_id,ios::binary|ios::in|ios::app);
     if(!datafile)
-        _response+=cmd+prompt+"the file "+upindex.file_id+" open failure!\n";
+        _response+=cmd_prompt+"the file "+upindex.file_id+" open failure!\n";
     upindex.value_pos=datafile.tellg();
     if (upindex.value_pos>filemax||filemax-upindex.value_pos<sizeof(updata)) {
         _activefile++;
@@ -255,7 +255,7 @@ void bitcask::update_data(string key, string value)
     datafile.close();
     write_data(updata);
     update_index(upindex,key);
-    _response+=cmd+"the data "+key+" update successful\n";
+    _response+=cmd_prompt+"the data "+key+" update successful\n";
 }
 
 void bitcask::update_index(bitcask_index upindex,string key)
@@ -284,7 +284,7 @@ void bitcask::merge()
         fstream datafile;
         datafile.open(filepath+file,ios::binary|ios::in);
         if (!datafile) {
-            _response+=cmd+prompt+"the data file "+file+" open failure!\n";
+            _response+=cmd_prompt+"the data file "+file+" open failure!\n";
         }
         bitcask_data beans_data;
         datafile.seekg(0,ios::beg);
@@ -298,7 +298,7 @@ void bitcask::merge()
         //write to file
         datafile.open(filepath+file,ios::binary|ios::out);
         if (!datafile) {
-            _response+=cmd+prompt+"the data file "+file+" open failure!\n";
+            _response+=cmd_prompt+"the data file "+file+" open failure!\n";
         }
         datafile.seekg(0, ios::beg);
         for(auto data:data_array)
@@ -324,7 +324,7 @@ void bitcask::merge()
             fstream datafile;
             datafile.open(filepath+file,ios::binary|ios::in);
             if (!datafile) {
-                _response+=cmd+"the data file "+file+" open failure!\n";
+                _response+=cmd_prompt+"the data file "+file+" open failure!\n";
             }
             bitcask_data beans_data;
             datafile.seekg(0,ios::beg);
@@ -339,7 +339,7 @@ void bitcask::merge()
                 fstream datafile;
                 datafile.open(filepath+mergefile,ios::binary|ios::in|ios::app);
                 if (!datafile) {
-                    _response+=cmd+prompt+"the data file "+file+" open failure!\n";
+                    _response+=cmd_prompt+"the data file "+file+" open failure!\n";
                 }
                 long mergefile_end=datafile.tellg();
                 bitcask_data merge_data=data_array.back();
@@ -365,7 +365,7 @@ void bitcask::merge()
                 fstream newdatafile;
                 newdatafile.open(filepath+file,ios::binary|ios::out);
                 if (!newdatafile) {
-                    _response+=cmd+prompt+"the data file "+file+" open failure!\n";
+                    _response+=cmd_prompt+"the data file "+file+" open failure!\n";
                 }
                 newdatafile.seekg(0, ios::beg);
                 for(auto data:data_array)
@@ -384,7 +384,7 @@ void bitcask::flush()
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::out);
     if (!hint) {
-        _response+=cmd+prompt+"the file hint.bin open failure!\n";
+        _response+=cmd_prompt+"the file hint.bin open failure!\n";
     }
     hint.seekg(0,ios::beg);
     for (auto indexinfo:index) {
@@ -396,7 +396,7 @@ void bitcask::flush()
     fstream filelog;
     filelog.open(filepath+"filelog.bin",ios::binary|ios::out);
     if (!filelog) {
-        _response+=cmd+prompt+"the filelog.bin open failuer!\n";
+        _response+=cmd_prompt+"the filelog.bin open failuer!\n";
     }
     filelog.write((char *)(&_activefile), sizeof(int));
 }

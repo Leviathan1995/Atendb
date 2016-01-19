@@ -1,4 +1,4 @@
-## erlang source file
+# erlang source file
 
 .SUFFIXES: .erl .beam 
  
@@ -9,11 +9,11 @@ ERL = erl -boot start_clean
 
 MODS=src/biu_server/biu src/biu_server/biu_server biu_client/biu_client
 
-all:compile biustorge
+all:compile biustorge create_data_folder
 
 compile: ${MODS:%=%.beam}
 
-## c++ source file
+# c++ source file
 
 biustorge:bitcask.o biu_api.o biu_comm.o biu_port.o
 	g++ -g bitcask.o biu_api.o biu_comm.o biu_port.o -o biustorge
@@ -25,6 +25,11 @@ biu_comm.o:src/biu_storage/biu_comm.cpp src/biu_storage/biu_comm.h
 	g++ -std=c++11 -g -c src/biu_storage/biu_comm.cpp
 biu_port.o:src/biu_storage/biu_port.cpp src/biu_storage/biu_comm.h src/biu_storage/biu_api.h src/biu_storage/bitcask.h
 	g++ -std=c++11 -g -c src/biu_storage/biu_port.cpp
+
+create_data_folder:
+	@echo "create data folder: ~/biudata" ;\
+		if [ ! -d ~/biudata  ] ; then mkdir ~/biudata ; fi ;\
+		chmod 777 ~/biudata
 
 clean:
 	rm -rf *.o *.beam biustorge

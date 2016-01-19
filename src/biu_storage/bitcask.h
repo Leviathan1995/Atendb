@@ -18,9 +18,9 @@ using namespace std;
 
 #define filemax 4096 //4kb
 
-const string filepath="/Users/Leviathan/Downloads/LibBiu/";
+const string filepath="/Users/yunba/biudata";
 const string fileprev="biu";
-const string prompt="Biu : ";
+const string cmd_prompt=">>> Biu : ";
 const string cmd=">>> ";
 const int number=0;
 //data
@@ -49,7 +49,7 @@ struct bitcask_index
 class bitcask
 {
 public:
-    
+
     //function
     bitcask();
     void start();
