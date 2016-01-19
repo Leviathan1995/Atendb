@@ -27,4 +27,4 @@ biu_port.o:src/biu_storage/biu_port.cpp src/biu_storage/biu_comm.h src/biu_stora
 	g++ -std=c++11 -g -c src/biu_storage/biu_port.cpp
 
 clean:
-	rm -rf *.o *.beam
+	rm -rf *.o *.beam biustorge
