@@ -7,7 +7,7 @@
  
 ERL = erl -boot start_clean
 
-MODS=biu/biu biu/biu_client biu/biu_server
+MODS=src/biu_server/biu src/biu_server/biu_server biu_client/biu_client
 
 all:compile biustorge
 
@@ -17,14 +17,14 @@ compile: ${MODS:%=%.beam}
 
 biustorge:bitcask.o biu_api.o biu_comm.o biu_port.o
 	g++ -g bitcask.o biu_api.o biu_comm.o biu_port.o -o biustorge
-bitcask.o:biu/bitcask.cpp biu/bitcask.h
-	g++ -std=c++11 -g -c biu/bitcask.cpp
-biu_api.o:biu/biu_api.cpp biu/biu_api.h biu/bitcask.h
-	g++ -std=c++11 -g -c biu/biu_api.cpp
-biu_comm.o:biu/biu_comm.cpp biu/biu_comm.h
-	g++ -std=c++11 -g -c biu/biu_comm.cpp
-biu_port.o:biu/biu_port.cpp biu/biu_comm.h biu/biu_api.h biu/bitcask.h
-	g++ -std=c++11 -g -c biu/biu_port.cpp
+bitcask.o:src/biu_storage/bitcask.cpp src/biu_storage/bitcask.h
+	g++ -std=c++11 -g -c src/biu_storage/bitcask.cpp
+biu_api.o:src/biu_storage/biu_api.cpp src/biu_storage/biu_api.h src/biu_storage/bitcask.h
+	g++ -std=c++11 -g -c src/biu_storage/biu_api.cpp
+biu_comm.o:src/biu_storage/biu_comm.cpp src/biu_storage/biu_comm.h
+	g++ -std=c++11 -g -c src/biu_storage/biu_comm.cpp
+biu_port.o:src/biu_storage/biu_port.cpp src/biu_storage/biu_comm.h src/biu_storage/biu_api.h src/biu_storage/bitcask.h
+	g++ -std=c++11 -g -c src/biu_storage/biu_port.cpp
 
 clean:
 	rm -rf *.o *.beam
