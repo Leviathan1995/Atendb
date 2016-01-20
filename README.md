@@ -6,15 +6,18 @@
 * 基于hash表的索引数据: 在Bitcask模型中,除了存储在磁盘上的数据文件,还有另外一块数据,那就是存储在内存中的hash表,hash表的作用是通过key值快速的定位到value的位置.
 * Hint file:Hint中每一项的数据结构,与数据文件中的数据结构非常相似,不同的是它并不存储具体的value值,而是存储value的位置.每次引擎重启时,遍历Hint加载索引至内存中.
 
-##Biu:
+##Biu(*nix):
+
+#####数据存储
+	存放路径:/Users/系统用户名/biudata/
 #####编译源文件
 	$ make 
 	
-#####Biu为c/c结构,需要打开两个Shell窗口,首先启动Biu服务器
+#####Biu为c/c结构,需要打开两个shell窗口,首先启动Biu服务器
 	$ erl
 	1> biu_server:start_server().
 	
-#####转达客户端Shell
+#####转达客户端shell
 	$ erl
 	1> biu_client:biu_connect().   #连接服务器
 	2> biu_client:biu_start().     #启动biu存储引擎
