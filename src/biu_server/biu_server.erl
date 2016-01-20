@@ -3,7 +3,7 @@
 -export([start_server/0,loop/2]).
 
 start_server() ->
-	{ok, Listen} = gen_tcp:listen(1345,
+	{ok, Listen} = gen_tcp:listen(1350,
 			 [binary, {packet, 4},{reuseaddr, true}, {active, true}]),
 	par_connect(Listen).
 

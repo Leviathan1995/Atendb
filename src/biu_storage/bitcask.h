@@ -18,7 +18,7 @@ using namespace std;
 
 #define filemax 4096 //4kb
 
-const string filepath="/Users/yunba/biudata";
+const string filepath="/Users/yunba/biudata/";
 const string fileprev="biu";
 const string cmd_prompt=">>> Biu : ";
 const string cmd=">>> ";
