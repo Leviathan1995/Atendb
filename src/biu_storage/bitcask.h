@@ -14,11 +14,11 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <pwd.h>
 using namespace std;
 
 #define filemax 4096 //4kb
 
-const string filepath="/Users/yunba/biudata/";
 const string fileprev="biu";
 const string cmd_prompt=">>> Biu : ";
 const string cmd=">>> ";
@@ -54,6 +54,7 @@ public:
     bitcask();
     void start();
     void init();
+    string getpath();
     void insert_data(string key,string value);
     void write_data(bitcask_data newdata);
     void write_index(bitcask_index newindex);
@@ -74,6 +75,7 @@ public:
     bool _start;
     bool _finish;
     string _response;
+    string filepath;
 };
 
 #endif /* _BITCASK_H */

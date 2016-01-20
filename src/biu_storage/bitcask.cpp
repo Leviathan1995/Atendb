@@ -9,11 +9,14 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h>
+#include <pwd.h>
 #include "bitcask.h"
 using namespace std;
+
 
 bitcask::bitcask()
 {
@@ -21,7 +24,9 @@ bitcask::bitcask()
     _activefile=0;
     _finish=false;
     _response="";
+    filepath="";
 }
+
 
 bitcask::~bitcask()
 {
@@ -37,6 +42,10 @@ void bitcask::start()
 
 void bitcask::init()
 {
+    struct passwd *pwd;
+    pwd=getpwuid(getuid());
+    string username=string(pwd->pw_name);
+    filepath="/Users/"+username+"/biudata/";
     this->_start=true;
     _response+="The Biu bitcask storage system  (Version 1.0.1) \n";
     _response+=cmd_prompt+"the bitcask is running...\n";
@@ -44,7 +53,7 @@ void bitcask::init()
     fstream hint;
     hint.open(filepath+"hint.bin",ios::binary|ios::app);
     if (!hint) {
-        _response+=cmd_prompt+"the file hint.bin open failure!\n";
+        _response+=cmd_prompt+"the file hint.bin open failure or maybe not exist!\n";
     }
     len=hint.tellg();
     if (len==0) {
@@ -60,7 +69,7 @@ void bitcask::init()
         fstream hint;
         hint.open(filepath+"hint.bin",ios::binary|ios::in);
         if (!hint) {
-            _response+=cmd_prompt+"the file hint.bin open failure!\n";
+            _response+=cmd_prompt+"the file hint.bin open failure or maybe not exist!\n";
         }
         while ((hint.read((char *)(&search), sizeof(search)))) {
             bitcask_index insert;
@@ -75,7 +84,7 @@ void bitcask::init()
     fstream filelog;
     filelog.open(filepath+"filelog.bin",ios::binary|ios::in);
     if (!filelog) {
-        _response+=cmd_prompt+"the file filelog.bin open failure!\n";
+        _response+=cmd_prompt+"the file filelog.bin open failure or maybe not exist!\n";
     }
     filelog.read((char *)(&_activefile),sizeof(int));
     filelog.close();
