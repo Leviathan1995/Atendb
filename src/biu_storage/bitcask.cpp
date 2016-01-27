@@ -63,7 +63,7 @@ void bitcask::init()
     {
         /*
          load index to memory
-         */
+        */
         _response+=cmd_prompt+"load index to memory...\n";
         bitcask_index search;
         fstream hint;
