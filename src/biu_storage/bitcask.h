@@ -7,8 +7,8 @@
 //
 
 
-#ifndef _BITCASK_H
-#define _BITCASK_H
+#ifndef BITCASK_H_
+#define BITCASK_H_
 
 #include <iostream>
 #include <vector>
@@ -78,4 +78,4 @@ public:
     string filepath;
 };
 
-#endif /* _BITCASK_H */
+#endif /* BITCASK_H_ */
