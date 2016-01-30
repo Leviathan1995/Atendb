@@ -6,8 +6,8 @@
 //  Copyright © 2015年 Leviathan. All rights reserved.
 //
 
-#ifndef _BIU_API_H
-#define _BIU_API_H
+#ifndef BIU_API_H_
+#define BIU_API_H_
 
 #include <iostream>
 #include <vector>
@@ -20,4 +20,4 @@ void exec(bitcask & bit,vector<string> cmd);
 vector<string> intepretor(string req);
 
 
-#endif /* _BIU_API_H */
+#endif /* BIU_API_H_ */
