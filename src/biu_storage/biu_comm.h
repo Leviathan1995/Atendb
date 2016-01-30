@@ -6,8 +6,8 @@
 //  Copyright © 2016年 Leviathan. All rights reserved.
 //
 
-#ifndef _BIU_COMM_H
-#define _BIU_COMM_H
+#ifndef BIU_COMM_H_
+#define BIU_COMM_H_
 
 #include <iostream>
 using namespace std;
@@ -20,4 +20,4 @@ int read_exact(byte *buff,int len);
 int write_exact(byte *buff,int len);
 
 
-#endif/* _BIU_COMM_H */
+#endif/* BIU_COMM_H_ */
