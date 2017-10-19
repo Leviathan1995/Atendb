@@ -23,6 +23,7 @@ const string fileprev="biu";
 const string cmd_prompt=">>> Biu : ";
 const string cmd=">>> ";
 const int number=0;
+
 //data
 struct bitcask_data
 {
@@ -32,6 +33,15 @@ struct bitcask_data
     int value_len;
     time_t timestamp;
     //crc
+};
+
+
+struct bitcask_data2 {
+    time_t timestamp;
+    long key_size;
+    long value_size;
+    std::string key;
+    std::string value;
 };
 
 //index
@@ -45,6 +55,16 @@ struct bitcask_index
     bool value_valid;
 };
 
+// the format store in hint file
+struct bitcask_index2 {
+    unsigned long crc;
+    time_t timestamp;
+    long file_id;
+    long value_pos;
+    long value_size;
+    long key_size;
+    std::string key;
+};
 //bitcask
 class bitcask
 {
