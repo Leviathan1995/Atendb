@@ -1,0 +1,19 @@
+lanauage: cpp
+
+install:
+  - sudo apt-get install -y libgtest-dev cmake
+  - cd /usr/src/gtest
+  - sudo cmake .
+  - sudo make
+  - sudo mv libgtest* /usr/lib/
+  - cd "${TRAVIS_BUILD_DIR}"
+ 
+os:
+  - linux 
+
+compiler:
+  - gcc
+
+script:
+  - cmake .
+  - make
